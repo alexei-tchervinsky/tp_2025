@@ -2,6 +2,7 @@
 #include <fstream>
 #include <vector>
 #include <iterator>
+#include <limits>
 
 int main()
 {
@@ -12,9 +13,18 @@ int main()
   auto ins = std::back_inserter(v);
   // ins имеет типstd::back_insert_iterator<std::vector<int>>
   while (beg != end) {
+    std::cout << *beg << '\n';
     *ins = *beg;
     ++beg;
-    ++ins;// не имеет эффекта
+    if (beg == end && !in.eof())
+    {
+      in.clear();
+      in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      std::istream_iterator<int> beg1(in);
+      beg = beg1;
+      continue;
+    }
+    // ++ins;// не имеет эффекта
   }
 
   for (auto e : v)
