@@ -4,27 +4,52 @@
 #include <iterator>
 #include <limits>
 #include <algorithm>
+#include "stream_guard.hpp"
+
+
+struct DataStruct
+{
+  int i;
+};
+
+std::istream & operator >> (std::istream & in, DataStruct & dest)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  DataStruct temp;
+  in >> std::skipws >> temp.i;
+  if (!in)
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+  dest = temp;
+  return in;
+}
+
+std::ostream & operator << (std::ostream & out, const DataStruct & data)
+{
+  StreamGuard guard(out);
+  out << data.i;
+  return out;
+}
 
 int main()
 {
-  std::vector<int> v{ 1, 2, 3 };
-  // std::ifstream in("data.txt");// в файле:4 5 6
-  std::istream_iterator<int> beg(std::cin);
-  std::istream_iterator<int> end;
-  auto ins = std::back_inserter(v);
-  // ins имеет типstd::back_insert_iterator<std::vector<int>>
+  std::vector<DataStruct> v;
   while(!std::cin.eof())
   {
-    std::copy(beg, end, ins);
-    std::cout << *beg << '\n';
+    std::copy(
+      std::istream_iterator< DataStruct >(std::cin),
+      std::istream_iterator< DataStruct >(),
+      std::back_inserter(v));
     if (std::cin.fail())
-    // if (beg == end)
     {
       std::cin.clear();
       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-      std::istream_iterator<int> beg1(std::cin);
-      beg = beg1;
-      // continue;
     }
   }
 
@@ -33,5 +58,6 @@ int main()
     std::cout << e << ',';
   }
   std::cout << '\n';
+
   return 0;
 }
