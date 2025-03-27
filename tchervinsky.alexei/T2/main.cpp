@@ -7,12 +7,12 @@
 int main()
 {
   std::vector<int> v{ 1, 2, 3 };
-  std::ifstream in("data.txt");// в файле:4 5 6
-  std::istream_iterator<int> beg(in);
+  // std::ifstream in("data.txt");// в файле:4 5 6
+  std::istream_iterator<int> beg(std::cin);
   std::istream_iterator<int> end;
   auto ins = std::back_inserter(v);
   // ins имеет типstd::back_insert_iterator<std::vector<int>>
-  while(!in.eof())
+  while(!std::cin.eof())
   {
     std::cout << *beg << '\n';
     *ins = *beg;
@@ -21,9 +21,9 @@ int main()
 // thus making an end-of-sequence indicator.
     if (beg == end)
     {
-      in.clear();
-      in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-      std::istream_iterator<int> beg1(in);
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      std::istream_iterator<int> beg1(std::cin);
       beg = beg1;
       continue;
     }
