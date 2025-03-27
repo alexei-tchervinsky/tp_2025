@@ -3,6 +3,7 @@
 #include <vector>
 #include <iterator>
 #include <limits>
+#include <algorithm>
 
 int main()
 {
@@ -14,18 +15,16 @@ int main()
   // ins имеет типstd::back_insert_iterator<std::vector<int>>
   while(!std::cin.eof())
   {
+    std::copy(beg, end, ins);
     std::cout << *beg << '\n';
-    *ins = *beg;
-    ++beg;
-// If the extraction fails, the object effectively replaces the stored pointer with a null pointer,
-// thus making an end-of-sequence indicator.
-    if (beg == end)
+    if (std::cin.fail())
+    // if (beg == end)
     {
       std::cin.clear();
       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
       std::istream_iterator<int> beg1(std::cin);
       beg = beg1;
-      continue;
+      // continue;
     }
   }
 
