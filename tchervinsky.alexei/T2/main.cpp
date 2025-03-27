@@ -12,11 +12,14 @@ int main()
   std::istream_iterator<int> end;
   auto ins = std::back_inserter(v);
   // ins имеет типstd::back_insert_iterator<std::vector<int>>
-  while (beg != end) {
+  while(!in.eof())
+  {
     std::cout << *beg << '\n';
     *ins = *beg;
     ++beg;
-    if (beg == end && !in.eof())
+// If the extraction fails, the object effectively replaces the stored pointer with a null pointer,
+// thus making an end-of-sequence indicator.
+    if (beg == end)
     {
       in.clear();
       in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -24,7 +27,6 @@ int main()
       beg = beg1;
       continue;
     }
-    // ++ins;// не имеет эффекта
   }
 
   for (auto e : v)
