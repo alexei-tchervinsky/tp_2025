@@ -37,6 +37,12 @@ std::ostream & operator << (std::ostream & out, const DataStruct & data)
   return out;
 }
 
+bool operator < (const DataStruct & a, const DataStruct & b)
+{
+  return (a.i < b.i);
+}
+
+
 int main()
 {
   std::vector<DataStruct> v;
@@ -53,11 +59,21 @@ int main()
     }
   }
 
+  std::sort(v.begin(), v.end());
+
+  std::copy(
+    std::begin(v),
+    std::end(v),
+    std::ostream_iterator< DataStruct >(std::cout, "\n")
+  );
+
+#if 0
   for (auto e : v)
   {
     std::cout << e << ',';
   }
   std::cout << '\n';
+#endif
 
   return 0;
 }
