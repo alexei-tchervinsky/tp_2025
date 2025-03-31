@@ -11,10 +11,12 @@ using narumov::DataStruct;
 int main() {
     std::vector<DataStruct> ds;
     while(!std::cin.eof()) {
-        DataStruct temp;
-        std::cin >> temp;
+        std::copy(
+            std::istream_iterator<DataStruct>(std::cin),
+            std::istream_iterator<DataStruct>(),
+            std::back_inserter(ds)
+        );
         if(!std::cin.fail()) {
-            ds.push_back(temp);
             continue;
         }
         std::cin.clear();
