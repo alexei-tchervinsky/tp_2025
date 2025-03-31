@@ -4,16 +4,22 @@
 #include <iostream>
 #include <iterator>
 #include <algorithm>
+#include <limits>
 
 using narumov::DataStruct;
 
 int main() {
     std::vector<DataStruct> ds;
-    std::copy(
-        std::istream_iterator<DataStruct>(std::cin),
-        std::istream_iterator<DataStruct>(),
-        std::back_inserter(ds)
-    );
+    while(!std::cin.eof()) {
+        DataStruct temp;
+        std::cin >> temp;
+        if(!std::cin.fail()) {
+            ds.push_back(temp);
+            continue;
+        }
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
     std::sort(ds.begin(), ds.end(), narumov::compareDataStruct);
     std::copy(
         ds.begin(),
