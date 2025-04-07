@@ -1,6 +1,6 @@
 #include <iostream>
 
 int main() {
-    std::cout << "буабид.лайес" << std::endl;
+    std::cout << "bouabid.lyes" << std::endl;
     return 0;
 }
