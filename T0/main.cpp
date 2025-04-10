@@ -1,6 +1,5 @@
 #include <iostream>
-
 int main() {
-    std::cout << "tarasov.fedor" << '\n';
+    std::cout << "tarasov.fedor" << std::endl;
     return 0;
 }
