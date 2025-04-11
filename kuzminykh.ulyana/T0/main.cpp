@@ -1,5 +1,8 @@
 #include <iostream>
-int main() {
+
+int main()
+{
 	std::cout << "kuzminykh.ulyana" << '\n';
+
 	return 0;
 }
