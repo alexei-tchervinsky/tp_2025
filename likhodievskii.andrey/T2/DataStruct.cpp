@@ -13,7 +13,7 @@ namespace likhodievskii {
         if (!sentry) {
             return os;
         }
-        os << "(:key1 ";
+        os << "(:key1 0x";
         os << std::setbase(16) << ds.key1_;
         os << ":key2 #c(";
         DataStruct::printDouble(os, ds.key2_.real());

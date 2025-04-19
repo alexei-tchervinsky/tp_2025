@@ -11,19 +11,18 @@ using namespace likhodievskii;
 
 int main() {
     std::vector<DataStruct> ds;
-    while (!std::cin.eof()) {
+    while(!std::cin.eof()) {
         std::copy(
-            std::istream_iterator<DataStruct>{std::cin},
+            std::istream_iterator<DataStruct>(std::cin),
             std::istream_iterator<DataStruct>(),
             std::back_inserter(ds)
         );
-        if (!std::cin.fail()) {
+        if(!std::cin.fail()) {
             continue;
         }
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
-
     std::sort(ds.begin(), ds.end(), compare);
     std::copy(
         ds.begin(),
