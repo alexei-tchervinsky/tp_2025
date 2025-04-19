@@ -29,15 +29,15 @@ namespace likhodievskii {
         unsigned long long &ref;
     };
 
-    inline std::istream &operator>>(std::istream &in, DelimiterIO &&dest);
+    std::istream &operator>>(std::istream &in, DelimiterIO &&dest);
 
-    inline std::istream &operator>>(std::istream &in, LabelIO &&dest);
+    std::istream &operator>>(std::istream &in, LabelIO &&dest);
 
-    inline std::istream &operator>>(std::istream &in, ComplexDoubleIO &&dest);
+    std::istream &operator>>(std::istream &in, ComplexDoubleIO &&dest);
 
-    inline std::istream &operator>>(std::istream &in, HexUnsignedLongLongIO &&dest);
+    std::istream &operator>>(std::istream &in, HexUnsignedLongLongIO &&dest);
 
-    inline std::istream &operator>>(std::istream &in, StringIO &&dest);
+    std::istream &operator>>(std::istream &in, StringIO &&dest);
 }
 
 #endif //IO_OBJECTS_HPP

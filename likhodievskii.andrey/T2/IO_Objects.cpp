@@ -5,7 +5,7 @@
 #include "IO_Objects.hpp"
 
 namespace likhodievskii {
-    inline std::istream &operator>>(std::istream &in, DelimiterIO &&dest) {
+     std::istream &operator>>(std::istream &in, DelimiterIO &&dest) {
         std::istream::sentry sentry(in);
         if (!sentry) {
             return in;
@@ -18,7 +18,7 @@ namespace likhodievskii {
         return in;
     }
 
-    inline std::istream &operator>>(std::istream &in, HexUnsignedLongLongIO &&dest) {
+    std::istream &operator>>(std::istream &in, HexUnsignedLongLongIO &&dest) {
         std::istream::sentry sentry(in);
         if (!sentry) {
             return in;
@@ -34,7 +34,7 @@ namespace likhodievskii {
     }
 
 
-    inline std::istream &operator>>(std::istream &in, StringIO &&dest) {
+    std::istream &operator>>(std::istream &in, StringIO &&dest) {
         std::istream::sentry sentry(in);
         if (!sentry) {
             return in;
@@ -43,7 +43,7 @@ namespace likhodievskii {
     }
 
 
-    inline std::istream &operator>>(std::istream &in, LabelIO &&dest) {
+    std::istream &operator>>(std::istream &in, LabelIO &&dest) {
         std::istream::sentry sentry(in);
         if (!sentry) {
             return in;
@@ -55,7 +55,7 @@ namespace likhodievskii {
         return in;
     }
 
-    inline std::istream &operator>>(std::istream &in, ComplexDoubleIO &&dest) {
+    std::istream &operator>>(std::istream &in, ComplexDoubleIO &&dest) {
         std::istream::sentry sentry(in);
         if (!sentry) {
             return in;
