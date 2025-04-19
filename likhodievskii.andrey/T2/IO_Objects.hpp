@@ -13,10 +13,6 @@ namespace likhodievskii {
         char delimiter;
     };
 
-    struct LabelIO {
-        std::string label;
-    };
-
     struct ComplexDoubleIO {
         std::complex<double> &ref;
     };
@@ -30,8 +26,6 @@ namespace likhodievskii {
     };
 
     std::istream &operator>>(std::istream &in, DelimiterIO &&dest);
-
-    std::istream &operator>>(std::istream &in, LabelIO &&dest);
 
     std::istream &operator>>(std::istream &in, ComplexDoubleIO &&dest);
 

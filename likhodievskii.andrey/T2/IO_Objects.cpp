@@ -10,7 +10,7 @@ namespace likhodievskii {
         if (!sentry) {
             return in;
         }
-        char c = '\0';
+        char c;
         in >> c;
         if (in && (c != dest.delimiter)) {
             in.setstate(std::ios::failbit);
@@ -43,25 +43,13 @@ namespace likhodievskii {
     }
 
 
-    std::istream &operator>>(std::istream &in, LabelIO &&dest) {
-        std::istream::sentry sentry(in);
-        if (!sentry) {
-            return in;
-        }
-        std::string data = "";
-        if ((in >> StringIO{data}) && (data != dest.label)) {
-            in.setstate(std::ios::failbit);
-        }
-        return in;
-    }
-
     std::istream &operator>>(std::istream &in, ComplexDoubleIO &&dest) {
         std::istream::sentry sentry(in);
         if (!sentry) {
             return in;
         }
         double real, imag;
-        in >> LabelIO{"#c"} >> DelimiterIO{'('};
+        in >> DelimiterIO{'#'} >> DelimiterIO{'c'} >> DelimiterIO{'('};
         in >> real >> imag;
         in >> DelimiterIO{')'};
         dest.ref = std::complex<double>(real, imag);

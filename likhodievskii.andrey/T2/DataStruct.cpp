@@ -21,7 +21,7 @@ namespace likhodievskii {
         DataStruct::printDouble(os, ds.key2_.imag());
         os << "):key3 \"";
         os << ds.key3_;
-        os << "\" :)";
+        os << "\":)";
         return os;
     }
 
@@ -30,7 +30,7 @@ namespace likhodievskii {
         if (std::floor(x) == x) {
             out << std::fixed << std::setprecision(1) << x;
         } else {
-            out << std::scientific << x;
+            out  << x;
         }
     }
 
@@ -43,11 +43,12 @@ namespace likhodievskii {
         DataStruct tmp;
         in >> DelimiterIO{'('};
         for (std::size_t i = 0; i < 3; i++) {
-            short number;
-            in >> DelimiterIO{':'} >> LabelIO{"key"} >> number;
+            short number = 0;
+            in >> DelimiterIO{':' } >> DelimiterIO{ 'k' };
+            in >> DelimiterIO{ 'e' } >> DelimiterIO{ 'y' } >> number;
             switch (number) {
                 case HEX: {
-                    in >> HexUnsignedLongLongIO{tmp.key1_};
+                    in >> HexUnsignedLongLongIO{tmp.key1_ };
                     break;
                 }
                 case COMPLEX: {
