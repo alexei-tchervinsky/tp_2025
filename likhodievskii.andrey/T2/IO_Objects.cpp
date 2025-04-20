@@ -12,7 +12,7 @@ namespace likhodievskii {
             return in;
         }
         std::string label = "";
-        for (int i = 0; i < dest.label.length(); ++i) {
+        for (std::size_t i = 0; i < dest.label.length(); ++i) {
             label += in.get();
         }
         if (in && (label != dest.label)) {
