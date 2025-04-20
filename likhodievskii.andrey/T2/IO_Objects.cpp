@@ -5,7 +5,24 @@
 #include "IO_Objects.hpp"
 
 namespace likhodievskii {
-     std::istream &operator>>(std::istream &in, DelimiterIO &&dest) {
+#if 1
+    std::istream &operator>>(std::istream &in, LabelIO &&dest) {
+        std::istream::sentry sentry(in);
+        if (!sentry) {
+            return in;
+        }
+        std::string label = "";
+        for (int i = 0; i < dest.label.length(); ++i) {
+            label += in.get();
+        }
+        if (in && (label != dest.label)) {
+            in.setstate(std::ios_base::failbit);
+        }
+        return in;
+    }
+#endif
+
+    std::istream &operator>>(std::istream &in, DelimiterIO &&dest) {
         std::istream::sentry sentry(in);
         if (!sentry) {
             return in;
@@ -49,7 +66,11 @@ namespace likhodievskii {
             return in;
         }
         double real, imag;
+#if 1
+        in >> LabelIO{"#c("};
+#else
         in >> DelimiterIO{'#'} >> DelimiterIO{'c'} >> DelimiterIO{'('};
+#endif
         in >> real >> imag;
         in >> DelimiterIO{')'};
         dest.ref = std::complex<double>(real, imag);

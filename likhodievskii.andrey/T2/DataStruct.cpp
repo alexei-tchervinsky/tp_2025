@@ -14,7 +14,7 @@ namespace likhodievskii {
             return os;
         }
         os << "(:key1 0x";
-        os << std::setbase(16) <<std::uppercase << ds.key1_;
+        os << std::setbase(16) << std::uppercase << ds.key1_;
         os << ":key2 #c(";
         DataStruct::printDouble(os, ds.key2_.real());
         os << " ";
@@ -30,7 +30,7 @@ namespace likhodievskii {
         if (std::floor(x) == x) {
             out << std::fixed << std::setprecision(1) << x;
         } else {
-            out  << x;
+            out << x;
         }
     }
 
@@ -44,11 +44,16 @@ namespace likhodievskii {
         in >> DelimiterIO{'('};
         for (std::size_t i = 0; i < 3; i++) {
             short number = 0;
+
+#if 1
+            in >> DelimiterIO{':'} >> LabelIO{"key"} >> number;
+#else
             in >> DelimiterIO{':' } >> DelimiterIO{ 'k' };
             in >> DelimiterIO{ 'e' } >> DelimiterIO{ 'y' } >> number;
+#endif
             switch (number) {
                 case HEX: {
-                    in >> HexUnsignedLongLongIO{tmp.key1_ };
+                    in >> HexUnsignedLongLongIO{tmp.key1_};
                     break;
                 }
                 case COMPLEX: {

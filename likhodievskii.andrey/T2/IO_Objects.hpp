@@ -25,6 +25,16 @@ namespace likhodievskii {
         unsigned long long &ref;
     };
 
+    #if 1
+
+    struct LabelIO {
+        std::string label;
+    };
+
+    std::istream& operator>>(std::istream&, LabelIO&&);
+
+    #endif
+
     std::istream &operator>>(std::istream &in, DelimiterIO &&dest);
 
     std::istream &operator>>(std::istream &in, ComplexDoubleIO &&dest);
