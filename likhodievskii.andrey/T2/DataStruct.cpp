@@ -45,12 +45,8 @@ namespace likhodievskii {
         for (std::size_t i = 0; i < 3; i++) {
             short number = 0;
 
-#if 1
             in >> DelimiterIO{':'} >> LabelIO{"key"} >> number;
-#else
-            in >> DelimiterIO{':' } >> DelimiterIO{ 'k' };
-            in >> DelimiterIO{ 'e' } >> DelimiterIO{ 'y' } >> number;
-#endif
+
             switch (number) {
                 case HEX: {
                     in >> HexUnsignedLongLongIO{tmp.key1_};

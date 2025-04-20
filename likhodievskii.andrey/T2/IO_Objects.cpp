@@ -5,7 +5,7 @@
 #include "IO_Objects.hpp"
 
 namespace likhodievskii {
-#if 1
+
     std::istream &operator>>(std::istream &in, LabelIO &&dest) {
         std::istream::sentry sentry(in);
         if (!sentry) {
@@ -20,7 +20,6 @@ namespace likhodievskii {
         }
         return in;
     }
-#endif
 
     std::istream &operator>>(std::istream &in, DelimiterIO &&dest) {
         std::istream::sentry sentry(in);
@@ -66,11 +65,9 @@ namespace likhodievskii {
             return in;
         }
         double real, imag;
-#if 1
+
         in >> LabelIO{"#c("};
-#else
-        in >> DelimiterIO{'#'} >> DelimiterIO{'c'} >> DelimiterIO{'('};
-#endif
+
         in >> real >> imag;
         in >> DelimiterIO{')'};
         dest.ref = std::complex<double>(real, imag);
