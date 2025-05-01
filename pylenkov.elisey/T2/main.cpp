@@ -9,7 +9,7 @@ struct DataStruct
     unsigned long long key2;
     std::string key3;
 
-    // перегруженный оператор ввода 
+    // перегруженный оператор ввода
     friend std::istream& operator>>(std::istream& is, DataStruct& ds)
     {
         std::string line;
@@ -48,7 +48,7 @@ struct DataStruct
 };
 
 // собственный компаратор
-bool compare(const DataStruct& a, const DataStruct& b) 
+bool compare(const DataStruct& a, const DataStruct& b)
 {
     if (a.key1 != b.key1) return a.key1 < b.key1;
     if (a.key2 != b.key2) return a.key2 < b.key2;
@@ -56,7 +56,7 @@ bool compare(const DataStruct& a, const DataStruct& b)
 }
 
 
-int main() 
+int main()
 {
     std::vector<DataStruct> data;
 
