@@ -102,7 +102,7 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
             }
             else if (in.peek() == '(')
             {
-                if (in >> RationalIO{input.key1}) 
+                if (in >> RationalIO{input.key1})
                 {
                     has_key1 = true;
                 }
@@ -185,4 +185,3 @@ bool compare_structures(const DataStruct& a, const DataStruct& b)
     return a.key3.length() < b.key3.length();
 }
 }
-
