@@ -88,14 +88,11 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
             if (in.peek() == '"')
             {
                 std::string str_val;
-                if (in >> StringIO{str_val})
+                if (in >> StringIO{str_val} && !str_val.empty())
                 {
-                    if (!str_val.empty())
-                    {
-                        input.key1.first = static_cast<long long>(str_val[0]);
-                        input.key1.second = 1;
-                        has_key1 = true;
-                    }
+                    input.key1.first = static_cast<long long>(str_val[0]);
+                    input.key1.second = 1;
+                    has_key1 = true;
                 }
             }
             else if (in.peek() == '(')
@@ -105,54 +102,14 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
                     has_key1 = true;
                 }
             }
-            else if (in.peek() == '\'')
-            {
-                char c;
-                if (in >> CharIO{c})
-                {
-                    input.key1.first = static_cast<long long>(c);
-                    input.key1.second = 1;
-                    has_key1 = true;
-                }
-            }
-            else
-            {
-                // Try to read as a number
-                long long num;
-                if (in >> num)
-                {
-                    input.key1.first = num;
-                    input.key1.second = 1;
-                    has_key1 = true;
-                }
-            }
             in >> DelimiterIO{':'};
         }
         else if (field == "key2")
         {
-            if (in.peek() == '(')
-            {
-                std::pair<long long, unsigned long long> tmp;
-                if (in >> RationalIO{tmp})
-                {
-                    input.key2 = static_cast<char>(tmp.first);
-                    has_key2 = true;
-                }
-            }
-            else if (in.peek() == '\'')
+            if (in.peek() == '\'')
             {
                 in >> CharIO{input.key2};
                 has_key2 = true;
-            }
-            else
-            {
-                // Try to read as a number
-                long long num;
-                if (in >> num)
-                {
-                    input.key2 = static_cast<char>(num);
-                    has_key2 = true;
-                }
             }
             in >> DelimiterIO{':'};
         }
