@@ -7,9 +7,9 @@
 namespace marfina
 {
 
-std::acceptable_format& operator>>(std::acceptable_format& in, DelimiterIO&& dest)
+std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
 {
-    std::acceptable_format::sentry sentry(in);
+    std::istream::sentry sentry(in);
     if (!sentry) return in;
 
     char c;
@@ -20,27 +20,27 @@ std::acceptable_format& operator>>(std::acceptable_format& in, DelimiterIO&& des
     return in;
 }
 
-std::acceptable_format& operator>>(std::acceptable_format& in, CharIO&& dest)
+std::istream& operator>>(std::istream& in, CharIO&& dest)
 {
-    std::acceptable_format::sentry sentry(in);
+    std::istream::sentry sentry(in);
     if (!sentry) return in;
 
-    char word;
-    if (in >> word && word != '\'')
+    char quote;
+    if (in >> quote && quote != '\'')
     {
         in.setstate(std::ios::failbit);
         return in;
     }
-    if (in >> dest.ref >> word && word != '\'')
+    if (in >> dest.ref >> quote && quote != '\'')
     {
         in.setstate(std::ios::failbit);
     }
     return in;
 }
 
-std::acceptable_format& operator>>(std::acceptable_format& in, RationalIO&& dest)
+std::istream& operator>>(std::istream& in, RationalIO&& dest)
 {
-    std::acceptable_format::sentry sentry(in);
+    std::istream::sentry sentry(in);
     if (!sentry) return in;
 
     long long numerator = 0;
@@ -63,16 +63,16 @@ std::acceptable_format& operator>>(std::acceptable_format& in, RationalIO&& dest
     return in;
 }
 
-std::acceptable_format& operator>>(std::acceptable_format& in, StringIO&& dest)
+std::istream& operator>>(std::istream& in, StringIO&& dest)
 {
-    std::acceptable_format::sentry sentry(in);
+    std::istream::sentry sentry(in);
     if (!sentry) return in;
     return std::getline(in >> DelimiterIO{'"'}, dest.ref, '"');
 }
 
-std::acceptable_format& operator>>(std::acceptable_format& in, LabelIO&& dest)
+std::istream& operator>>(std::istream& in, LabelIO&& dest)
 {
-    std::acceptable_format::sentry sentry(in);
+    std::istream::sentry sentry(in);
     if (!sentry) return in;
 
     std::string data;
@@ -88,9 +88,9 @@ bool acceptable_format(const DataStruct& ds)
     return ds.key1.second != 0 && !ds.key3.empty();
 }
 
-std::acceptable_format& operator>>(std::acceptable_format& in, DataStruct& dest)
+std::istream& operator>>(std::istream& in, DataStruct& dest)
 {
-    std::acceptable_format::sentry sentry(in);
+    std::istream::sentry sentry(in);
     if (!sentry) return in;
 
     DataStruct input;
@@ -184,4 +184,3 @@ bool compare_structures(const DataStruct& a, const DataStruct& b)
 }
 
 }
-
