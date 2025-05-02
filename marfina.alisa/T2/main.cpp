@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <limits>
 #include "data_struct.hpp"
-
 int main()
 {
     std::vector<marfina::DataStruct> data;

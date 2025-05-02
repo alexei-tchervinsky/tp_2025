@@ -82,20 +82,63 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
 
         std::string field;
         if (!(in >> field)) break;
+
         if (field == "key1")
         {
-            if (in >> RationalIO{input.key1}) has_key1 = true;
+            if (in.peek() == '(')
+            {
+                if (in >> RationalIO{input.key1})
+                {
+                    has_key1 = true;
+                }
+            }
+            else if (in.peek() == '\'')
+            {
+                char c;
+                if (in >> CharIO{c})
+                {
+                    input.key1.first = static_cast<long long>(c);
+                    input.key1.second = 1;
+                    has_key1 = true;
+                }
+            }
+            else
+            {
+                in >> input.key1.first;
+                input.key1.second = 1;
+                has_key1 = true;
+            }
             in >> DelimiterIO{':'};
         }
         else if (field == "key2")
         {
-            if (in >> CharIO{input.key2}) has_key2 = true;
+            if (in.peek() == '(')
+            {
+                std::pair<long long, unsigned long long> tmp;
+                if (in >> RationalIO{tmp})
+                {
+                    input.key2 = static_cast<char>(tmp.first);
+                    has_key2 = true;
+                }
+            }
+            else if (in.peek() == '\'')
+            {
+                in >> CharIO{input.key2};
+                has_key2 = true;
+            }
+            else
+            {
+                double tmp;
+                in >> tmp;
+                input.key2 = static_cast<char>(tmp);
+                has_key2 = true;
+            }
             in >> DelimiterIO{':'};
         }
         else if (field == "key3")
         {
-            if (in >> StringIO{input.key3}) has_key3 = true;
-            in >> DelimiterIO{':'};
+            in >> StringIO{input.key3} >> DelimiterIO{':'};
+            has_key3 = true;
         }
         else
         {
