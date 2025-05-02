@@ -14,7 +14,7 @@ std::istream& operator>>(std::istream& in, DataStruct& data) {
     // Регулярные выражения для поиска ключей
     std::regex dblRegex(R"(:key1 ([+-]?[\d]+\.[\d]+)[dD]:)");
     std::regex chrRegex(R"(:key2 '(.{1})':)");
-    std::regex strRegex(R"(:key3 "((?:[^"\\]|\\.)*)":)");
+    std::regex strRegex(R"(:key3 \"((?:[^"\\"\\\\]|\\\\.)*)\":)");
 
     bool ok = true;
     if (std::regex_search(line, match, dblRegex)) {
