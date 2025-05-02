@@ -39,6 +39,21 @@ struct LabelIO
     std::string exp;
 };
 
+struct DoubleIO
+{
+    double& ref;
+};
+
+struct LongLongIO
+{
+    long long& ref;
+};
+
+struct UnsignedLongLongIO
+{
+    unsigned long long& ref;
+};
+
 class iofmtguard
 {
 public:
@@ -57,6 +72,9 @@ std::istream& operator>>(std::istream& in, RationalIO&& dest);
 std::istream& operator>>(std::istream& in, CharIO&& dest);
 std::istream& operator>>(std::istream& in, StringIO&& dest);
 std::istream& operator>>(std::istream& in, LabelIO&& dest);
+std::istream& operator>>(std::istream& in, DoubleIO&& dest);
+std::istream& operator>>(std::istream& in, LongLongIO&& dest);
+std::istream& operator>>(std::istream& in, UnsignedLongLongIO&& dest);
 std::istream& operator>>(std::istream& in, DataStruct& dest);
 std::ostream& operator<<(std::ostream& out, const DataStruct& dest);
 
@@ -64,5 +82,4 @@ bool compare_structures(const DataStruct& a, const DataStruct& b);
 bool acceptable_format(const DataStruct& ds);
 
 }
-
 #endif
