@@ -87,11 +87,9 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
         {
             if (in.peek() == '"')
             {
-                // Обработка строкового значения для key1
                 std::string str_val;
                 if (in >> StringIO{str_val})
                 {
-                    // Преобразуем строку в числовое значение (первый символ)
                     if (!str_val.empty())
                     {
                         input.key1.first = static_cast<long long>(str_val[0]);
@@ -117,6 +115,17 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
                     has_key1 = true;
                 }
             }
+            else
+            {
+                // Try to read as a number
+                long long num;
+                if (in >> num)
+                {
+                    input.key1.first = num;
+                    input.key1.second = 1;
+                    has_key1 = true;
+                }
+            }
             in >> DelimiterIO{':'};
         }
         else if (field == "key2")
@@ -134,6 +143,16 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
             {
                 in >> CharIO{input.key2};
                 has_key2 = true;
+            }
+            else
+            {
+                // Try to read as a number
+                long long num;
+                if (in >> num)
+                {
+                    input.key2 = static_cast<char>(num);
+                    has_key2 = true;
+                }
             }
             in >> DelimiterIO{':'};
         }
