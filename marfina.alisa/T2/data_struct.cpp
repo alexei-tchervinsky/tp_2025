@@ -85,9 +85,24 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
 
         if (field == "key1")
         {
-            if (in.peek() == '(')
+            if (in.peek() == '"')
             {
-                if (in >> RationalIO{input.key1})
+                // Обработка строкового значения для key1
+                std::string str_val;
+                if (in >> StringIO{str_val})
+                {
+                    // Преобразуем строку в числовое значение (первый символ)
+                    if (!str_val.empty())
+                    {
+                        input.key1.first = static_cast<long long>(str_val[0]);
+                        input.key1.second = 1;
+                        has_key1 = true;
+                    }
+                }
+            }
+            else if (in.peek() == '(')
+            {
+                if (in >> RationalIO{input.key1}) 
                 {
                     has_key1 = true;
                 }
@@ -170,3 +185,4 @@ bool compare_structures(const DataStruct& a, const DataStruct& b)
     return a.key3.length() < b.key3.length();
 }
 }
+
