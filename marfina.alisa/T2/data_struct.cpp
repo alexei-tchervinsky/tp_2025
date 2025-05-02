@@ -1,13 +1,15 @@
 #include <iostream>
 #include <string>
 #include <iomanip>
+#include <vector>
 #include "data_struct.hpp"
 
-namespace marfina {
-
-std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
+namespace marfina
 {
-    std::istream::sentry sentry(in);
+
+std::acceptable_format& operator>>(std::acceptable_format& in, DelimiterIO&& dest)
+{
+    std::acceptable_format::sentry sentry(in);
     if (!sentry) return in;
 
     char c;
@@ -18,27 +20,27 @@ std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
     return in;
 }
 
-std::istream& operator>>(std::istream& in, CharIO&& dest)
+std::acceptable_format& operator>>(std::acceptable_format& in, CharIO&& dest)
 {
-    std::istream::sentry sentry(in);
+    std::acceptable_format::sentry sentry(in);
     if (!sentry) return in;
 
-    char quote;
-    if (in >> quote && quote != '\'')
+    char word;
+    if (in >> word && word != '\'')
     {
         in.setstate(std::ios::failbit);
         return in;
     }
-    if (in >> dest.ref >> quote && quote != '\'')
+    if (in >> dest.ref >> word && word != '\'')
     {
         in.setstate(std::ios::failbit);
     }
     return in;
 }
 
-std::istream& operator>>(std::istream& in, RationalIO&& dest)
+std::acceptable_format& operator>>(std::acceptable_format& in, RationalIO&& dest)
 {
-    std::istream::sentry sentry(in);
+    std::acceptable_format::sentry sentry(in);
     if (!sentry) return in;
 
     long long numerator = 0;
@@ -53,41 +55,49 @@ std::istream& operator>>(std::istream& in, RationalIO&& dest)
     {
         dest.ref.first = numerator;
         dest.ref.second = denominator;
-    } else
+    }
+    else
     {
         in.setstate(std::ios::failbit);
     }
     return in;
 }
 
-std::istream& operator>>(std::istream& in, StringIO&& dest)
+std::acceptable_format& operator>>(std::acceptable_format& in, StringIO&& dest)
 {
-    std::istream::sentry sentry(in);
+    std::acceptable_format::sentry sentry(in);
     if (!sentry) return in;
     return std::getline(in >> DelimiterIO{'"'}, dest.ref, '"');
 }
 
-std::istream& operator>>(std::istream& in, LabelIO&& dest)
+std::acceptable_format& operator>>(std::acceptable_format& in, LabelIO&& dest)
 {
-    std::istream::sentry sentry(in);
+    std::acceptable_format::sentry sentry(in);
     if (!sentry) return in;
 
     std::string data;
-    if (in >> data && data != dest.exp) {
+    if (in >> data && data != dest.exp)
+    {
         in.setstate(std::ios::failbit);
     }
     return in;
 }
 
-std::istream& operator>>(std::istream& in, DataStruct& dest)
+bool acceptable_format(const DataStruct& ds)
 {
-    std::istream::sentry sentry(in);
+    return ds.key1.second != 0 && !ds.key3.empty();
+}
+
+std::acceptable_format& operator>>(std::acceptable_format& in, DataStruct& dest)
+{
+    std::acceptable_format::sentry sentry(in);
     if (!sentry) return in;
 
     DataStruct input;
     bool has_key1 = false, has_key2 = false, has_key3 = false;
 
-    if (!(in >> DelimiterIO{'('} >> DelimiterIO{':'})) {
+    if (!(in >> DelimiterIO{'('} >> DelimiterIO{':'}))
+    {
         return in;
     }
 
@@ -97,38 +107,42 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
             in.ignore();
             break;
         }
-
         std::string field;
         if (!(in >> field)) break;
 
         if (field == "key1")
         {
-            if (in >> RationalIO{input.key1} >> DelimiterIO{':'}) {
+            if (in >> RationalIO{input.key1} >> DelimiterIO{':'})
+            {
                 has_key1 = true;
             } else break;
         }
         else if (field == "key2")
         {
-            if (in >> CharIO{input.key2} >> DelimiterIO{':'}) {
+            if (in >> CharIO{input.key2} >> DelimiterIO{':'})
+            {
                 has_key2 = true;
             } else break;
         }
         else if (field == "key3")
         {
-            if (in >> StringIO{input.key3} >> DelimiterIO{':'}) {
+            if (in >> StringIO{input.key3} >> DelimiterIO{':'})
+            {
                 has_key3 = true;
             } else break;
         }
-        else {
+        else
+        {
             in.setstate(std::ios::failbit);
             break;
         }
     }
 
-    if (has_key1 && has_key2 && has_key3)
+    if (has_key1 && has_key2 && has_key3 && acceptable_format(input))
     {
         dest = input;
-    } else
+    }
+    else
     {
         in.setstate(std::ios::failbit);
     }
@@ -139,7 +153,6 @@ std::ostream& operator<<(std::ostream& out, const DataStruct& src)
 {
     std::ostream::sentry sentry(out);
     if (!sentry) return out;
-
     iofmtguard fmtguard(out);
     out << "(:key1 (:N " << src.key1.first << ":D " << src.key1.second << ":)"
         << ":key2 '" << src.key2 << "'"
@@ -170,4 +183,5 @@ bool compare_structures(const DataStruct& a, const DataStruct& b)
     return a.key3.length() < b.key3.length();
 }
 
-} // namespace marfina
+}
+
