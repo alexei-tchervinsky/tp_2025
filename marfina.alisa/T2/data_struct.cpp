@@ -160,8 +160,10 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
         {
             if (in.peek() == '(')
             {
-                if (in >> RationalIO{input.key2})
+                std::pair<long long, unsigned long long> tmp;
+                if (in >> RationalIO{tmp})
                 {
+                    input.key2 = static_cast<char>(tmp.first);
                     has_key2 = true;
                 }
             }

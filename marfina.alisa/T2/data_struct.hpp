@@ -7,19 +7,18 @@
 
 namespace marfina
 {
-struct DataStruct
-{
-    std::pair<long long, unsigned long long> key1;
-    char key2;
-    std::string key3;
-};
+    struct DataStruct
+    {
+        std::pair<long long, unsigned long long> key1;
+        char key2;
+        std::string key3;
+    };
 
-struct DelimiterIO { char exp; };
-struct RationalIO { std::pair<long long, unsigned long long>& ref; };
-struct CharIO { char& ref; };
-struct StringIO { std::string& ref; };
-struct LabelIO { std::string exp; };
-struct ComplexIO { std::complex<double>& ref; };
+    struct DelimiterIO { char exp; };
+    struct RationalIO { std::pair<long long, unsigned long long>& ref; };
+    struct CharIO { char& ref; };
+    struct StringIO { std::string& ref; };
+    struct LabelIO { std::string exp; };
 
 class iofmtguard
 {
