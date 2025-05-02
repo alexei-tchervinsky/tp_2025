@@ -5,10 +5,9 @@
 #include <limits>
 #include "data_struct.hpp"
 
-int main()
-{
+int main() {
     std::vector<marfina::DataStruct> data;
-    bool has_supported_records = false;
+    bool has_supported = false;
 
     while (!std::cin.eof())
     {
@@ -18,33 +17,24 @@ int main()
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
 
-        marfina::DataStruct temp;
-        if (std::cin >> temp)
+        marfina::DataStruct tmp;
+        if (std::cin >> tmp && marfina::is_supported_input(tmp))
         {
-            if (marfina::acceptable_format(temp))
-            {
-                data.push_back(temp);
-                has_supported_records = true;
-            }
+            data.push_back(tmp);
+            has_supported = true;
         }
     }
 
-    if (!has_supported_records)
+    if (!has_supported)
     {
         std::cout << "Looks like there is no supported record. Cannot determine input. Test skipped\n";
         return 0;
     }
 
     std::cout << "Atleast one supported record type\n";
-
     std::sort(data.begin(), data.end(), marfina::compare_structures);
-
-    std::copy
-    (
-        data.begin(),
-        data.end(),
-        std::ostream_iterator<marfina::DataStruct>(std::cout, "\n")
-    );
+    std::copy(data.begin(), data.end(),
+              std::ostream_iterator<marfina::DataStruct>(std::cout, "\n"));
 
     return 0;
 }

@@ -1,9 +1,9 @@
 #ifndef DATA_STRUCT_HPP
 #define DATA_STRUCT_HPP
-
 #include <iostream>
 #include <utility>
 #include <string>
+#include <complex>
 
 namespace marfina
 {
@@ -14,45 +14,12 @@ struct DataStruct
     std::string key3;
 };
 
-struct DelimiterIO
-{
-    char exp;
-};
-
-struct RationalIO
-{
-    std::pair<long long, unsigned long long>& ref;
-};
-
-struct CharIO
-{
-    char& ref;
-};
-
-struct StringIO
-{
-    std::string& ref;
-};
-
-struct LabelIO
-{
-    std::string exp;
-};
-
-struct DoubleIO
-{
-    double& ref;
-};
-
-struct LongLongIO
-{
-    long long& ref;
-};
-
-struct UnsignedLongLongIO
-{
-    unsigned long long& ref;
-};
+struct DelimiterIO { char exp; };
+struct RationalIO { std::pair<long long, unsigned long long>& ref; };
+struct CharIO { char& ref; };
+struct StringIO { std::string& ref; };
+struct LabelIO { std::string exp; };
+struct ComplexIO { std::complex<double>& ref; };
 
 class iofmtguard
 {
@@ -72,14 +39,13 @@ std::istream& operator>>(std::istream& in, RationalIO&& dest);
 std::istream& operator>>(std::istream& in, CharIO&& dest);
 std::istream& operator>>(std::istream& in, StringIO&& dest);
 std::istream& operator>>(std::istream& in, LabelIO&& dest);
-std::istream& operator>>(std::istream& in, DoubleIO&& dest);
-std::istream& operator>>(std::istream& in, LongLongIO&& dest);
-std::istream& operator>>(std::istream& in, UnsignedLongLongIO&& dest);
+std::istream& operator>>(std::istream& in, ComplexIO&& dest);
 std::istream& operator>>(std::istream& in, DataStruct& dest);
 std::ostream& operator<<(std::ostream& out, const DataStruct& dest);
 
 bool compare_structures(const DataStruct& a, const DataStruct& b);
-bool acceptable_format(const DataStruct& ds);
+bool is_supported_input(const DataStruct& ds);
 
 }
+
 #endif

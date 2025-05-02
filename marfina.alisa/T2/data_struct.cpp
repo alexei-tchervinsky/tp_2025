@@ -2,6 +2,7 @@
 #include <string>
 #include <iomanip>
 #include <vector>
+#include <complex>
 #include <cctype>
 #include "data_struct.hpp"
 
@@ -11,120 +12,65 @@ namespace marfina
 std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
 {
     std::istream::sentry sentry(in);
-    if (!sentry)
-    {
-        return in;
-    }
-
-    char c = '0';
-    in >> c;
-    if (in && (c != dest.exp))
-    {
-        in.setstate(std::ios::failbit);
-    }
+    if (!sentry) return in;
+    char c;
+    if (in >> c && c != dest.exp) in.setstate(std::ios::failbit);
     return in;
 }
 
 std::istream& operator>>(std::istream& in, CharIO&& dest)
 {
     std::istream::sentry sentry(in);
-    if (!sentry)
-    {
-        return in;
-    }
-
-    char quote = '0';
-    in >> quote;
-    if (quote != '\'')
+    if (!sentry) return in;
+    char quote;
+    if (in >> quote && quote != '\'')
     {
         in.setstate(std::ios::failbit);
         return in;
     }
-    in >> dest.ref;
-    in >> quote;
-    if (quote != '\'')
+    if (in >> dest.ref >> quote && quote != '\'')
     {
         in.setstate(std::ios::failbit);
     }
     return in;
 }
 
-std::istream& operator>>(std::istream& in, DoubleIO&& dest)
+std::istream& operator>>(std::istream& in, ComplexIO&& dest)
 {
-    in >> dest.ref;
-    if (in.peek() == 'd' || in.peek() == 'e')
-    {
-        in.ignore();
-    }
-    return in;
-}
-
-std::istream& operator>>(std::istream& in, LongLongIO&& dest)
-{
-    in >> dest.ref;
-    while (in.peek() == 'l')
-    {
-        in.ignore();
-    }
-    return in;
-}
-
-std::istream& operator>>(std::istream& in, UnsignedLongLongIO&& dest)
-{
-    in >> dest.ref;
-    while (in.peek() == 'u' || in.peek() == 'l')
-    {
-        in.ignore();
-    }
+    std::istream::sentry sentry(in);
+    if (!sentry) return in;
+    double real, imag;
+    in >> DelimiterIO{'#'} >> DelimiterIO{'c'} >> DelimiterIO{'('};
+    in >> real >> imag >> DelimiterIO{')'};
+    dest.ref = std::complex<double>(real, imag);
     return in;
 }
 
 std::istream& operator>>(std::istream& in, RationalIO&& dest)
 {
     std::istream::sentry sentry(in);
-    if (!sentry)
-    {
-        return in;
-    }
-
-    in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' } >> LabelIO{ "N" };
-    long long numerator = 0;
-    in >> numerator;
-    in >> DelimiterIO{ ':' } >> LabelIO{ "D" };
-    unsigned long long denominator = 0;
-    in >> denominator;
-    in >> DelimiterIO{ ':' } >> DelimiterIO{ ')' };
-
-    if (in && denominator != 0)
-    {
-        dest.ref = { numerator, denominator };
-    }
-    else
-    {
-        in.setstate(std::ios::failbit);
-    }
+    if (!sentry) return in;
+    in >> DelimiterIO{'('} >> DelimiterIO{':'} >> LabelIO{"N"};
+    in >> dest.ref.first;
+    in >> DelimiterIO{':'} >> LabelIO{"D"};
+    in >> dest.ref.second;
+    in >> DelimiterIO{':'} >> DelimiterIO{')'};
+    if (dest.ref.second == 0) in.setstate(std::ios::failbit);
     return in;
 }
 
 std::istream& operator>>(std::istream& in, StringIO&& dest)
 {
     std::istream::sentry sentry(in);
-    if (!sentry)
-    {
-        return in;
-    }
-    return std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
+    if (!sentry) return in;
+    return std::getline(in >> DelimiterIO{'"'}, dest.ref, '"');
 }
 
 std::istream& operator>>(std::istream& in, LabelIO&& dest)
 {
     std::istream::sentry sentry(in);
-    if (!sentry)
-    {
-        return in;
-    }
-
-    std::string data = "";
+    if (!sentry) return in;
+    std::string data;
     if ((in >> data) && (data != dest.exp))
     {
         in.setstate(std::ios::failbit);
@@ -132,7 +78,7 @@ std::istream& operator>>(std::istream& in, LabelIO&& dest)
     return in;
 }
 
-bool acceptable_format(const DataStruct& ds)
+bool is_supported_input(const DataStruct& ds)
 {
     return !ds.key3.empty();
 }
@@ -140,16 +86,10 @@ bool acceptable_format(const DataStruct& ds)
 std::istream& operator>>(std::istream& in, DataStruct& dest)
 {
     std::istream::sentry sentry(in);
-    if (!sentry)
-    {
-        return in;
-    }
-
+    if (!sentry) return in;
     DataStruct input;
     bool has_key1 = false, has_key2 = false, has_key3 = false;
-
-    in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' };
-
+    in >> DelimiterIO{'('} >> DelimiterIO{':'};
     while (true)
     {
         if (in.peek() == ')')
@@ -157,68 +97,60 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
             in.ignore();
             break;
         }
-
         std::string field;
-        if (!(in >> field))
-        {
-            break;
-        }
-
+        if (!(in >> field)) break;
         if (field == "key1")
         {
             if (in.peek() == '(')
             {
-                if (in >> RationalIO{ input.key1 })
-                {
-                    has_key1 = true;
-                }
-            }
-            else if (std::isdigit(in.peek()) || in.peek() == '-')
+                if (in >> RationalIO{input.key1}) has_key1 = true;
+            } else if (std::isdigit(in.peek()) || in.peek() == '-')
             {
-                if (in >> LongLongIO{ input.key1.first })
-                {
-                    input.key1.second = 1;
-                    has_key1 = true;
-                }
+                in >> input.key1.first;
+                input.key1.second = 1;
+                has_key1 = true;
             }
             else if (in.peek() == '\'')
             {
                 char c;
-                if (in >> CharIO{ c })
+                if (in >> CharIO{c})
                 {
-                    input.key1.first = static_cast<long long>(c);
+                    input.key1.first = c;
                     input.key1.second = 1;
                     has_key1 = true;
                 }
             }
-            in >> DelimiterIO{ ':' };
+            in >> DelimiterIO{':'};
         }
         else if (field == "key2")
         {
             if (in.peek() == '(')
             {
                 std::pair<long long, unsigned long long> tmp;
-                if (in >> RationalIO{ tmp })
-                {
-                    input.key2 = static_cast<char>(tmp.first);
-                }
+                if (in >> RationalIO{tmp}) input.key2 = tmp.first;
             }
             else if (in.peek() == '\'')
             {
-                in >> CharIO{ input.key2 };
+                in >> CharIO{input.key2};
+            }
+            else if (in.peek() == '#')
+            {
+                std::complex<double> tmp;
+                in >> ComplexIO{tmp};
+                input.key2 = static_cast<char>(tmp.real());
             }
             else
             {
                 double tmp;
-                in >> DoubleIO{ tmp };
+                in >> tmp;
                 input.key2 = static_cast<char>(tmp);
             }
             has_key2 = true;
-            in >> DelimiterIO{ ':' };
+            in >> DelimiterIO{':'};
         }
         else if (field == "key3")
         {
-            in >> StringIO{ input.key3 } >> DelimiterIO{ ':' };
+            in >> StringIO{input.key3} >> DelimiterIO{':'};
             has_key3 = true;
         }
         else
@@ -228,7 +160,7 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
         }
     }
 
-    if (in && has_key1 && has_key2 && has_key3 && acceptable_format(input))
+    if (has_key1 && has_key2 && has_key3 && is_supported_input(input))
     {
         dest = input;
     }
@@ -242,11 +174,7 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
 std::ostream& operator<<(std::ostream& out, const DataStruct& src)
 {
     std::ostream::sentry sentry(out);
-    if (!sentry)
-    {
-        return out;
-    }
-
+    if (!sentry) return out;
     iofmtguard fmtguard(out);
     out << "(:key1 (:N " << src.key1.first << ":D " << src.key1.second << ":)"
         << ":key2 '" << src.key2 << "'"
@@ -255,12 +183,8 @@ std::ostream& operator<<(std::ostream& out, const DataStruct& src)
 }
 
 iofmtguard::iofmtguard(std::basic_ios<char>& s) :
-    s_(s),
-    width_(s.width()),
-    fill_(s.fill()),
-    precision_(s.precision()),
-    fmt_(s.flags())
-{}
+    s_(s), width_(s.width()), fill_(s.fill()),
+    precision_(s.precision()), fmt_(s.flags()) {}
 
 iofmtguard::~iofmtguard()
 {
@@ -272,14 +196,8 @@ iofmtguard::~iofmtguard()
 
 bool compare_structures(const DataStruct& a, const DataStruct& b)
 {
-    if (a.key1 != b.key1)
-    {
-        return a.key1 < b.key1;
-    }
-    if (a.key2 != b.key2)
-    {
-        return a.key2 < b.key2;
-    }
+    if (a.key1 != b.key1) return a.key1 < b.key1;
+    if (a.key2 != b.key2) return a.key2 < b.key2;
     return a.key3.length() < b.key3.length();
 }
 
