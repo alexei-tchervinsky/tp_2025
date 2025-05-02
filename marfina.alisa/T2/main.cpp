@@ -33,8 +33,10 @@ int main()
 
     std::cout << "Atleast one supported record type\n";
     std::sort(data.begin(), data.end(), marfina::compare_structures);
-    std::copy(data.begin(), data.end(),
-              std::ostream_iterator<marfina::DataStruct>(std::cout, "\n"));
+    for (const auto& item : data)
+    {
+        std::cout << item << "\n";
+    }
 
     return 0;
 }

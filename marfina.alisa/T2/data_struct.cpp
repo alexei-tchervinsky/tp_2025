@@ -104,9 +104,8 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
             }
             else
             {
-                in >> input.key1.first;
-                input.key1.second = 1;
-                has_key1 = true;
+                std::string dummy;
+                in >> dummy;
             }
             in >> DelimiterIO{':'};
         }
@@ -128,10 +127,9 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
             }
             else
             {
-                double tmp;
-                in >> tmp;
-                input.key2 = static_cast<char>(tmp);
-                has_key2 = true;
+                // Пропускаем нераспознанные форматы key2
+                std::string dummy;
+                in >> dummy;
             }
             in >> DelimiterIO{':'};
         }
@@ -187,5 +185,4 @@ bool compare_structures(const DataStruct& a, const DataStruct& b)
     if (a.key2 != b.key2) return a.key2 < b.key2;
     return a.key3.length() < b.key3.length();
 }
-
 }
