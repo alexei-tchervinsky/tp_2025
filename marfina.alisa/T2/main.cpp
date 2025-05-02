@@ -5,7 +5,8 @@
 #include <limits>
 #include "data_struct.hpp"
 
-int main() {
+int main()
+{
     std::vector<marfina::DataStruct> data;
     bool has_supported = false;
 
@@ -18,7 +19,7 @@ int main() {
         }
 
         marfina::DataStruct tmp;
-        if (std::cin >> tmp && marfina::is_supported_input(tmp))
+        if (std::cin >> tmp)
         {
             data.push_back(tmp);
             has_supported = true;
