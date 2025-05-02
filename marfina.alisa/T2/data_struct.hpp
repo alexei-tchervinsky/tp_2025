@@ -33,7 +33,6 @@ private:
     std::basic_ios<char>::fmtflags fmt_;
 };
 
-// Операторы ввода
 std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
 std::istream& operator>>(std::istream& in, RationalIO&& dest);
 std::istream& operator>>(std::istream& in, CharIO&& dest);

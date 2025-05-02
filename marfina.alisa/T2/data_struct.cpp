@@ -102,11 +102,6 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
                     has_key1 = true;
                 }
             }
-            else
-            {
-                std::string dummy;
-                in >> dummy;
-            }
             in >> DelimiterIO{':'};
         }
         else if (field == "key2")
@@ -125,23 +120,12 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
                 in >> CharIO{input.key2};
                 has_key2 = true;
             }
-            else
-            {
-                // Пропускаем нераспознанные форматы key2
-                std::string dummy;
-                in >> dummy;
-            }
             in >> DelimiterIO{':'};
         }
         else if (field == "key3")
         {
             in >> StringIO{input.key3} >> DelimiterIO{':'};
             has_key3 = true;
-        }
-        else
-        {
-            in.setstate(std::ios::failbit);
-            break;
         }
     }
 
