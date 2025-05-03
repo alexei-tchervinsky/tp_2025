@@ -87,6 +87,8 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
             else
             {
                 in.setstate(std::ios::failbit);
+                in.ignore(std::numeric_limits<std::streamsize>::max(), ':');
+                continue;
             }
             in >> DelimiterIO{':'};
         }
@@ -94,18 +96,21 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
         {
             if (in.peek() == '(')
             {
-                if (!(in >> RationalIO{input.key2}))
+                if (in >> RationalIO{input.key2})
                 {
-                    in.setstate(std::ios::failbit);
+                    has_key2 = true;
                 }
                 else
                 {
-                    has_key2 = true;
+                    in.ignore(std::numeric_limits<std::streamsize>::max(), ':');
+                    continue;
                 }
             }
             else
             {
                 in.setstate(std::ios::failbit);
+                in.ignore(std::numeric_limits<std::streamsize>::max(), ':');
+                continue;
             }
             in >> DelimiterIO{':'};
         }
@@ -118,9 +123,10 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
         else
         {
             in.setstate(std::ios::failbit);
+            in.ignore(std::numeric_limits<std::streamsize>::max(), ':');
+            continue;
         }
     }
-
     if (has_key1 && has_key2 && has_key3)
     {
         dest = input;
