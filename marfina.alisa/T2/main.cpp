@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <limits>
 #include "data_struct.hpp"
+
 int main()
 {
     std::vector<marfina::DataStruct> data;
@@ -16,10 +17,9 @@ int main()
         }
 
         marfina::DataStruct tmp;
-        if (std::cin >> tmp && marfina::is_supported_input(tmp))
+        if (std::cin >> tmp)  // Removed the is_supported_input check
         {
             data.push_back(tmp);
-            has_supported = true;
         }
     }
     std::sort(data.begin(), data.end(), marfina::compare_structures);
