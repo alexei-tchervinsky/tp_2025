@@ -61,17 +61,13 @@ std::istream& operator>>(std::istream& in, LabelIO&& dest)
     }
     return in;
 }
-// data_struct.cpp
 std::istream& operator>>(std::istream& in, DataStruct& dest)
 {
     std::istream::sentry sentry(in);
     if (!sentry) return in;
-
     DataStruct input;
     bool has_key1 = false, has_key2 = false, has_key3 = false;
-
     in >> DelimiterIO{'('} >> DelimiterIO{':'};
-
     while (true)
     {
         if (in.peek() == ')')
@@ -79,44 +75,49 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
             in.ignore();
             break;
         }
-
         std::string field;
         if (!(in >> field)) break;
-
         if (field == "key1")
         {
-            if (in.peek() == '\'')  // Теперь key1 - только символ
+            if (in.peek() == '\'')
             {
                 in >> CharIO{input.key1};
                 has_key1 = true;
+            }
+            else
+            {
+                in.setstate(std::ios::failbit);
             }
             in >> DelimiterIO{':'};
         }
         else if (field == "key2")
         {
-            if (in.peek() == '(')  // Теперь key2 - рациональное число
+            if (in.peek() == '(')
             {
-                if (in >> RationalIO{input.key2})
+                if (!(in >> RationalIO{input.key2}))
+                {
+                    in.setstate(std::ios::failbit);
+                }
+                else
                 {
                     has_key2 = true;
                 }
             }
-            else if (in.peek() == '"')  // Дополнительно: строка для key2
+            else
             {
-                std::string str_val;
-                if (in >> StringIO{str_val} && !str_val.empty())
-                {
-                    input.key2.first = static_cast<long long>(str_val[0]);
-                    input.key2.second = 1;
-                    has_key2 = true;
-                }
+                in.setstate(std::ios::failbit);
             }
             in >> DelimiterIO{':'};
         }
         else if (field == "key3")
         {
-            in >> StringIO{input.key3} >> DelimiterIO{':'};
+            in >> StringIO{input.key3};
             has_key3 = true;
+            in >> DelimiterIO{':'};
+        }
+        else
+        {
+            in.setstate(std::ios::failbit);
         }
     }
 
