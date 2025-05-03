@@ -8,7 +8,7 @@ std::istream& operator>>(std::istream& in, DataStruct& data) {
 
     // Проверка на обрамляющие скобки
     if (!std::regex_match(line, std::regex(R"(\(:.*:\))")))
-        return in;
+        continue;
 
     // Регулярные выражения для поиска ключей
     std::regex dblRegex(R"(:key1 ([+-]?[\d]+\.[\d]+)[dD]:)");
