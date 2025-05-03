@@ -3,7 +3,7 @@
 std::istream& operator>>(std::istream& in, DataStruct& data) {
     std::string line;
     while (std::getline(in, line)) {
-    
+
         std::smatch match;
 
     // Проверка на обрамляющие скобки
@@ -34,7 +34,7 @@ std::istream& operator>>(std::istream& in, DataStruct& data) {
             ok = false;
         }
 
-    if (ok){ 
+    if (ok){
         return in;
     }
   }
