@@ -111,6 +111,15 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
                 in >> CharIO{input.key2};
                 has_key2 = true;
             }
+            else if (in.peek() == '(')
+            {
+                std::pair<long long, unsigned long long> tmp;
+                if (in >> RationalIO{tmp})
+                {
+                    input.key2 = static_cast<char>(tmp.first);
+                    has_key2 = true;
+                }
+            }
             in >> DelimiterIO{':'};
         }
         else if (field == "key3")
@@ -136,8 +145,13 @@ std::ostream& operator<<(std::ostream& out, const DataStruct& src)
     std::ostream::sentry sentry(out);
     if (!sentry) return out;
     iofmtguard fmtguard(out);
-    out << "(:key1 (:N " << src.key1.first << ":D " << src.key1.second << ":)"
-        << ":key2 '" << src.key2 << "'"
+    out << "(:key1 ";
+    if (src.key1.second == 1 && isprint(static_cast<char>(src.key1.first))) {
+        out << "\"" << static_cast<char>(src.key1.first) << "\"";
+    } else {
+        out << "(:N " << src.key1.first << ":D " << src.key1.second << ":)";
+    }
+    out << ":key2 '" << src.key2 << "'"
         << ":key3 \"" << src.key3 << "\":)";
     return out;
 }
