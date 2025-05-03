@@ -61,6 +61,7 @@ std::istream& operator>>(std::istream& in, LabelIO&& dest)
     }
     return in;
 }
+// data_struct.cpp
 std::istream& operator>>(std::istream& in, DataStruct& dest)
 {
     std::istream::sentry sentry(in);
@@ -84,38 +85,29 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
 
         if (field == "key1")
         {
-            if (in.peek() == '"')
+            if (in.peek() == '\'')  // Теперь key1 - только символ
             {
-                std::string str_val;
-                if (in >> StringIO{str_val} && !str_val.empty())
-                {
-                    input.key1.first = static_cast<long long>(str_val[0]);
-                    input.key1.second = 1;
-                    has_key1 = true;
-                }
-            }
-            else if (in.peek() == '(')
-            {
-                if (in >> RationalIO{input.key1})
-                {
-                    has_key1 = true;
-                }
+                in >> CharIO{input.key1};
+                has_key1 = true;
             }
             in >> DelimiterIO{':'};
         }
         else if (field == "key2")
         {
-            if (in.peek() == '\'')
+            if (in.peek() == '(')  // Теперь key2 - рациональное число
             {
-                in >> CharIO{input.key2};
-                has_key2 = true;
-            }
-            else if (in.peek() == '(')
-            {
-                std::pair<long long, unsigned long long> tmp;
-                if (in >> RationalIO{tmp})
+                if (in >> RationalIO{input.key2})
                 {
-                    input.key2 = static_cast<char>(tmp.first);
+                    has_key2 = true;
+                }
+            }
+            else if (in.peek() == '"')  // Дополнительно: строка для key2
+            {
+                std::string str_val;
+                if (in >> StringIO{str_val} && !str_val.empty())
+                {
+                    input.key2.first = static_cast<long long>(str_val[0]);
+                    input.key2.second = 1;
                     has_key2 = true;
                 }
             }
@@ -144,14 +136,14 @@ std::ostream& operator<<(std::ostream& out, const DataStruct& src)
     std::ostream::sentry sentry(out);
     if (!sentry) return out;
     iofmtguard fmtguard(out);
-    out << "(:key1 ";
-    if (src.key1.second == 1 && isprint(static_cast<char>(src.key1.first))) {
-        out << "\"" << static_cast<char>(src.key1.first) << "\"";
+    out << "(:key1 '" << src.key1 << "'"
+        << ":key2 ";
+    if (src.key2.second == 1 && isprint(static_cast<char>(src.key2.first))) {
+        out << "\"" << static_cast<char>(src.key2.first) << "\"";
     } else {
-        out << "(:N " << src.key1.first << ":D " << src.key1.second << ":)";
+        out << "(:N " << src.key2.first << ":D " << src.key2.second << ":)";
     }
-    out << ":key2 '" << src.key2 << "'"
-        << ":key3 \"" << src.key3 << "\":)";
+    out << ":key3 \"" << src.key3 << "\":)";
     return out;
 }
 
