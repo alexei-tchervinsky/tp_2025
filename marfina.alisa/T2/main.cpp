@@ -10,22 +10,19 @@ int main()
     std::vector<marfina::DataStruct> data;
     while (!std::cin.eof())
     {
-        std::copy
-        (
-            std::istream_iterator<marfina::DataStruct>(std::cin),
-            std::istream_iterator<marfina::DataStruct>(),
-            std::back_inserter(data)
-        );
-         if (std::cin.fail())
-         {
+        marfina::DataStruct temp;
+        std::cin >> temp;
+        if (std::cin.fail())
+        {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             continue;
-         }
-        std::cin.clear();
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+
+        data.push_back(temp);
     }
     std::sort(data.begin(), data.end(), marfina::compare_structures);
-    std::copy
-    (
+    std::copy(
         data.begin(),
         data.end(),
         std::ostream_iterator<marfina::DataStruct>(std::cout, "\n")
