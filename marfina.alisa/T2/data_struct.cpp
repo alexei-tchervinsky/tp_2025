@@ -103,14 +103,13 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
                 }
                 else
                 {
-                    in.ignore(std::numeric_limits<std::streamsize>::max(), ':');
+                    in.setstate(std::ios::failbit);
                     continue;
                 }
             }
             else
             {
                 in.setstate(std::ios::failbit);
-                in.ignore(std::numeric_limits<std::streamsize>::max(), ':');
                 continue;
             }
             in >> DelimiterIO{':'};
@@ -124,7 +123,6 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
         else
         {
             in.setstate(std::ios::failbit);
-            in.ignore(std::numeric_limits<std::streamsize>::max(), ':');
             continue;
         }
     }
@@ -145,13 +143,8 @@ std::ostream& operator<<(std::ostream& out, const DataStruct& src)
     if (!sentry) return out;
     iofmtguard fmtguard(out);
     out << "(:key1 '" << src.key1 << "'"
-        << ":key2 ";
-    if (src.key2.second == 1 && isprint(static_cast<char>(src.key2.first))) {
-        out << "\"" << static_cast<char>(src.key2.first) << "\"";
-    } else {
-        out << "(:N " << src.key2.first << ":D " << src.key2.second << ":)";
-    }
-    out << ":key3 \"" << src.key3 << "\":)";
+        << ":key2 (:N " << src.key2.first << ":D " << src.key2.second << ":)"
+        << ":key3 \"" << src.key3 << "\":)";
     return out;
 }
 
