@@ -3,6 +3,7 @@
 #include <iterator>
 #include <algorithm>
 #include <limits>
+#include <sstream>
 #include "data_struct.hpp"
 
 int main()
@@ -24,7 +25,6 @@ int main()
         std::cout << "Looks like there is no supported record. Cannot determine input. Test skipped\n";
         return 0;
     }
-    std::cout << "Atleast one supported record type\n";
     std::sort(data.begin(), data.end(), marfina::compare_structures);
     std::copy(
         data.begin(),
