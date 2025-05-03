@@ -2,6 +2,7 @@
 #include <string>
 #include <iomanip>
 #include "data_struct.hpp"
+#include <limits>
 
 namespace marfina
 {
