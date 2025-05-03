@@ -30,13 +30,14 @@ int main()
         std::cout << "Looks like there is no supported record. Cannot determine input. Test skipped\n";
         return 0;
     }
-
+    else
+    {
     std::sort(data.begin(), data.end(), marfina::compare_structures);
     std::cout << "Atleast one supported record type\n";
     for (const auto& item : data)
     {
         std::cout << item << "\n";
     }
-
+    }
     return 0;
 }
