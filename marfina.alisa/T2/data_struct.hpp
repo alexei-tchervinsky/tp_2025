@@ -32,8 +32,6 @@ private:
     std::streamsize precision_;
     std::basic_ios<char>::fmtflags fmt_;
 };
-
-// Операторы ввода
 std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
 std::istream& operator>>(std::istream& in, RationalIO&& dest);
 std::istream& operator>>(std::istream& in, CharIO&& dest);
@@ -43,7 +41,6 @@ std::istream& operator>>(std::istream& in, DataStruct& dest);
 std::ostream& operator<<(std::ostream& out, const DataStruct& dest);
 
 bool compare_structures(const DataStruct& a, const DataStruct& b);
-
+bool is_supported_input(const DataStruct& data);
 }
-
 #endif
