@@ -15,7 +15,7 @@ int main()
             std::istream_iterator<marfina::DataStruct>(std::cin),
             std::istream_iterator<marfina::DataStruct>(),
             std::back_inserter(data)
-        )
+        );
          if (std::cin.fail())
          {
             continue;
