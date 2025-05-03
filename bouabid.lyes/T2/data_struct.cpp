@@ -2,10 +2,9 @@
 
 std::istream& operator>>(std::istream& in, DataStruct& data) {
     std::string line;
-    if (!std::getline(in, line))
-        return in;
-
-    std::smatch match;
+    while (std::getline(in, line)) {
+    
+        std::smatch match;
 
     // Проверка на обрамляющие скобки
     if (!std::regex_match(line, std::regex(R"(\(:.*:\))")))
