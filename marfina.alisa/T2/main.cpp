@@ -11,15 +11,20 @@ int main()
     while (!std::cin.eof())
     {
         marfina::DataStruct temp;
-        std::cin >> temp;
-        if (std::cin.fail())
+        if (std::cin >> temp)
+        {
+            data.push_back(temp);
+        }
+        else if (!std::cin.eof())
         {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            continue;
         }
-
-        data.push_back(temp);
+    }
+    if (data.empty())
+    {
+        std::cout << "Looks like there is no supported record. Cannot determine input. Test skipped\n";
+        return 0;
     }
     std::sort(data.begin(), data.end(), marfina::compare_structures);
     std::copy(
