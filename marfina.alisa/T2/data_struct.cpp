@@ -2,7 +2,6 @@
 #include <string>
 #include <iomanip>
 #include "data_struct.hpp"
-#include <limits>
 
 namespace marfina
 {
@@ -62,13 +61,17 @@ std::istream& operator>>(std::istream& in, LabelIO&& dest)
     }
     return in;
 }
+
 std::istream& operator>>(std::istream& in, DataStruct& dest)
 {
     std::istream::sentry sentry(in);
     if (!sentry) return in;
+
     DataStruct input;
     bool has_key1 = false, has_key2 = false, has_key3 = false;
+
     in >> DelimiterIO{'('} >> DelimiterIO{':'};
+
     while (true)
     {
         if (in.peek() == ')')
@@ -76,56 +79,31 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
             in.ignore();
             break;
         }
+
         std::string field;
         if (!(in >> field)) break;
         if (field == "key1")
         {
-            if (in.peek() == '\'')
-            {
-                in >> CharIO{input.key1};
-                has_key1 = true;
-            }
-            else
-            {
-                in.setstate(std::ios::failbit);
-                in.ignore(std::numeric_limits<std::streamsize>::max(), ':');
-                continue;
-            }
+            if (in >> RationalIO{input.key1}) has_key1 = true;
             in >> DelimiterIO{':'};
         }
         else if (field == "key2")
         {
-            if (in.peek() == '(')
-            {
-                if (in >> RationalIO{input.key2})
-                {
-                    has_key2 = true;
-                }
-                else
-                {
-                    in.setstate(std::ios::failbit);
-                    continue;
-                }
-            }
-            else
-            {
-                in.setstate(std::ios::failbit);
-                continue;
-            }
+            if (in >> CharIO{input.key2}) has_key2 = true;
             in >> DelimiterIO{':'};
         }
         else if (field == "key3")
         {
-            in >> StringIO{input.key3};
-            has_key3 = true;
+            if (in >> StringIO{input.key3}) has_key3 = true;
             in >> DelimiterIO{':'};
         }
         else
         {
             in.setstate(std::ios::failbit);
-            continue;
+            break;
         }
     }
+
     if (has_key1 && has_key2 && has_key3)
     {
         dest = input;
@@ -142,8 +120,8 @@ std::ostream& operator<<(std::ostream& out, const DataStruct& src)
     std::ostream::sentry sentry(out);
     if (!sentry) return out;
     iofmtguard fmtguard(out);
-    out << "(:key1 '" << src.key1 << "'"
-        << ":key2 (:N " << src.key2.first << ":D " << src.key2.second << ":)"
+    out << "(:key1 (:N " << src.key1.first << ":D " << src.key1.second << ":)"
+        << ":key2 '" << src.key2 << "'"
         << ":key3 \"" << src.key3 << "\":)";
     return out;
 }
@@ -166,4 +144,5 @@ bool compare_structures(const DataStruct& a, const DataStruct& b)
     if (a.key2 != b.key2) return a.key2 < b.key2;
     return a.key3.length() < b.key3.length();
 }
+
 }
