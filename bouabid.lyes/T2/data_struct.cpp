@@ -3,11 +3,12 @@
 std::istream& operator>>(std::istream& in, DataStruct& data) {
     std::string line;
     while (std::getline(in, line)) {
+    
         std::smatch match;
 
-        // Проверка на обрамляющие скобки
-        if (!std::regex_match(line, std::regex(R"(\(:.*:\))")))
-            continue;
+    // Проверка на обрамляющие скобки
+    if (!std::regex_match(line, std::regex(R"(\(:.*:\))")))
+        continue;
 
         // Регулярные выражения для поиска ключей
         std::regex dblRegex(R"(:key1 ([+-]?[\d]+\.[\d]+)[dD]:)");
@@ -33,14 +34,15 @@ std::istream& operator>>(std::istream& in, DataStruct& data) {
             ok = false;
         }
 
-        if (ok) { 
-            return in;
-        }
+    if (ok){ 
+        return in;
     }
+  }
 
-    in.setstate(std::ios::failbit);
 
-    return in;
+  in.setstate(std::ios::failbit);
+
+  return in;
 }
 
 std::ostream& operator<<(std::ostream& out, const DataStruct& data) {
