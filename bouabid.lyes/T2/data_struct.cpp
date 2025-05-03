@@ -2,41 +2,43 @@
 
 std::istream& operator>>(std::istream& in, DataStruct& data) {
     std::string line;
-    if (!std::getline(in, line))
-        return in;
+    while (std::getline(in, line)) {
+        std::smatch match;
 
-    std::smatch match;
+        // Проверка на обрамляющие скобки
+        if (!std::regex_match(line, std::regex(R"(\(:.*:\))")))
+            continue;
 
-    // Проверка на обрамляющие скобки
-    if (!std::regex_match(line, std::regex(R"(\(:.*:\))")))
-        return in;
+        // Регулярные выражения для поиска ключей
+        std::regex dblRegex(R"(:key1 ([+-]?[\d]+\.[\d]+)[dD]:)");
+        std::regex chrRegex(R"(:key2 '(.{1})':)");
+        std::regex strRegex(R"(:key3 \"((?:[^"\\"\\\\]|\\\\.)*)\":)");
 
-    // Регулярные выражения для поиска ключей
-    std::regex dblRegex(R"(:key1 ([+-]?[\d]+\.[\d]+)[dD]:)");
-    std::regex chrRegex(R"(:key2 '(.{1})':)");
-    std::regex strRegex(R"(:key3 \"((?:[^"\\"\\\\]|\\\\.)*)\":)");
+        bool ok = true;
+        if (std::regex_search(line, match, dblRegex)) {
+            data.key1 = std::stod(match[1]);
+        } else {
+            ok = false;
+        }
 
-    bool ok = true;
-    if (std::regex_search(line, match, dblRegex)) {
-        data.key1 = std::stod(match[1]);
-    } else {
-        ok = false;
+        if (std::regex_search(line, match, chrRegex)) {
+            data.key2 = match[1].str()[0];
+        } else {
+            ok = false;
+        }
+
+        if (std::regex_search(line, match, strRegex)) {
+            data.key3 = match[1];
+        } else {
+            ok = false;
+        }
+
+        if (ok) { 
+            return in;
+        }
     }
 
-    if (std::regex_search(line, match, chrRegex)) {
-        data.key2 = match[1].str()[0];
-    } else {
-        ok = false;
-    }
-
-    if (std::regex_search(line, match, strRegex)) {
-        data.key3 = match[1];
-    } else {
-        ok = false;
-    }
-
-    if (!ok)
-        in.setstate(std::ios::failbit);
+    in.setstate(std::ios::failbit);
 
     return in;
 }
