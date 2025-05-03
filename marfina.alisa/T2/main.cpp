@@ -8,17 +8,15 @@
 int main()
 {
     std::vector<marfina::DataStruct> data;
-    while (!std::cin.eof())
+    std::string line;
+    while (std::getline(std::cin, line))
     {
+        if (line.empty()) continue;
+        std::istringstream iss(line);
         marfina::DataStruct temp;
-        if (std::cin >> temp)
+        if (iss >> temp)
         {
             data.push_back(temp);
-        }
-        else if (!std::cin.eof())
-        {
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
     }
     if (data.empty())
@@ -26,6 +24,7 @@ int main()
         std::cout << "Looks like there is no supported record. Cannot determine input. Test skipped\n";
         return 0;
     }
+    std::cout << "Atleast one supported record type\n";
     std::sort(data.begin(), data.end(), marfina::compare_structures);
     std::copy(
         data.begin(),
