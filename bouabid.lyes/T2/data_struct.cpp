@@ -34,10 +34,15 @@ std::istream& operator>>(std::istream& in, DataStruct& data) {
         ok = false;
     }
 
-    if (!ok)
-        in.setstate(std::ios::failbit);
+    if (ok){ 
+        return in;
+    }
+  }
 
-    return in;
+
+  in.setstate(std::ios::failbit);
+
+  return in;
 }
 
 std::ostream& operator<<(std::ostream& out, const DataStruct& data) {
