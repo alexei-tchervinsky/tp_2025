@@ -60,7 +60,8 @@ namespace nspace
             return os;
         }
         iofmtguard fmtguard(os);
-        os << "(:key1 '" << ds.key1 << "':key2 0x" << ds.key2 << ":key3 \"" << ds.key3 << "\":)";
+        os << "(:key1 '" << ds.key1 << "':key2 0x" << std::hex\
+        << std::uppercase << ds.key2 << std::dec <<":key3 \"" << ds.key3 << "\":)";
 
         return os;
     }
