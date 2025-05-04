@@ -8,7 +8,8 @@ namespace tarasov {
     }
 
     std::istream& operator>>(std::istream& in, DelimiterIO&& dest) {
-        if (const std::istream::sentry sentry(in); !sentry) return in;
+        const std::istream::sentry sentry(in);
+        if (!sentry) return in;
 
         char c = 0;
         in >> std::ws;
@@ -24,7 +25,8 @@ namespace tarasov {
     }
     /*
     std::istream& operator>>(std::istream& in, LabelIO&& dest) {
-        if (const std::istream::sentry sentry(in); !sentry) return in;
+        const std::istream::sentry sentry(in);
+        if (!sentry) return in;
 
         std::string read_str;
         char c;
@@ -45,13 +47,15 @@ namespace tarasov {
     }
     */
     std::istream& operator>>(std::istream& in, DoubleSciIO&& dest) {
-        if (const std::istream::sentry sentry(in); !sentry) return in;
+        const std::istream::sentry sentry(in);
+        if (!sentry) return in;
 
         return in >> std::scientific >> dest.ref;
     }
 
     std::istream& operator>>(std::istream& in, CharLitIO&& dest) {
-        if (const std::istream::sentry sentry(in); !sentry) return in;
+        const std::istream::sentry sentry(in);
+        if (!sentry) return in;
 
         char c1, c2, c3;
         in >> c1 >> c2 >> c3;
@@ -65,7 +69,8 @@ namespace tarasov {
     }
 
     std::istream& operator>>(std::istream& in, StringLitIO&& dest) {
-        if (const std::istream::sentry sentry(in); !sentry) return in;
+        const std::istream::sentry sentry(in);
+        if (!sentry) return in;
 
         return in >> std::quoted(dest.ref);
     }

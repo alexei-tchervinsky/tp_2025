@@ -14,7 +14,8 @@ namespace tarasov {
     }
 
     std::istream& operator>>(std::istream& in, DataStruct& dest) {
-        if (const std::istream::sentry sentry(in); !sentry) return in;
+        const std::istream::sentry sentry(in);
+        if (!sentry) return in;
 
         DataStruct data;
         std::string key_label;
@@ -61,7 +62,8 @@ namespace tarasov {
     }
 
     std::ostream& operator<<(std::ostream& out, const DataStruct& data) {
-        if (const std::ostream::sentry sentry(out); !sentry) return out;
+        const std::ostream::sentry sentry(out);
+        if (!sentry) return out;
 
         iofmtguard fmtguard(out);
 
