@@ -93,9 +93,7 @@ namespace nspace
             char c;
             is >> c;
             hex_num += c;
-            std::cerr << "DEBUG: символы 16ричного числа: " << c << "\n";
         }
-        std::cerr << "DEBUG: hex_num: " << hex_num << "\n";
         try
         {
             ullhex.ref = std::stoull(hex_num, nullptr, 16);
@@ -104,7 +102,6 @@ namespace nspace
         {
             is.setstate(std::ios::failbit);
         }
-        std::cerr << "DEBUG: 16-ричное число: " << std::hex << ullhex.ref << "\n";
         return is;
     }
 
