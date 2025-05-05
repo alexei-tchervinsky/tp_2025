@@ -1,5 +1,6 @@
 #include "ObjectsIO.h"
-std::istream& operator>>(std::istream& in, DelimiterIO&& dest) //перегрузка оператора ввода для разделителей
+//перегрузка оператора ввода для разделителей
+std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
 {
     std::istream::sentry sentry(in);
     if (!sentry)
@@ -14,7 +15,9 @@ std::istream& operator>>(std::istream& in, DelimiterIO&& dest) //перегру�
     }
     return in;
 }
-std::istream& operator>>(std::istream& in, OctIO&& dest) //перегрузка оператора ввода для данных 1-го ключа
+
+//перегрузка оператора ввода для данных 1-го ключа
+std::istream& operator>>(std::istream& in, OctIO&& dest)
 {
     std::istream::sentry sentry(in);
     if (!sentry)
@@ -23,7 +26,9 @@ std::istream& operator>>(std::istream& in, OctIO&& dest) //перегрузка 
     }
     return in >> DelimiterIO{'0'} >> dest.ref;
 }
-std::istream& operator>>(std::istream& in, StringIO&& dest) //перегрузка оператора ввода для данных 3-го ключа
+
+//перегрузка оператора ввода для данных 3-го ключа
+std::istream& operator>>(std::istream& in, StringIO&& dest)
 {
     std::istream::sentry sentry(in);
     if (!sentry)
@@ -32,7 +37,9 @@ std::istream& operator>>(std::istream& in, StringIO&& dest) //перегрузк
     }
     return std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
 }
-std::istream& operator>>(std::istream& in, LabelIO&& dest) //перегрузка оператора ввода для ключа
+
+//перегрузка оператора ввода для ключа
+std::istream& operator>>(std::istream& in, LabelIO&& dest)
 {
     std::istream::sentry sentry(in);
     if(!sentry)
@@ -46,7 +53,8 @@ std::istream& operator>>(std::istream& in, LabelIO&& dest) //перегрузк�
     }
     return in;
 }
-std::istream& operator>>(std::istream& in, CharIO&& dest) //перегрузка оператора ввода данных для 2-го ключа
+//перегрузка оператора ввода данных для 2-го ключа
+std::istream& operator>>(std::istream& in, CharIO&& dest)
 {
     std::istream::sentry sentry(in);
     if (!sentry)
