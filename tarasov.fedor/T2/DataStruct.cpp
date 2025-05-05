@@ -61,6 +61,21 @@ namespace tarasov {
         return in;
     }
 
+    std::string formatScientific(double data) {
+        std::ostringstream oss;
+        oss << std::scientific << std::setprecision(2) << data;
+        std::string str = oss.str();
+
+        size_t e_pos = str.find('e');
+        if (e_pos != std::string::npos) {
+            if (str[e_pos + 2] == '0') {
+                str.erase(e_pos + 2, 1);
+            }
+        }
+        return str;
+
+}
+
     std::ostream& operator<<(std::ostream& out, const DataStruct& data) {
         const std::ostream::sentry sentry(out);
         if (!sentry) return out;
@@ -68,7 +83,7 @@ namespace tarasov {
         iofmtguard fmtguard(out);
 
         out << "(:";
-        out << "key1 " << std::scientific << std::setprecision(1) << data.key1 << ":";
+        out << "key1 " << formatScientific(data.key1) << ":";
         out << "key2 " << '\'' << data.key2 << '\'' << ":";
         out << "key3 " << std::quoted(data.key3);
         out << ":)";

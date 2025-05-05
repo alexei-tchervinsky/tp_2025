@@ -3,6 +3,9 @@
 
 #include <iostream>
 #include <iomanip>
+#include <sstream>
+#include <string>
+#include <algorithm>
 #include <limits>
 
 namespace tarasov {
@@ -17,6 +20,8 @@ namespace tarasov {
     std::istream& operator>>(std::istream& in, DataStruct& dest);
 
     std::ostream& operator<<(std::ostream& out, const DataStruct& data);
+
+    std::string formatScientific(double data);
 }
 
 #endif
