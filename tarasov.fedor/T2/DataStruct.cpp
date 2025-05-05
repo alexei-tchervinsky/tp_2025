@@ -53,10 +53,12 @@ namespace tarasov {
         } else {
             in.setstate(std::ios::failbit);
 
+            /*
             if (in.fail()) {
                 in.clear();
                 in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             }
+            */
         }
         return in;
     }
@@ -73,8 +75,7 @@ namespace tarasov {
             }
         }
         return str;
-
-}
+    }
 
     std::ostream& operator<<(std::ostream& out, const DataStruct& data) {
         const std::ostream::sentry sentry(out);
