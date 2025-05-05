@@ -28,7 +28,7 @@ namespace tarasov {
             if (!(in >> key_label)) break;
 
             if (key_label == "key1") {
-                if (!(in >> DoubleSciIO{data.key1} >> DelimiterIO{':'})) break;
+                if (!(in >> DoubleSciIO{data.key1} >> DelimiterIO{':'}) or data.key1 == 0) break;
                 key1_read = true;
             } else if (key_label == "key2") {
                 if (!(in >> CharLitIO{data.key2} >> DelimiterIO{':'})) break;
@@ -63,7 +63,7 @@ namespace tarasov {
         return in;
     }
 
-    std::string formatScientific(double data) {
+    std::string formatScientific(const double data) {
         std::ostringstream oss;
         oss << std::scientific << std::setprecision(2) << data;
         std::string str = oss.str();
