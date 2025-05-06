@@ -65,7 +65,7 @@ namespace tarasov {
 
     std::string formatScientific(const double data) {
         std::ostringstream oss;
-        oss << std::scientific << std::setprecision(2) << data;
+        oss << std::scientific << std::setprecision(1) << data;
         std::string str = oss.str();
 
         size_t e_pos = str.find('e');
