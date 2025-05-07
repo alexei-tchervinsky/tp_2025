@@ -11,26 +11,15 @@ int main()
 {
     std::vector<DataStruct> ds;
 
-    while (true)
+    while (!std::cin.eof())
     {
-        DataStruct temp;
-
-        if (!(std::cin >> temp))
-        {
-            if (std::cin.eof())
-            {
-                break;
-            }
-
-
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            continue;
-        }
-
-        ds.push_back(temp);
+        std::copy(
+            std::istream_iterator<DataStruct>(std::cin),
+            std::istream_iterator<DataStruct>(),
+            std::back_inserter(ds)
+        );
+        if(!std::cin.fail()) continue;
     }
-
     std::sort(ds.begin(), ds.end(), nspace::compare);
 
     std::copy(
