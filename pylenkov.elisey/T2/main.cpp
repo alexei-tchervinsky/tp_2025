@@ -19,6 +19,8 @@ int main()
             std::back_inserter(ds)
         );
         if(!std::cin.fail()) continue;
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
     std::sort(ds.begin(), ds.end(), nspace::compare);
 
