@@ -1,4 +1,6 @@
 #include <iostream>
+#include <algorithm>
+#include <iterator>
 #include <string>
 #include <iomanip>
 #include "data_struct.hpp"
@@ -11,23 +13,40 @@ std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
     std::istream::sentry sentry(in);
     if (!sentry) return in;
     char c;
-    if (in >> c && c != dest.exp) in.setstate(std::ios::failbit);
+    in >> c;
+    if (in && (c != dest.exp))
+    {
+        in.setstate(std::ios::failbit);
+    }
     return in;
 }
 
 std::istream& operator>>(std::istream& in, CharIO&& dest)
 {
     std::istream::sentry sentry(in);
-    if (!sentry) return in;
+    if (!sentry)
+    {
+        return in;
+    }
+
     char quote;
-    if (in >> quote && quote != '\'')
+    in >> quote;
+    if (quote != '\'')
     {
         in.setstate(std::ios::failbit);
         return in;
     }
-    in >> dest.ref >> quote;
-    if (quote != '\'') in.setstate(std::ios::failbit);
+    char c;
+    in >> c;
+    dest.ref = c;
+    in >> quote;
+    if (quote != '\'')
+    {
+        in.setstate(std::ios::failbit);
+        return in;
+    }
     return in;
+
 }
 
 std::istream& operator>>(std::istream& in, RationalIO&& dest)
@@ -46,16 +65,29 @@ std::istream& operator>>(std::istream& in, RationalIO&& dest)
 std::istream& operator>>(std::istream& in, StringIO&& dest)
 {
     std::istream::sentry sentry(in);
-    if (!sentry) return in;
-    return std::getline(in >> DelimiterIO{'"'}, dest.ref, '"');
+    if (!sentry)
+    {
+        return in;
+    }
+    return std::getline(in >> DelimiterIO{'\"'}, dest.ref, '\"');
 }
 
 std::istream& operator>>(std::istream& in, LabelIO&& dest)
 {
     std::istream::sentry sentry(in);
-    if (!sentry) return in;
+    if (!sentry)
+    {
+        return in;
+    }
     std::string data;
-    if ((in >> data) && (data != dest.exp))
+    std::copy_n
+    (
+        std::istream_iterator<char>(in),
+        dest.exp.length(),
+        std::back_inserter(data)
+    );
+
+    if (in && (data != dest.exp))
     {
         in.setstate(std::ios::failbit);
     }
@@ -84,12 +116,12 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
         if (!(in >> field)) break;
         if (field == "key1")
         {
-            if (in >> RationalIO{input.key1}) has_key1 = true;
+            if (in >> CharIO{input.key1}) has_key1 = true;
             in >> DelimiterIO{':'};
         }
         else if (field == "key2")
         {
-            if (in >> CharIO{input.key2}) has_key2 = true;
+            if (in >> RationalIO{input.key2}) has_key2 = true;
             in >> DelimiterIO{':'};
         }
         else if (field == "key3")
@@ -99,8 +131,8 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
         }
         else
         {
-            in.setstate(std::ios::failbit);
-            break;
+            std::string stranger;
+            std::getline(in, stranger, ':');
         }
     }
 
@@ -115,14 +147,14 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
     return in;
 }
 
-std::ostream& operator<<(std::ostream& out, const DataStruct& src)
+std::ostream& operator<<(std::ostream& out, const DataStruct& dest)
 {
     std::ostream::sentry sentry(out);
     if (!sentry) return out;
     iofmtguard fmtguard(out);
-    out << "(:key1 (:N " << src.key1.first << ":D " << src.key1.second << ":)"
-        << ":key2 '" << src.key2 << "'"
-        << ":key3 \"" << src.key3 << "\":)";
+    out << "(:key1 '" << dest.key1 << "'"
+    << ":key2 (:N " << dest.key2.first << ":D " << dest.key2.second << ":)"
+    << ":key3 \"" << dest.key3 << "\":)";
     return out;
 }
 
@@ -144,10 +176,4 @@ bool compare_structures(const DataStruct& a, const DataStruct& b)
     if (a.key2 != b.key2) return a.key2 < b.key2;
     return a.key3.length() < b.key3.length();
 }
-
-bool is_supported_input(const DataStruct& data)
-{
-    return data.key3.find('"') == std::string::npos;
-}
-
 }
