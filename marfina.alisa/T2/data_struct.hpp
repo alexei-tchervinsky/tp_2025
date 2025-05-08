@@ -1,6 +1,6 @@
 #ifndef DATA_STRUCT_HPP
 #define DATA_STRUCT_HPP
-
+#include <iterator>
 #include <iostream>
 #include <utility>
 #include <string>
@@ -9,8 +9,8 @@ namespace marfina
 {
 struct DataStruct
 {
-    std::pair<long long, unsigned long long> key1;
-    char key2;
+    char key1;
+    std::pair<long long, unsigned long long> key2;
     std::string key3;
 };
 
@@ -40,6 +40,7 @@ std::istream& operator>>(std::istream& in, StringIO&& dest);
 std::istream& operator>>(std::istream& in, LabelIO&& dest);
 std::istream& operator>>(std::istream& in, DataStruct& dest);
 std::ostream& operator<<(std::ostream& out, const DataStruct& dest);
+
 bool compare_structures(const DataStruct& a, const DataStruct& b);
 }
 #endif
