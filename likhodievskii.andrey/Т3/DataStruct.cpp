@@ -24,7 +24,7 @@ namespace likhodievskii {
         return std::abs(sum) / 2.0;
     }
 
-    bool isRectangle(const Polygon& poly) {
+    bool isRectangle(const Polygon &poly) {
         if (poly.points.size() != 4) return false;
 
         auto isRightAngle = [](Point a, Point b, Point c) {
@@ -38,7 +38,7 @@ namespace likhodievskii {
                isRightAngle(poly.points[2], poly.points[3], poly.points[0]);
     }
 
-    bool isSame(const Polygon& poly1, const Polygon& poly2) {
+    bool isSame(const Polygon &poly1, const Polygon &poly2) {
         if (poly1.points.size() != poly2.points.size()) {
             return false;
         }
@@ -46,7 +46,7 @@ namespace likhodievskii {
         auto sortedPoints1 = poly1.points;
         auto sortedPoints2 = poly2.points;
 
-        auto pointComparator = [](const Point& a, const Point& b) {
+        auto pointComparator = [](const Point &a, const Point &b) {
             return (a.x < b.x) || (a.x == b.x && a.y < b.y);
         };
 
