@@ -168,7 +168,7 @@ namespace likhodievskii {
 
     void sameCommand(const std::vector<Polygon> &polygons, std::istream &in, std::ostream &out) {
         Polygon target;
-        if (!(in >> target)) {
+        if (!(in >> target) || target.points.size() < 3) {
             throw std::invalid_argument("INVALID COMMAND");
         }
         out << std::count_if(polygons.begin(), polygons.end(),

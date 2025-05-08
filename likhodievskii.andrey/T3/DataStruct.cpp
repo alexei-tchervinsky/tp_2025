@@ -130,7 +130,10 @@ namespace likhodievskii {
             }
             dest.points.push_back(p);
         }
-
+        if (dest.points.size() != numPoints) {
+            is.setstate(std::ios::failbit);
+            dest.points.clear();
+        }
         return is;
     }
 }
