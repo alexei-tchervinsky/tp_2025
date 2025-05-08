@@ -5,6 +5,7 @@
 #include "DataStruct.hpp"
 #include <algorithm>
 #include <numeric>
+#include <sstream>
 
 #include "iofmtguard.hpp"
 
@@ -114,9 +115,15 @@ namespace likhodievskii {
             return is;
         }
 
+        std::string line;
+        if (!std::getline(is, line)) {
+            return is;
+        }
+
+        std::istringstream iss(line);
         size_t numPoints = 0;
-        is >> numPoints;
-        if (numPoints < 3) {
+        iss >> numPoints;
+        if (numPoints < 3 || iss.fail()) {
             is.setstate(std::ios::failbit);
             return is;
         }
@@ -126,23 +133,19 @@ namespace likhodievskii {
 
         for (size_t i = 0; i < numPoints; ++i) {
             Point p;
-            if (!(is >> p)) {
+            if (!(iss >> p)) {
                 is.setstate(std::ios::failbit);
-                break;
+                return is;
             }
             dest.points.push_back(p);
         }
-        if (dest.points.size() != numPoints) {
+
+        iss >> std::ws;
+        if (iss.peek() != EOF) {
             is.setstate(std::ios::failbit);
-            dest.points.clear();
+            return is;
         }
 
-        iofmtguard guard(is);
-        is >> std::ws;
-        if (is.peek() != EOF && is.peek() != '\n') {
-            is.setstate(std::ios::failbit);
-            dest.points.clear();
-        }
         return is;
     }
 }
