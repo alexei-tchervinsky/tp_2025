@@ -24,8 +24,8 @@ namespace likhodievskii {
         return std::abs(sum) / 2.0;
     }
 
-    bool isRectangle(const Polygon &poly) {
-        if (poly.points.size() != 4) return false;
+    bool Polygon::isRectangle() const {
+        if (points.size() != 4) return false;
 
         auto isRightAngle = [](Point a, Point b, Point c) {
             int dx1 = b.x - a.x, dy1 = b.y - a.y;
@@ -33,9 +33,9 @@ namespace likhodievskii {
             return (dx1 * dx2 + dy1 * dy2) == 0;
         };
 
-        return isRightAngle(poly.points[0], poly.points[1], poly.points[2]) &&
-               isRightAngle(poly.points[1], poly.points[2], poly.points[3]) &&
-               isRightAngle(poly.points[2], poly.points[3], poly.points[0]);
+        return isRightAngle(points[0], points[1], points[2]) &&
+               isRightAngle(points[1], points[2], points[3]) &&
+               isRightAngle(points[2], points[3], points[0]);
     }
 
     bool isSame(const Polygon &poly1, const Polygon &poly2) {
@@ -83,6 +83,34 @@ namespace likhodievskii {
         if (is) {
             dest = tmp;
         }
+        return is;
+    }
+
+    std::istream &operator>>(std::istream &is, Polygon &dest) {
+        std::istream::sentry sentry(is);
+        if (!sentry) {
+            return is;
+        }
+
+        size_t numPoints = 0;
+        is >> numPoints;
+        if (numPoints < 3) {
+            is.setstate(std::ios::failbit);
+            return is;
+        }
+
+        dest.points.clear();
+        dest.points.reserve(numPoints);
+
+        for (size_t i = 0; i < numPoints; ++i) {
+            Point p;
+            if (!(is >> p)) {
+                is.setstate(std::ios::failbit);
+                break;
+            }
+            dest.points.push_back(p);
+        }
+
         return is;
     }
 }
