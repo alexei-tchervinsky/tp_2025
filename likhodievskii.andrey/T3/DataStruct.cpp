@@ -4,6 +4,7 @@
 
 #include "DataStruct.hpp"
 #include <algorithm>
+#include <numeric>
 
 namespace likhodievskii {
     bool Point::operator==(const Point &other) const {
@@ -38,22 +39,41 @@ namespace likhodievskii {
                isRightAngle(points[2], points[3], points[0]);
     }
 
+
     bool isSame(const Polygon &poly1, const Polygon &poly2) {
         if (poly1.points.size() != poly2.points.size()) {
             return false;
         }
+        if (poly1.points.empty()) {
+            return true;
+        }
 
-        auto sortedPoints1 = poly1.points;
-        auto sortedPoints2 = poly2.points;
-
-        auto pointComparator = [](const Point &a, const Point &b) {
-            return (a.x < b.x) || (a.x == b.x && a.y < b.y);
+        const auto min_point = [](const Polygon &poly) {
+            return std::accumulate(
+                poly.points.begin(), poly.points.end(),
+                poly.points.front(),
+                [](const Point &acc, const Point &p) {
+                    return Point(
+                        std::min(acc.x, p.x),
+                        std::min(acc.y, p.y)
+                    );
+                }
+            );
         };
 
-        std::sort(sortedPoints1.begin(), sortedPoints1.end(), pointComparator);
-        std::sort(sortedPoints2.begin(), sortedPoints2.end(), pointComparator);
+        const Point min1 = min_point(poly1);
+        const Point min2 = min_point(poly2);
 
-        return sortedPoints1 == sortedPoints2;
+        return std::inner_product(
+            poly1.points.begin(), poly1.points.end(),
+            poly2.points.begin(),
+            true,
+            [](bool acc, bool current) { return acc && current; },
+            [&](const Point &p1, const Point &p2) {
+                return (p1.x - min1.x) == (p2.x - min2.x) &&
+                       (p1.y - min1.y) == (p2.y - min2.y);
+            }
+        );
     }
 
     std::istream &operator>>(std::istream &is, const Delim &dest) {

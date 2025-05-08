@@ -67,6 +67,9 @@ namespace likhodievskii {
         } else {
             try {
                 size_t num = std::stoul(subcmd);
+                if (num < 3) {
+                    throw std::invalid_argument("INVALID COMMAND");
+                }
                 double res = std::accumulate(polygons.begin(), polygons.end(), 0.0,
                                              [num](double sum, const Polygon &p) {
                                                  return p.points.size() == num ? sum + p.area() : sum;
@@ -143,6 +146,9 @@ namespace likhodievskii {
         } else {
             try {
                 size_t num = std::stoul(subcmd);
+                if (num < 3) {
+                    throw std::invalid_argument("INVALID COMMAND");
+                }
                 out << std::count_if(polygons.begin(), polygons.end(),
                                      [num](const Polygon &p) {
                                          return p.points.size() == num;
