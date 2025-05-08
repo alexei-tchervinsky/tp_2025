@@ -8,13 +8,13 @@
 int main() {
     std::vector<marfina::DataStruct> data;
 
-    while (true) {
+    while (!std::cin.eof()) {
         marfina::DataStruct temp;
         if (std::cin >> temp) {
             data.push_back(temp);
-        } else if (std::cin.eof()) {
-            break;
-        } else {
+        }
+         else
+        {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
