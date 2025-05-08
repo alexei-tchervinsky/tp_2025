@@ -142,7 +142,7 @@ namespace likhodievskii {
         if (is.peek() != EOF && is.peek() != '\n') {
             is.setstate(std::ios::failbit);
             dest.points.clear();
-        } 
+        }
         return is;
     }
 }
