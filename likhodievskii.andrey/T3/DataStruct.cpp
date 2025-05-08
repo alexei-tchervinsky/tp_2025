@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <numeric>
 
+#include "iofmtguard.hpp"
+
 namespace likhodievskii {
     bool Point::operator==(const Point &other) const {
         return x == other.x && y == other.y;
@@ -134,6 +136,13 @@ namespace likhodievskii {
             is.setstate(std::ios::failbit);
             dest.points.clear();
         }
+
+        iofmtguard guard(is);
+        is >> std::ws;
+        if (is.peek() != EOF && is.peek() != '\n') {
+            is.setstate(std::ios::failbit);
+            dest.points.clear();
+        } 
         return is;
     }
 }
