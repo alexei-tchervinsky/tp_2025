@@ -34,8 +34,9 @@ int main(int argc, char *argv[]) {
         try {
             executeCommand(commands, polygons, command, std::cin, std::cout);
         } catch (const std::invalid_argument &e) {
-            if (std::string(e.what()) == "INVALID COMMAND") {
-                std::cout << "<INVALID COMMAND>\n";
+            std::cout << "<INVALID COMMAND>\n";
+            if (std::string(e.what()) == "UNKNOWN COMMAND") {
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             }
         }
     }

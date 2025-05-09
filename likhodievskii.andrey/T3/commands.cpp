@@ -37,7 +37,7 @@ namespace likhodievskii {
                         std::ostream &out) {
         auto it = commands.find(command);
         if (it == commands.end()) {
-            throw std::invalid_argument("INVALID COMMAND");
+            throw std::invalid_argument("UNKNOWN COMMAND");
         }
         it->second(polygons, in, out);
     }
