@@ -19,12 +19,20 @@ namespace likhodievskii {
     }
 
     double Polygon::area() const {
-        double sum = 0.0;
-        for (size_t i = 0; i < points.size(); ++i) {
-            const Point &p1 = points[i];
-            const Point &p2 = points[(i + 1) % points.size()];
-            sum += (p1.x * p2.y) - (p1.y * p2.x);
+        if (points.size() < 3) {
+            return 0.0;
         }
+
+        double sum = std::accumulate(
+            points.begin(),
+            points.end(),
+            0.0,
+            [this](double acc, const Point& p1) {
+                const Point& p2 = points[(&p1 - &points[0] + 1) % points.size()];
+                return acc + (p1.x * p2.y) - (p1.y * p2.x);
+            }
+        );
+
         return std::abs(sum) / 2.0;
     }
 
