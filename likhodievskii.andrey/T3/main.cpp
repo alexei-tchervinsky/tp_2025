@@ -8,17 +8,16 @@
 using namespace likhodievskii;
 
 int main(int argc, char *argv[]) {
-    // if (argc != 2) {
-    //     std::cerr << "ERROR: Filename not provided!\n";
-    //     return 1;
-    // }
-    //
-    // std::ifstream file(argv[1]);
-    // if (!file) {
-    //     std::cerr << "ERROR: Cannot open file!\n";
-    //     return 2;
-    // }
-    std::ifstream file("test");
+    if (argc != 2) {
+        std::cerr << "ERROR: Filename not provided!\n";
+        return 1;
+    }
+
+    std::ifstream file(argv[1]);
+    if (!file) {
+        std::cerr << "ERROR: Cannot open file!\n";
+        return 2;
+    }
     std::vector<Polygon> polygons;
     while (!file.eof()) {
         Polygon poly;
