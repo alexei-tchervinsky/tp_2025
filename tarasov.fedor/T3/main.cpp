@@ -138,6 +138,7 @@ void areaCommand(std::vector<Polygon>& polygons, const std::string& sub_command)
             size_t number_of_vertices = std::stol(sub_command);
             if (number_of_vertices < 3) {
                 std::cout << "<INVALID COMMAND>" << std::endl;
+                return;
             }
             area = std::accumulate(polygons.begin(), polygons.end(), area,
             [&number_of_vertices](const double sum, const Polygon& p) {
@@ -226,6 +227,7 @@ void countCommand(const std::vector<Polygon>& polygons, const std::string& sub_c
             size_t number_of_vertices = std::stol(sub_command);
             if (number_of_vertices < 3) {
                 std::cout << "<INVALID COMMAND>" << std::endl;
+                return;
             }
             count = std::count_if(polygons.cbegin(), polygons.cend(), [&number_of_vertices](const Polygon& p) {
                 return number_of_vertices == p.points.size();
