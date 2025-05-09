@@ -93,13 +93,17 @@ std::vector<Polygon> readFile(const std::string& fileName) {
 }
 
 double calculateArea(const Polygon& polygon) {
-    double area = 0.0;
-    for (size_t i = 0; i < polygon.points.size(); ++i) {
-        const Point& p1 = polygon.points[i];
-        const Point& p2 = polygon.points[(i + 1) % polygon.points.size()];
-        area += static_cast<double>(p1.x * p2.y) - static_cast<double>(p1.y * p2.x);
+    double area = std::accumulate(polygon.points.begin(),
+        std::prev(polygon.points.end()), 0.0,
+        [&](double sum, const Point& p1) {
+            const Point& p2 = *std::next(&p1);
+            return sum + (static_cast<double>(p1.x) * p2.y - static_cast<double>(p1.y) * p2.x);
+        });
 
-    }
+    const Point& last_point = polygon.points.back();
+    const Point& first_point = polygon.points.front();
+    area += static_cast<double>(last_point.x) * first_point.y - static_cast<double>(last_point.y) * first_point.x;
+
     return std::abs(area) / 2.0;
 }
 
