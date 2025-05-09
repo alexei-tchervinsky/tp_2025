@@ -8,7 +8,6 @@
 #include <numeric>
 #include <sstream>
 
-#include "iofmtguard.hpp"
 
 namespace likhodievskii {
     bool Point::operator==(const Point &other) const {
@@ -121,7 +120,6 @@ namespace likhodievskii {
 
         std::string readNow;
         std::getline(is, readNow);
-        std::cout << "readNow: " << readNow << '\n';
         std::istringstream iss(readNow);
         iss >> numPoints;
         if (numPoints < 3) {
