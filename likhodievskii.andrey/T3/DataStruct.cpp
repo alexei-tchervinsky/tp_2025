@@ -4,7 +4,9 @@
 
 #include "DataStruct.hpp"
 #include <algorithm>
+#include <iostream>
 #include <numeric>
+#include <sstream>
 
 namespace likhodievskii {
     bool Point::operator==(const Point &other) const {
@@ -113,25 +115,25 @@ namespace likhodievskii {
         }
 
         size_t numPoints = 0;
-        is >> numPoints;
+        dest.points.clear();
+
+        std::string readNow;
+        std::getline(is, readNow);
+        std::cout << "readNow: " << readNow << '\n';
+        std::istringstream iss(readNow);
+        iss >> numPoints;
         if (numPoints < 3) {
-            is.setstate(std::ios::failbit);
             return is;
         }
 
-        dest.points.clear();
-        dest.points.reserve(numPoints);
-
-        for (size_t i = 0; i < numPoints; ++i) {
+        while (!iss.eof()) {
             Point p;
-            if (!(is >> p)) {
-                is.setstate(std::ios::failbit);
+            if (!(iss >> p)) {
                 break;
             }
             dest.points.push_back(p);
         }
         if (dest.points.size() != numPoints) {
-            is.setstate(std::ios::failbit);
             dest.points.clear();
         }
         return is;
