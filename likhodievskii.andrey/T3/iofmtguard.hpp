@@ -29,6 +29,6 @@ namespace likhodievskii {
         std::streamsize precision_;
         std::basic_ios<char>::fmtflags fmt_;
     };
-};
+}
 
 #endif //IOFMTGUARD_HPP
