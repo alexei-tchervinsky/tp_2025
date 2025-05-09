@@ -79,8 +79,14 @@ std::vector<Polygon> readFile(const std::string& fileName) {
     std::vector<Polygon> polygons;
     std::string line;
     while (std::getline(file, line)) {
-        Polygon p = parsePolygon(line);
-        polygons.push_back(p);
+        if (line.empty() || std::all_of(line.begin(), line.end(), [](unsigned char c){ return std::isspace(c);})) {
+            continue;
+        }
+
+        try {
+            Polygon p = parsePolygon(line);
+            polygons.push_back(p);
+        } catch (const std::runtime_error& e) {}
     }
     file.close();
     return polygons;
