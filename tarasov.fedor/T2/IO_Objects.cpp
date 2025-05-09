@@ -23,29 +23,7 @@ namespace tarasov {
 
         return in;
     }
-    /*
-    std::istream& operator>>(std::istream& in, LabelIO&& dest) {
-        const std::istream::sentry sentry(in);
-        if (!sentry) return in;
 
-        std::string read_str;
-        char c;
-
-        while (in.get(c) && !std::isspace(c) && c != ':' && c != ')') {
-            read_str += c;
-        }
-
-        if (in && !std::isspace(c)) {
-            in.putback(c);
-        }
-
-        if (read_str != dest.exp) {
-            in.setstate(std::ios::failbit);
-        }
-
-        return in;
-    }
-    */
     std::istream& operator>>(std::istream& in, DoubleSciIO&& dest) {
         const std::istream::sentry sentry(in);
         if (!sentry) return in;
@@ -57,11 +35,9 @@ namespace tarasov {
         const std::istream::sentry sentry(in);
         if (!sentry) return in;
 
-        char c1, c2, c3;
-        in >> c1 >> c2 >> c3;
-
-        if (in && c1 == '\'' && c3 == '\'') {
-            dest.ref = c2;
+        char c;
+        if (in >> DelimiterIO{'\''} >> c >> DelimiterIO{'\''}) {
+            dest.ref = c;
         } else {
             in.setstate(std::ios::failbit);
         }

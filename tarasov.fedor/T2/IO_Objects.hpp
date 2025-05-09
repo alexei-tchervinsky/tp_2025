@@ -9,12 +9,6 @@ namespace tarasov {
         char exp;
     };
 
-    /*
-    struct LabelIO {
-        std::string exp;
-    };
-    */
-
     struct DoubleSciIO {
         double& ref;
     };
@@ -30,8 +24,6 @@ namespace tarasov {
     char readChar(std::istream& in);
 
     std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
-
-    //std::istream& operator>>(std::istream& in, LabelIO&& dest);
 
     std::istream& operator>>(std::istream& in, DoubleSciIO&& dest);
 

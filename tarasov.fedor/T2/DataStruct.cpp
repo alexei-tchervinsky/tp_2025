@@ -42,7 +42,6 @@ namespace tarasov {
                 if (!in) break;
             }
 
-            if (in.peek() == ')') break;
             in >> std::ws;
         }
 
@@ -52,13 +51,6 @@ namespace tarasov {
             dest = data;
         } else {
             in.setstate(std::ios::failbit);
-
-            /*
-            if (in.fail()) {
-                in.clear();
-                in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            }
-            */
         }
         return in;
     }
