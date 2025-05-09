@@ -301,6 +301,7 @@ int main(int argc, char* argv[]) {
     std::string line;
     while (std::getline(std::cin, line)) {
         std::stringstream ss(line);
+
         std::string command;
         ss >> command;
 
