@@ -29,18 +29,22 @@ std::istream& operator>>(std::istream& in, CharIO&& dest)
         return in;
     }
 
-    char quote;
-    in >> quote;
-    if (quote != '\'')
+
+    if (! (in >> DelimiterIO {'\''}))
     {
         in.setstate(std::ios::failbit);
         return in;
     }
     char c;
-    in >> c;
+
+    if (!(in >> c))
+    {
+        in.setstate(std::ios::failbit);
+        return in;
+    }
     dest.ref = c;
-    in >> quote;
-    if (quote != '\'')
+
+    if (!(in >> DelimiterIO{'\''}))
     {
         in.setstate(std::ios::failbit);
         return in;
@@ -53,12 +57,28 @@ std::istream& operator>>(std::istream& in, RationalIO&& dest)
 {
     std::istream::sentry sentry(in);
     if (!sentry) return in;
-    in >> DelimiterIO{'('} >> DelimiterIO{':'} >> LabelIO{"N"};
-    in >> dest.ref.first;
-    in >> DelimiterIO{':'} >> LabelIO{"D"};
-    in >> dest.ref.second;
-    in >> DelimiterIO{':'} >> DelimiterIO{')'};
-    if (dest.ref.second == 0) in.setstate(std::ios::failbit);
+
+    if (!(in >> DelimiterIO{'('} >> DelimiterIO{':'} >> LabelIO{"N"}))
+    {
+        in.setstate(std::ios::failbit);
+        return in;
+    }
+    if (!(in >> dest.ref.first)) return in;
+    if (!(in >> DelimiterIO{':'} >> LabelIO{"D"}))
+    {
+        in.setstate(std::ios::failbit);
+        return in;
+    }
+    if (!(in >> dest.ref.second)) return in;
+    if (!(in >> DelimiterIO{':'} >> DelimiterIO{')'}))
+    {
+        in.setstate(std::ios::failbit);
+        return in;
+    }
+    if (dest.ref.second == 0)
+    {
+        in.setstate(std::ios::failbit);
+    }
     return in;
 }
 
