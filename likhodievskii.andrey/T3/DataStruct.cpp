@@ -8,6 +8,8 @@
 #include <numeric>
 #include <sstream>
 
+#include "iofmtguard.hpp"
+
 namespace likhodievskii {
     bool Point::operator==(const Point &other) const {
         return x == other.x && y == other.y;
@@ -136,6 +138,7 @@ namespace likhodievskii {
         if (dest.points.size() != numPoints) {
             dest.points.clear();
         }
+
         return is;
     }
 }

@@ -171,6 +171,11 @@ namespace likhodievskii {
         if (!(in >> target) || target.points.size() < 3) {
             throw std::invalid_argument("INVALID COMMAND");
         }
+        iofmtguard guard(in);
+        in >> std::ws;
+        if (in.peek() != '\n' && in.peek() != EOF) {
+            throw std::invalid_argument("INVALID COMMAND");
+        }
         out << std::count_if(polygons.begin(), polygons.end(),
                              [&target](const Polygon &p) {
                                  return isSame(p, target);
