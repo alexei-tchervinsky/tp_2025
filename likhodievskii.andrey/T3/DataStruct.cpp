@@ -114,7 +114,7 @@ namespace likhodievskii {
         if (!sentry) {
             return is;
         }
-
+        Polygon tmp{};
         size_t numPoints = 0;
         dest.points.clear();
 
@@ -131,12 +131,13 @@ namespace likhodievskii {
             if (!(iss >> p)) {
                 break;
             }
-            dest.points.push_back(p);
+            tmp.points.push_back(p);
         }
-        if (dest.points.size() != numPoints) {
-            dest.points.clear();
+        if (tmp.points.size() != numPoints) {
+            tmp.points.clear();
+            return is;
         }
-
+        dest = std::move(tmp);
         return is;
     }
 }

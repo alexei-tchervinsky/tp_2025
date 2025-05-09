@@ -83,10 +83,10 @@ namespace likhodievskii {
 
     void maxCommand(const std::vector<Polygon> &polygons, std::istream &in, std::ostream &out) {
         iofmtguard guard(out);
-        checkEmpty(polygons);
 
         std::string subcmd;
         in >> subcmd;
+        checkEmpty(polygons);
 
         if (subcmd == "AREA") {
             auto it = std::max_element(polygons.begin(), polygons.end(),
@@ -107,10 +107,10 @@ namespace likhodievskii {
 
     void minCommand(const std::vector<Polygon> &polygons, std::istream &in, std::ostream &out) {
         iofmtguard guard(out);
-        checkEmpty(polygons);
 
         std::string subcmd;
         in >> subcmd;
+        checkEmpty(polygons);
 
         if (subcmd == "AREA") {
             auto it = std::min_element(polygons.begin(), polygons.end(),
@@ -171,11 +171,7 @@ namespace likhodievskii {
         if (!(in >> target) || target.points.size() < 3) {
             throw std::invalid_argument("INVALID COMMAND");
         }
-        iofmtguard guard(in);
-        in >> std::ws;
-        if (in.peek() != '\n' && in.peek() != EOF) {
-            throw std::invalid_argument("INVALID COMMAND");
-        }
+
         out << std::count_if(polygons.begin(), polygons.end(),
                              [&target](const Polygon &p) {
                                  return isSame(p, target);
