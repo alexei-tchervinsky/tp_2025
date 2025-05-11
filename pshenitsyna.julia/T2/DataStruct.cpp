@@ -22,7 +22,7 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
         in >> sep{':'};
         in >> label{"key2"} >> sep{' '} >> chr{input.key2};
         in >> sep{':'};
-        in >> label{"key1"} >> sep{' '} >> oct{input.key1};
+        in >> label{"key3"} >> sep{' '} >> str{input.key3};
         in >> sep{':'};
         in >> sep{')'};
     }
