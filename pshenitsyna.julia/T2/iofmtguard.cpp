@@ -1,7 +1,3 @@
-//
-// Created by Thunderobot on 05.05.2025.
-//
-
 #include "iofmtguard.h"
 iofmtguard::iofmtguard(std::basic_ios< char >& s) :
     s_(s),
