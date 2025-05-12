@@ -7,7 +7,7 @@ std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
     {
         return in;
     }
-    char c = '0';
+    char c;
     in >> c;
     if (in && (c != dest.exp))
     {
@@ -22,6 +22,13 @@ std::istream& operator>>(std::istream& in, OctIO&& dest)
     std::istream::sentry sentry(in);
     if (!sentry)
     {
+        return in;
+    }
+    char c;
+    in >> c;
+    if(!in || c !='0')
+    {
+        in.setstate(std::ios::failbit);
         return in;
     }
     return in >> std::oct >> dest.ref;
@@ -46,8 +53,8 @@ std::istream& operator>>(std::istream& in, LabelIO&& dest)
     {
         return in;
     }
-    std::string data = "";
-    if ((in >> StringIO{ data }) && (data != dest.exp))
+    std::string data;
+    if ((in >> StringIO{data}) && (data != dest.exp))
     {
         in.setstate(std::ios::failbit);
     }

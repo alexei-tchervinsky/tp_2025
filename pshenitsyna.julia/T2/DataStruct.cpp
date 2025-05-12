@@ -4,19 +4,18 @@
 
 std::istream& operator>>(std::istream& in, DataStruct& dest)
 {
-    std::string keyLabel;
     std::istream::sentry sentry(in);
     if (!sentry)
     {
         return in;
     }
     DataStruct input;
+    std::string keyLabel;
         using sep = DelimiterIO;
         using oct = OctIO;
         using chr = CharIO;
         using str = StringIO;
-        in >> sep{'('};
-        in >> sep{':'};
+        in >> sep{'('} >> sep{':'};
         bool isKey1 = false, isKey2 = false, isKey3 = false;
         while(in.peek() != ')')
         {
