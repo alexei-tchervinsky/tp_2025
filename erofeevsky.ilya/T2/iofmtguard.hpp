@@ -4,16 +4,18 @@
 #include <iostream>
 
 namespace erofick {
-    class iofmtguard {
+    class iofmtguard
+    {
     public:
         iofmtguard(std::basic_ios<char>&);
         ~iofmtguard();
+
     private:
-        std::basic_ios<char>& s_;
-        std::streamsize width_;
-        char fill_;
-        std::streamsize precision_;
-        std::basic_ios<char>::fmtflags fmt_;
+        std::basic_ios<char>& _s;
+        std::streamsize _width;
+        char _fill;
+        std::streamsize _precision;
+        std::basic_ios<char>::fmtflags _fmt;
     };
 }
 

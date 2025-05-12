@@ -4,8 +4,9 @@
 #include <string>
 #include <utility>
 
-namespace erofick {
-    struct DataStruct {
+namespace erofick{
+    struct DataStruct
+    {
         long long key1;
         char key2;
         std::string key3;
