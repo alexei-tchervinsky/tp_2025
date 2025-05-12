@@ -16,17 +16,16 @@ int main() {
     std::vector<DataStruct> v;
     while (!std::cin.eof())
     {
-        std::copy(
-                std::istream_iterator<DataStruct>(std::cin),
-                std::istream_iterator<DataStruct>(),
-                std::back_inserter(v)
-        );
-        if(!std::cin.fail())
+        DataStruct ds;
+        if (std::cin >> ds)
         {
-            continue;
+            v.push_back(ds);
         }
-        std::cin.clear();
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        else if (!std::cin.eof())
+        {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
     }
     std::sort(v.begin(), v.end(), DataStructSort);
     std::copy(
