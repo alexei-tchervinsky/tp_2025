@@ -1,5 +1,6 @@
 #ifndef GEOMETRY_HPP
 #define GEOMETRY_HPP
+#include <iostream>
 #include <vector>
 #include <string>
 #include <functional>

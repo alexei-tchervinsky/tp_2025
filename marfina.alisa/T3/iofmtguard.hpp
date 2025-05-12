@@ -1,5 +1,6 @@
 #ifndef IOFMTGUARD_HPP
 #define IOFMTGUARD_HPP
+#include <iostream>
 #include <ios>
 class iofmtguard
 {
