@@ -12,7 +12,6 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
     }
     DataStruct input;
         using sep = DelimiterIO;
-        using label = LabelIO;
         using oct = OctIO;
         using chr = CharIO;
         using str = StringIO;
