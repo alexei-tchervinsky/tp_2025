@@ -24,7 +24,7 @@ std::istream& operator>>(std::istream& in, OctIO&& dest)
     {
         return in;
     }
-    return in >> DelimiterIO{'0'} >> dest.ref;
+    return in >> std::oct >> dest.ref;
 }
 
 //перегрузка оператора ввода для данных 3-го ключа
