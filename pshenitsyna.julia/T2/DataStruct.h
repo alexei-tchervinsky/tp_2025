@@ -8,8 +8,8 @@ struct DataStruct{
     char key2;
     std::string key3;
 
-    friend std::ostream& operator<<(std::ostream&, const DataStruct&);
-    friend std::istream& operator>>(std::istream&, DataStruct&);
+    friend std::ostream& operator<<(std::ostream&, const DataStruct& src);
+    friend std::istream& operator>>(std::istream&, DataStruct& dest);
 };
 
 #endif //T2_DATASTRUCT_H

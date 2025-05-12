@@ -1,7 +1,3 @@
-//
-// Created by Thunderobot on 05.05.2025.
-//
-
 #ifndef T2_IOFMTGUARD_H
 #define T2_IOFMTGUARD_H
 #include <iostream>

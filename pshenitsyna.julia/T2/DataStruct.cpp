@@ -11,7 +11,6 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
         return in;
     }
     DataStruct input;
-    {
         using sep = DelimiterIO;
         using label = LabelIO;
         using oct = OctIO;
@@ -19,33 +18,42 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
         using str = StringIO;
         in >> sep{'('};
         in >> sep{':'};
+        bool isKey1 = false, isKey2 = false, isKey3 = false;
         while(in.peek() != ')')
         {
             if(!(in >> keyLabel))
             {
                 break;
             }
-            if (keyLabel == "key1")
+            if (keyLabel == "key1" && !isKey1)
             {
-                in >> label{"key1"} >> sep{' '} >> oct{input.key1};
-                in >> sep{':'};
+                in >> sep{' '} >> oct{input.key1} >> sep{':'};
+                isKey1 = true;
             }
-            else if (keyLabel == "key2")
+            else if (keyLabel == "key2" && !isKey2)
             {
-                in >> label{"key2"} >> sep{' '} >> chr{input.key2};
-                in >> sep{':'};
+                in >> sep{' '} >> chr{input.key2} >> sep{':'};
+                isKey2 = true;
             }
-            else if (keyLabel == "key3")
+            else if (keyLabel == "key3" && !isKey3)
             {
-                in >> label{"key3"} >> sep{' '} >> str{input.key3};
-                in >> sep{':'};
+                in >> sep{' '} >> str{input.key3} >> sep{':'};
+                isKey3 = true;
+            }
+            else
+            {
+                in.setstate(std::ios::failbit);
+                break;
             }
         }
-        in >> sep{')'};
-    }
-    if (in)
+    if (in && isKey1 && isKey2 && isKey3)
     {
+        in >> sep{')'};
         dest = input;
+    }
+    else
+    {
+        in.setstate(std::ios::failbit);
     }
     return in;
 }

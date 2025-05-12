@@ -1,8 +1,3 @@
-/*
- * T2 key 1: ULL OCT
- * T2 key 2" CHR LIT
- * (:key1 10ull:key2 'c':key3 "Data":)
- */
 #include "DataStruct.h"
 #include "DataStructSort.h"
 
