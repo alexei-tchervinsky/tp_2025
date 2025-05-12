@@ -4,6 +4,7 @@
 
 std::istream& operator>>(std::istream& in, DataStruct& dest)
 {
+    std::string keyLabel;
     std::istream::sentry sentry(in);
     if (!sentry)
     {
@@ -18,12 +19,28 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
         using str = StringIO;
         in >> sep{'('};
         in >> sep{':'};
-        in >> label{"key1"} >> sep{' '} >> oct{input.key1};
-        in >> sep{':'};
-        in >> label{"key2"} >> sep{' '} >> chr{input.key2};
-        in >> sep{':'};
-        in >> label{"key3"} >> sep{' '} >> str{input.key3};
-        in >> sep{':'};
+        while(in.peek() != ')')
+        {
+            if(!(in >> keyLabel))
+            {
+                break;
+            }
+            if (keyLabel == "key1")
+            {
+                in >> label{"key1"} >> sep{' '} >> oct{input.key1};
+                in >> sep{':'};
+            }
+            else if (keyLabel == "key2")
+            {
+                in >> label{"key2"} >> sep{' '} >> chr{input.key2};
+                in >> sep{':'};
+            }
+            else if (keyLabel == "key3")
+            {
+                in >> label{"key3"} >> sep{' '} >> str{input.key3};
+                in >> sep{':'};
+            }
+        }
         in >> sep{')'};
     }
     if (in)
@@ -41,8 +58,8 @@ std::ostream& operator<<(std::ostream& out, const DataStruct& src)
         return out;
     }
     iofmtguard fmtguard(out);
-    out << "(:key1 " << src.key1 << ":";
-    out << "key2 " << src.key2 << ":";
-    out << "key3 " << src.key3 << ":)";
+    out << "(:key1 " << '0' <<src.key1 << ":";
+    out << "key2 " << '\'' << src.key2 << '\'' << ":";
+    out << "key3 " << '"' << src.key3 << '"' << ":)";
     return out;
 }
