@@ -334,8 +334,9 @@ void echoCommand(std::vector<Polygon>& polygons, const std::string& arg)
         }
         if (poly.points.size() == vertexCount && isPolygonValid(poly))
         {
+            size_t countBefore = polygons.size();
             polygons.push_back(poly);
-            std::cout << vertexCount << '\n';
+            std::cout << (polygons.size() - countBefore) << '\n';
         }
         else
         {
@@ -519,9 +520,9 @@ void intersectionsCommand(const std::vector<Polygon>& polygons, const std::strin
             return;
         }
         size_t count = 0;
-        for (const auto& p : polygons)
+        for (const auto& existingPoly : polygons)
         {
-            if (doPolygonsIntersect(poly, p))
+            if (doPolygonsIntersect(poly, existingPoly))
             {
                 ++count;
             }
