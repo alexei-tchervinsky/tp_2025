@@ -332,11 +332,19 @@ void echoCommand(std::vector<Polygon>& polygons, const std::string& arg)
                 }
             }
         }
+
         if (poly.points.size() == vertexCount && isPolygonValid(poly))
         {
-            size_t countBefore = polygons.size();
             polygons.push_back(poly);
-            std::cout << (polygons.size() - countBefore) << '\n';
+            size_t count = 0;
+            for (const auto& p : polygons)
+            {
+                if (p.points.size() == vertexCount)
+                {
+                    ++count;
+                }
+            }
+            std::cout << count << '\n';
         }
         else
         {
@@ -373,7 +381,6 @@ void inframeCommand(const std::vector<Polygon>& polygons, const std::string& arg
         std::cout << "<INVALID COMMAND>\n";
         return;
     }
-
     try
     {
         size_t vertexCount = std::stoul(arg);
@@ -450,7 +457,8 @@ void inframeCommand(const std::vector<Polygon>& polygons, const std::string& arg
     }
 }
 
-bool doPolygonsIntersect(const Polygon& a, const Polygon& b) {
+bool doPolygonsIntersect(const Polygon& a, const Polygon& b)
+{
     int aMinX = a.points[0].x, aMaxX = a.points[0].x;
     int aMinY = a.points[0].y, aMaxY = a.points[0].y;
     for (const auto& point : a.points)
