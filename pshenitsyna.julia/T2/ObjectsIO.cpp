@@ -32,7 +32,7 @@ std::istream& operator>>(std::istream& in, OctIO&& dest)
     }
 
     if (isdigit(in.peek())) {
-        in >> std::oct >> dest.ref;
+        in >> dest.ref;
     }
     else
     {
