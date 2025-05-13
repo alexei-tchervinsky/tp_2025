@@ -9,7 +9,6 @@ int main(int argc, char* argv[])
         std::cerr << "Usage: " << argv[0] << " filename\n";
         return 1;
     }
-
     try
     {
         std::vector<Polygon> polygons = readPolygonsFromFile(argv[1]);
@@ -20,6 +19,5 @@ int main(int argc, char* argv[])
         std::cerr << "Error: " << e.what() << '\n';
         return 1;
     }
-
     return 0;
 }
