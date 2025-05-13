@@ -2,8 +2,6 @@
 #define GEOMETRY_HPP
 #include <vector>
 #include <string>
-#include <functional>
-
 struct Point
 {
     int x, y;
@@ -19,7 +17,7 @@ bool operator!=(const Point& lhs, const Point& rhs);
 double calculateArea(const Polygon& polygon);
 double calculateArea(const std::vector<Polygon>& polygons);
 std::vector<Polygon> readPolygonsFromFile(const std::string& filename);
-void processCommands(const std::vector<Polygon>& polygons);
+void processCommands(std::vector<Polygon>& polygons);
 void areaCommand(const std::vector<Polygon>& polygons, const std::string& arg);
 void maxCommand(const std::vector<Polygon>& polygons, const std::string& arg);
 void minCommand(const std::vector<Polygon>& polygons, const std::string& arg);
@@ -27,13 +25,8 @@ void countCommand(const std::vector<Polygon>& polygons, const std::string& arg);
 void echoCommand(std::vector<Polygon>& polygons, const std::string& arg);
 void inframeCommand(const std::vector<Polygon>& polygons, const std::string& arg);
 void intersectionsCommand(const std::vector<Polygon>& polygons, const std::string& arg);
-void maxseqCommand(const std::vector<Polygon>& polygons, const std::string& arg);
-void permsCommand(const std::vector<Polygon>& polygons, const std::string& arg);
-void rmechoCommand(std::vector<Polygon>& polygons, const std::string& arg);
-void sameCommand(const std::vector<Polygon>& polygons, const std::string& arg);
 bool isPolygonValid(const Polygon& poly);
 bool isPointInFrame(const Point& p, const Polygon& frame);
 bool doPolygonsIntersect(const Polygon& a, const Polygon& b);
-bool arePolygonsSame(const Polygon& a, const Polygon& b);
 
 #endif
