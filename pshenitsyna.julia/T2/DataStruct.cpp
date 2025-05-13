@@ -4,13 +4,13 @@
 
 std::istream& operator>>(std::istream& in, DataStruct& dest)
 {
+//    std::cerr << "DEBUG: Start parsing..." << std::endl;
     std::istream::sentry sentry(in);
     if (!sentry)
     {
         return in;
     }
     DataStruct input;
-    std::string keyLabel;
         using sep = DelimiterIO;
         using oct = OctIO;
         using chr = CharIO;
@@ -19,24 +19,31 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
         bool isKey1 = false, isKey2 = false, isKey3 = false;
         while(in.peek() != ')')
         {
+            std::string keyLabel;
             if(!(in >> keyLabel))
             {
                 break;
             }
             if (keyLabel == "key1" && !isKey1)
             {
-                in >> sep{' '} >> oct{input.key1} >> sep{':'};
+                in >> oct{input.key1} >> sep{':'};
                 isKey1 = true;
+//                std::cerr << "DEBUG: Successful read key1" << std::endl;
+
             }
             else if (keyLabel == "key2" && !isKey2)
             {
-                in >> sep{' '} >> chr{input.key2} >> sep{':'};
+                in >> chr{input.key2} >> sep{':'};
                 isKey2 = true;
+//                std::cerr << "DEBUG: Successful read key2" << std::endl;
+
             }
             else if (keyLabel == "key3" && !isKey3)
             {
-                in >> sep{' '} >> str{input.key3} >> sep{':'};
+                in >> str{input.key3} >> sep{':'};
                 isKey3 = true;
+//                std::cerr << "DEBUG: Successful read key3" << std::endl;
+
             }
             else
             {
@@ -46,11 +53,13 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
         }
     if (in && isKey1 && isKey2 && isKey3)
     {
+//        std::cerr << "DEBUG: Parsed successfully!" << std::endl;
         in >> sep{')'};
         dest = input;
     }
     else
     {
+//        std::cerr << "DEBUG: Parsing failed!" << std::endl;
         in.setstate(std::ios::failbit);
     }
     return in;

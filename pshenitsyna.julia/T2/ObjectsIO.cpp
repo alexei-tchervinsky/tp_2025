@@ -25,13 +25,22 @@ std::istream& operator>>(std::istream& in, OctIO&& dest)
         return in;
     }
     char c;
-    in >> c;
-    if(!in || c !='0')
+    if(!(in>>c) || c !='0')
     {
         in.setstate(std::ios::failbit);
         return in;
     }
-    return in >> std::oct >> dest.ref;
+
+    if (isdigit(in.peek())) {
+        in >> std::oct >> dest.ref;
+    }
+    else
+    {
+        dest.ref = 0;
+    }
+
+    return in;
+//    return in >> std::oct >> dest.ref;
 }
 
 //перегрузка оператора ввода для данных 3-го ключа
