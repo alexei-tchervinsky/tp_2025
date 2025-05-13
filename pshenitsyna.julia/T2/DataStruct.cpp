@@ -4,7 +4,6 @@
 
 std::istream& operator>>(std::istream& in, DataStruct& dest)
 {
-//    std::cerr << "DEBUG: Start parsing..." << std::endl;
     std::istream::sentry sentry(in);
     if (!sentry)
     {
@@ -28,21 +27,18 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
             {
                 in >> oct{input.key1} >> sep{':'};
                 isKey1 = true;
-//                std::cerr << "DEBUG: Successful read key1" << std::endl;
 
             }
             else if (keyLabel == "key2" && !isKey2)
             {
                 in >> chr{input.key2} >> sep{':'};
                 isKey2 = true;
-//                std::cerr << "DEBUG: Successful read key2" << std::endl;
 
             }
             else if (keyLabel == "key3" && !isKey3)
             {
                 in >> str{input.key3} >> sep{':'};
                 isKey3 = true;
-//                std::cerr << "DEBUG: Successful read key3" << std::endl;
 
             }
             else
@@ -53,13 +49,11 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
         }
     if (in && isKey1 && isKey2 && isKey3)
     {
-//        std::cerr << "DEBUG: Parsed successfully!" << std::endl;
         in >> sep{')'};
         dest = input;
     }
     else
     {
-//        std::cerr << "DEBUG: Parsing failed!" << std::endl;
         in.setstate(std::ios::failbit);
     }
     return in;

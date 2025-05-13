@@ -40,7 +40,6 @@ std::istream& operator>>(std::istream& in, OctIO&& dest)
     }
 
     return in;
-//    return in >> std::oct >> dest.ref;
 }
 
 //перегрузка оператора ввода для данных 3-го ключа
