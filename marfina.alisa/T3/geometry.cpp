@@ -589,7 +589,7 @@ void processCommands(std::vector<Polygon>& polygons)
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             }
         }
-        catch (const std::exception& e)
+        catch (...)
         {
             std::cout << "<INVALID COMMAND>\n";
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
