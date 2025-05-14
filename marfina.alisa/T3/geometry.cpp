@@ -201,22 +201,26 @@ void minCommand(const std::vector<Polygon>& polygons, const std::string& arg) {
 }
 
 void countCommand(const std::vector<Polygon>& polygons, const std::string& arg) {
-    auto countIf = [&polygons](const std::function<bool(size_t)>& pred) {
-        return std::count_if(polygons.begin(), polygons.end(),
-            [&pred](const Polygon& p) { return pred(p.points.size()); });
-    };
-
     if (arg == "EVEN") {
-        std::cout << countIf([](size_t n) { return n % 2 == 0; }) << '\n';
+        size_t count = std::count_if(polygons.begin(), polygons.end(),
+            [](const Polygon& p) { return p.points.size() % 2 == 0; });
+        std::cout << count << '\n';
     }
     else if (arg == "ODD") {
-        std::cout << countIf([](size_t n) { return n % 2 != 0; }) << '\n';
+        size_t count = std::count_if(polygons.begin(), polygons.end(),
+            [](const Polygon& p) { return p.points.size() % 2 != 0; });
+        std::cout << count << '\n';
     }
     else {
         try {
             size_t num = std::stoul(arg);
-            if (num < 3) throw std::invalid_argument("Invalid vertex count");
-            std::cout << countIf([num](size_t n) { return n == num; }) << '\n';
+            if (num < 3) {
+                std::cout << "<INVALID COMMAND>\n";
+                return;
+            }
+            size_t count = std::count_if(polygons.begin(), polygons.end(),
+                [num](const Polygon& p) { return p.points.size() == num; });
+            std::cout << count << '\n';
         }
         catch (...) {
             std::cout << "<INVALID COMMAND>\n";
@@ -277,12 +281,19 @@ void inframeCommand(std::vector<Polygon>& polygons, const std::string& arg) {
             }
             poly.points.push_back(p);
         }
+        for (size_t i = 0; i < poly.points.size(); ++i) {
+            for (size_t j = i + 1; j < poly.points.size(); ++j) {
+                if (poly.points[i] == poly.points[j]) {
+                    std::cout << "<INVALID COMMAND>\n";
+                    return;
+                }
+            }
+        }
 
         if (!isPolygonValid(poly)) {
             std::cout << "<INVALID COMMAND>\n";
             return;
         }
-
         int minX = std::numeric_limits<int>::max();
         int maxX = std::numeric_limits<int>::min();
         int minY = std::numeric_limits<int>::max();
@@ -296,12 +307,14 @@ void inframeCommand(std::vector<Polygon>& polygons, const std::string& arg) {
                 maxY = std::max(maxY, point.y);
             }
         }
-
-        bool allInside = std::all_of(poly.points.begin(), poly.points.end(),
-            [=](const Point& point) {
-                return point.x >= minX && point.x <= maxX &&
-                       point.y >= minY && point.y <= maxY;
-            });
+        bool allInside = true;
+        for (const auto& point : poly.points) {
+            if (point.x < minX || point.x > maxX ||
+                point.y < minY || point.y > maxY) {
+                allInside = false;
+                break;
+            }
+        }
 
         std::cout << (allInside ? "<TRUE>" : "<FALSE>") << '\n';
     }
