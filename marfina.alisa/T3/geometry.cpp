@@ -106,18 +106,18 @@ void areaCommand(const std::vector<Polygon>& polygons, const std::string& arg) {
     iofmtguard guard(std::cout);
     std::cout << std::fixed << std::setprecision(1);
 
-    auto areaFilter = [](const Polygon& p, const std::function<bool(size_t)>& pred) {
-        return pred(p.points.size()) ? calculateArea(p) : 0.0;
-    };
-
     if (arg == "EVEN") {
         auto sum = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-            std::bind(areaFilter, _1, [](size_t n) { return n % 2 == 0; }));
+            [](double sum, const Polygon& p) {
+                return sum + (p.points.size() % 2 == 0 ? calculateArea(p) : 0.0);
+            });
         std::cout << sum << '\n';
     }
     else if (arg == "ODD") {
         auto sum = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-            std::bind(areaFilter, _1, [](size_t n) { return n % 2 != 0; }));
+            [](double sum, const Polygon& p) {
+                return sum + (p.points.size() % 2 != 0 ? calculateArea(p) : 0.0);
+            });
         std::cout << sum << '\n';
     }
     else if (arg == "MEAN") {
@@ -133,7 +133,9 @@ void areaCommand(const std::vector<Polygon>& polygons, const std::string& arg) {
             size_t num = std::stoul(arg);
             if (num < 3) throw std::invalid_argument("Invalid vertex count");
             auto sum = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-                std::bind(areaFilter, _1, [num](size_t n) { return n == num; }));
+                [num](double sum, const Polygon& p) {
+                    return sum + (p.points.size() == num ? calculateArea(p) : 0.0);
+                });
             std::cout << sum << '\n';
         }
         catch (...) {
