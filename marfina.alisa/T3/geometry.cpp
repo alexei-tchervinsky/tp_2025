@@ -335,24 +335,16 @@ void echoCommand(std::vector<Polygon>& polygons, const std::string& arg)
 
         if (poly.points.size() == vertexCount && isPolygonValid(poly))
         {
-            size_t countBefore = 0;
-            for (const auto& p : polygons)
-            {
-                if (p.points.size() == vertexCount)
-                {
-                    ++countBefore;
-                }
-            }
             polygons.push_back(poly);
-            size_t countAfter = 0;
+            size_t count = 0;
             for (const auto& p : polygons)
             {
                 if (p.points.size() == vertexCount)
                 {
-                    ++countAfter;
+                    ++count;
                 }
             }
-            std::cout << countAfter << '\n';
+            std::cout << count << '\n';
         }
         else
         {
@@ -432,8 +424,21 @@ void inframeCommand(const std::vector<Polygon>& polygons, const std::string& arg
             return;
         }
 
-        int minX, maxX, minY, maxY;
-        getFrame(polygons, minX, maxX, minY, maxY);
+        int minX = polygons[0].points[0].x;
+        int maxX = polygons[0].points[0].x;
+        int minY = polygons[0].points[0].y;
+        int maxY = polygons[0].points[0].y;
+        for (const auto& polygon : polygons)
+        {
+            for (const auto& point : polygon.points)
+            {
+                minX = std::min(minX, point.x);
+                maxX = std::max(maxX, point.x);
+                minY = std::min(minY, point.y);
+                maxY = std::max(maxY, point.y);
+            }
+        }
+
         bool allInside = true;
         for (const auto& point : poly.points)
         {
@@ -521,6 +526,7 @@ void intersectionsCommand(const std::vector<Polygon>& polygons, const std::strin
             std::cout << "<INVALID COMMAND>\n";
             return;
         }
+
         size_t count = 0;
         for (const auto& existingPoly : polygons)
         {
