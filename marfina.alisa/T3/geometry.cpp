@@ -295,250 +295,135 @@ void countCommand(const std::vector<Polygon>& polygons, const std::string& arg)
     }
 }
 
-void echoCommand(std::vector<Polygon>& polygons, const std::string& arg)
-{
-    try
-    {
+void echoCommand(std::vector<Polygon>& polygons, const std::string& arg) {
+    try {
         size_t vertexCount = std::stoul(arg);
-        if (vertexCount < 3)
-        {
-            std::cout << "<INVALID COMMAND>\n";
-            return;
+        if (vertexCount < 3) {
+            throw std::invalid_argument("INVALID COMMAND");
         }
         Polygon poly;
-        Point p;
+        std::string line;
+        std::getline(std::cin, line);
+        std::istringstream iss(line);
         char discard;
-        std::cin >> discard;
-        if (discard != '(')
-        {
-            std::cout << "<INVALID COMMAND>\n";
-            return;
-        }
-        for (size_t i = 0; i < vertexCount; ++i)
-        {
-            if (!(std::cin >> p.x >> discard >> p.y >> discard) || discard != ')')
-            {
-                std::cout << "<INVALID COMMAND>\n";
-                return;
-            }
-            poly.points.push_back(p);
-            if (i != vertexCount - 1)
-            {
-                std::cin >> discard;
-                if (discard != '(')
-                {
-                    std::cout << "<INVALID COMMAND>\n";
-                    return;
-                }
+        for (size_t i = 0; i < vertexCount; ++i) {
+            if (!(iss >> discard >> poly.points[i].x >> discard >> poly.points[i].y >> discard)) {
+                throw std::invalid_argument("INVALID COMMAND");
             }
         }
-
-        if (poly.points.size() == vertexCount && isPolygonValid(poly))
-        {
-            polygons.push_back(poly);
-            size_t count = 0;
-            for (const auto& p : polygons)
-            {
-                if (p.points.size() == vertexCount)
-                {
-                    ++count;
-                }
-            }
-            std::cout << count << '\n';
+        if (poly.points.size() != vertexCount || !isPolygonValid(poly)) {
+            throw std::invalid_argument("INVALID COMMAND");
         }
-        else
-        {
-            std::cout << "<INVALID COMMAND>\n";
-        }
+        polygons.push_back(poly);
+        size_t count = std::count(polygons.begin(), polygons.end(), poly);
+        std::cout << count << '\n';
     }
-    catch (...)
-    {
+    catch (...) {
         std::cout << "<INVALID COMMAND>\n";
     }
 }
 
-void getFrame(const std::vector<Polygon>& polygons, int& minX, int& maxX, int& minY, int& maxY)
-{
-    if (polygons.empty()) return;
-    minX = polygons[0].points[0].x;
-    maxX = polygons[0].points[0].x;
-    minY = polygons[0].points[0].y;
-    maxY = polygons[0].points[0].y;
-    for (const auto& polygon : polygons)
-    {
-        for (const auto& point : polygon.points)
-        {
-            minX = std::min(minX, point.x);
-            maxX = std::max(maxX, point.x);
-            minY = std::min(minY, point.y);
-            maxY = std::max(maxY, point.y);
-        }
-    }
-}
-
-void inframeCommand(const std::vector<Polygon>& polygons, const std::string& arg)
-{
-    if (polygons.empty())
-    {
+void inframeCommand(const std::vector<Polygon>& polygons, const std::string& arg) {
+    if (polygons.empty()) {
         std::cout << "<INVALID COMMAND>\n";
         return;
     }
-    try
-    {
+    try {
         size_t vertexCount = std::stoul(arg);
-        if (vertexCount < 3)
-        {
-            std::cout << "<INVALID COMMAND>\n";
-            return;
+        if (vertexCount < 3) {
+            throw std::invalid_argument("INVALID COMMAND");
         }
         Polygon poly;
-        Point p;
+        std::string line;
+        std::getline(std::cin, line);
+        std::istringstream iss(line);
         char discard;
-        std::cin >> discard;
-        if (discard != '(')
-        {
-            std::cout << "<INVALID COMMAND>\n";
-            return;
-        }
-        for (size_t i = 0; i < vertexCount; ++i)
-        {
-            if (!(std::cin >> p.x >> discard >> p.y >> discard) || discard != ')')
-            {
-                std::cout << "<INVALID COMMAND>\n";
-                return;
-            }
-            poly.points.push_back(p);
-            if (i != vertexCount - 1)
-            {
-                std::cin >> discard;
-                if (discard != '(')
-                {
-                    std::cout << "<INVALID COMMAND>\n";
-                    return;
-                }
+        for (size_t i = 0; i < vertexCount; ++i) {
+            if (!(iss >> discard >> poly.points[i].x >> discard >> poly.points[i].y >> discard)) {
+                throw std::invalid_argument("INVALID COMMAND");
             }
         }
-        if (poly.points.size() != vertexCount || !isPolygonValid(poly))
-        {
-            std::cout << "<INVALID COMMAND>\n";
-            return;
+        if (poly.points.size() != vertexCount || !isPolygonValid(poly)) {
+            throw std::invalid_argument("INVALID COMMAND");
         }
-
         int minX = polygons[0].points[0].x;
         int maxX = polygons[0].points[0].x;
         int minY = polygons[0].points[0].y;
         int maxY = polygons[0].points[0].y;
-        for (const auto& polygon : polygons)
-        {
-            for (const auto& point : polygon.points)
-            {
+        for (const auto& polygon : polygons) {
+            for (const auto& point : polygon.points) {
                 minX = std::min(minX, point.x);
                 maxX = std::max(maxX, point.x);
                 minY = std::min(minY, point.y);
                 maxY = std::max(maxY, point.y);
             }
         }
-
         bool allInside = true;
-        for (const auto& point : poly.points)
-        {
-            if (point.x < minX || point.x > maxX || point.y < minY || point.y > maxY)
-            {
+        for (const auto& point : poly.points) {
+            if (point.x < minX || point.x > maxX || point.y < minY || point.y > maxY) {
                 allInside = false;
                 break;
             }
         }
         std::cout << (allInside ? "<TRUE>" : "<FALSE>") << '\n';
     }
-    catch (...)
-    {
+    catch (...) {
         std::cout << "<INVALID COMMAND>\n";
     }
 }
 
-bool doPolygonsIntersect(const Polygon& a, const Polygon& b)
-{
-    int aMinX = a.points[0].x, aMaxX = a.points[0].x;
-    int aMinY = a.points[0].y, aMaxY = a.points[0].y;
-    for (const auto& point : a.points)
-    {
-        aMinX = std::min(aMinX, point.x);
-        aMaxX = std::max(aMaxX, point.x);
-        aMinY = std::min(aMinY, point.y);
-        aMaxY = std::max(aMaxY, point.y);
+bool doPolygonsIntersect(const Polygon& a, const Polygon& b) {
+    auto getBoundingBox = [](const Polygon& poly) {
+        int minX = poly.points[0].x, maxX = poly.points[0].x;
+        int minY = poly.points[0].y, maxY = poly.points[0].y;
+        for (const auto& p : poly.points) {
+            minX = std::min(minX, p.x);
+            maxX = std::max(maxX, p.x);
+            minY = std::min(minY, p.y);
+            maxY = std::max(maxY, p.y);
+        }
+        return std::make_tuple(minX, maxX, minY, maxY);
+    };
+    auto [aMinX, aMaxX, aMinY, aMaxY] = getBoundingBox(a);
+    auto [bMinX, bMaxX, bMinY, bMaxY] = getBoundingBox(b);
+    if (aMaxX < bMinX || aMinX > bMaxX || aMaxY < bMinY || aMinY > bMaxY) {
+        return false;
     }
-    int bMinX = b.points[0].x, bMaxX = b.points[0].x;
-    int bMinY = b.points[0].y, bMaxY = b.points[0].y;
-    for (const auto& point : b.points)
-    {
-        bMinX = std::min(bMinX, point.x);
-        bMaxX = std::max(bMaxX, point.x);
-        bMinY = std::min(bMinY, point.y);
-        bMaxY = std::max(bMaxY, point.y);
-    }
-    return !(aMaxX < bMinX || aMinX > bMaxX || aMaxY < bMinY || aMinY > bMaxY);
+    return true;
 }
 
-void intersectionsCommand(const std::vector<Polygon>& polygons, const std::string& arg)
-{
-    if (polygons.empty())
-    {
+void intersectionsCommand(const std::vector<Polygon>& polygons, const std::string& arg) {
+    if (polygons.empty()) {
         std::cout << "<INVALID COMMAND>\n";
         return;
     }
-    try
-    {
+    try {
         size_t vertexCount = std::stoul(arg);
-        if (vertexCount < 3)
-        {
-            std::cout << "<INVALID COMMAND>\n";
-            return;
+        if (vertexCount < 3) {
+            throw std::invalid_argument("INVALID COMMAND");
         }
         Polygon poly;
-        Point p;
+        std::string line;
+        std::getline(std::cin, line);
+        std::istringstream iss(line);
         char discard;
-        std::cin >> discard;
-        if (discard != '(')
-        {
-            std::cout << "<INVALID COMMAND>\n";
-            return;
-        }
-        for (size_t i = 0; i < vertexCount; ++i)
-        {
-            if (!(std::cin >> p.x >> discard >> p.y >> discard) || discard != ')')
-            {
-                std::cout << "<INVALID COMMAND>\n";
-                return;
-            }
-            poly.points.push_back(p);
-            if (i != vertexCount - 1)
-            {
-                std::cin >> discard;
-                if (discard != '(')
-                {
-                    std::cout << "<INVALID COMMAND>\n";
-                    return;
-                }
+        for (size_t i = 0; i < vertexCount; ++i) {
+            if (!(iss >> discard >> poly.points[i].x >> discard >> poly.points[i].y >> discard)) {
+                throw std::invalid_argument("INVALID COMMAND");
             }
         }
-        if (poly.points.size() != vertexCount || !isPolygonValid(poly))
-        {
-            std::cout << "<INVALID COMMAND>\n";
-            return;
+        if (poly.points.size() != vertexCount || !isPolygonValid(poly)) {
+            throw std::invalid_argument("INVALID COMMAND");
         }
-
         size_t count = 0;
-        for (const auto& existingPoly : polygons)
-        {
-            if (doPolygonsIntersect(poly, existingPoly))
-            {
+        for (const auto& existingPoly : polygons) {
+            if (doPolygonsIntersect(poly, existingPoly)) {
                 ++count;
             }
         }
         std::cout << count << '\n';
     }
-    catch (...)
-    {
+    catch (...) {
         std::cout << "<INVALID COMMAND>\n";
     }
 }
