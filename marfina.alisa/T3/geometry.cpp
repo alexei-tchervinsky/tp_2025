@@ -231,11 +231,14 @@ void rightShapesCommand(const std::vector<Polygon>& polygons) {
 }
 
 bool isPointInFrame(const Point& p, const Polygon& frame) {
-    auto [minX, maxX] = std::minmax_element(frame.points.begin(), frame.points.end(),
+    auto minX = std::min_element(frame.points.begin(), frame.points.end(),
         [](const Point& a, const Point& b) { return a.x < b.x; });
-    auto [minY, maxY] = std::minmax_element(frame.points.begin(), frame.points.end(),
+    auto maxX = std::max_element(frame.points.begin(), frame.points.end(),
+        [](const Point& a, const Point& b) { return a.x < b.x; });
+    auto minY = std::min_element(frame.points.begin(), frame.points.end(),
         [](const Point& a, const Point& b) { return a.y < b.y; });
-
+    auto maxY = std::max_element(frame.points.begin(), frame.points.end(),
+        [](const Point& a, const Point& b) { return a.y < b.y; });
     return p.x >= minX->x && p.x <= maxX->x && p.y >= minY->y && p.y <= maxY->y;
 }
 
