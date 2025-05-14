@@ -87,209 +87,134 @@ std::vector<Polygon> readPolygonsFromFile(const std::string& filename)
     return polygons;
 }
 
-void areaCommand(const std::vector<Polygon>& polygons, const std::string& arg)
-{
+void areaCommand(const std::vector<Polygon>& polygons, const std::string& arg) {
     iofmtguard guard(std::cout);
     std::cout << std::fixed << std::setprecision(1);
-    if (arg == "EVEN")
-    {
-        double sum = 0.0;
-        for (const auto& p : polygons)
-        {
-            if (p.points.size() % 2 == 0)
-            {
-                sum += calculateArea(p);
-            }
-        }
+    if (arg == "EVEN") {
+        auto sum = std::accumulate(polygons.begin(), polygons.end(), 0.0,
+            [](double acc, const Polygon& p) {
+                return acc + (p.points.size() % 2 == 0 ? calculateArea(p) : 0.0);
+            });
         std::cout << sum << '\n';
     }
-    else if (arg == "ODD")
-    {
-        double sum = 0.0;
-        for (const auto& p : polygons)
-        {
-            if (p.points.size() % 2 != 0)
-            {
-                sum += calculateArea(p);
-            }
-        }
+    else if (arg == "ODD") {
+        auto sum = std::accumulate(polygons.begin(), polygons.end(), 0.0,
+            [](double acc, const Polygon& p) {
+                return acc + (p.points.size() % 2 != 0 ? calculateArea(p) : 0.0);
+            });
         std::cout << sum << '\n';
     }
-    else if (arg == "MEAN")
-    {
-        if (polygons.empty())
-        {
+    else if (arg == "MEAN") {
+        if (polygons.empty()) {
             std::cout << "<INVALID COMMAND>\n";
             return;
         }
-        double total = calculateArea(polygons);
+        auto total = std::accumulate(polygons.begin(), polygons.end(), 0.0,
+            [](double acc, const Polygon& p) {
+                return acc + calculateArea(p);
+            });
         std::cout << total / polygons.size() << '\n';
     }
-    else
-    {
-        try
-        {
+    else {
+        try {
             size_t num = std::stoul(arg);
-            if (num < 3)
-            {
+            if (num < 3) {
                 std::cout << "<INVALID COMMAND>\n";
                 return;
             }
-            double sum = 0.0;
-            for (const auto& p : polygons)
-            {
-                if (p.points.size() == num)
-                {
-                    sum += calculateArea(p);
-                }
-            }
+            auto sum = std::accumulate(polygons.begin(), polygons.end(), 0.0,
+                [num](double acc, const Polygon& p) {
+                    return acc + (p.points.size() == num ? calculateArea(p) : 0.0);
+                });
             std::cout << sum << '\n';
         }
-        catch (...)
-        {
+        catch (...) {
             std::cout << "<INVALID COMMAND>\n";
         }
     }
 }
 
-void maxCommand(const std::vector<Polygon>& polygons, const std::string& arg)
-{
+void maxCommand(const std::vector<Polygon>& polygons, const std::string& arg) {
     iofmtguard guard(std::cout);
     std::cout << std::fixed << std::setprecision(1);
-    if (polygons.empty())
-    {
+    if (polygons.empty()) {
         std::cout << "<INVALID COMMAND>\n";
         return;
     }
-    if (arg == "AREA")
-    {
-        auto maxIt = polygons.begin();
-        double maxArea = calculateArea(*maxIt);
-        for (auto it = polygons.begin(); it != polygons.end(); ++it)
-        {
-            double area = calculateArea(*it);
-            if (area > maxArea)
-            {
-                maxArea = area;
-                maxIt = it;
-            }
-        }
-        std::cout << maxArea << '\n';
+    if (arg == "AREA") {
+        auto maxIt = std::max_element(polygons.begin(), polygons.end(),
+            [](const Polygon& a, const Polygon& b) {
+                return calculateArea(a) < calculateArea(b);
+            });
+        std::cout << calculateArea(*maxIt) << '\n';
     }
-    else if (arg == "VERTEXES")
-    {
-        auto maxIt = polygons.begin();
-        size_t maxVert = maxIt->points.size();
-        for (auto it = polygons.begin(); it != polygons.end(); ++it)
-        {
-            size_t vert = it->points.size();
-            if (vert > maxVert)
-            {
-                maxVert = vert;
-                maxIt = it;
-            }
-        }
-        std::cout << maxVert << '\n';
+    else if (arg == "VERTEXES") {
+        auto maxIt = std::max_element(polygons.begin(), polygons.end(),
+            [](const Polygon& a, const Polygon& b) {
+                return a.points.size() < b.points.size();
+            });
+        std::cout << maxIt->points.size() << '\n';
     }
-    else
-    {
+    else {
         std::cout << "<INVALID COMMAND>\n";
     }
 }
 
-void minCommand(const std::vector<Polygon>& polygons, const std::string& arg)
-{
+void minCommand(const std::vector<Polygon>& polygons, const std::string& arg) {
     iofmtguard guard(std::cout);
     std::cout << std::fixed << std::setprecision(1);
-    if (polygons.empty())
-    {
+    if (polygons.empty()) {
         std::cout << "<INVALID COMMAND>\n";
         return;
     }
-    if (arg == "AREA")
-    {
-        auto minIt = polygons.begin();
-        double minArea = calculateArea(*minIt);
-        for (auto it = polygons.begin(); it != polygons.end(); ++it)
-        {
-            double area = calculateArea(*it);
-            if (area < minArea)
-            {
-                minArea = area;
-                minIt = it;
-            }
-        }
-        std::cout << minArea << '\n';
+    if (arg == "AREA") {
+        auto minIt = std::min_element(polygons.begin(), polygons.end(),
+            [](const Polygon& a, const Polygon& b) {
+                return calculateArea(a) < calculateArea(b);
+            });
+        std::cout << calculateArea(*minIt) << '\n';
     }
-    else if (arg == "VERTEXES")
-    {
-        auto minIt = polygons.begin();
-        size_t minVert = minIt->points.size();
-        for (auto it = polygons.begin(); it != polygons.end(); ++it)
-        {
-            size_t vert = it->points.size();
-            if (vert < minVert)
-            {
-                minVert = vert;
-                minIt = it;
-            }
-        }
-        std::cout << minVert << '\n';
+    else if (arg == "VERTEXES") {
+        auto minIt = std::min_element(polygons.begin(), polygons.end(),
+            [](const Polygon& a, const Polygon& b) {
+                return a.points.size() < b.points.size();
+            });
+        std::cout << minIt->points.size() << '\n';
     }
-    else
-    {
+    else {
         std::cout << "<INVALID COMMAND>\n";
     }
 }
 
-void countCommand(const std::vector<Polygon>& polygons, const std::string& arg)
-{
-    if (arg == "EVEN")
-    {
-        size_t count = 0;
-        for (const auto& p : polygons)
-        {
-            if (p.points.size() % 2 == 0)
-            {
-                ++count;
-            }
-        }
+void countCommand(const std::vector<Polygon>& polygons, const std::string& arg) {
+    if (arg == "EVEN") {
+        auto count = std::count_if(polygons.begin(), polygons.end(),
+            [](const Polygon& p) {
+                return p.points.size() % 2 == 0;
+            });
         std::cout << count << '\n';
     }
-    else if (arg == "ODD")
-    {
-        size_t count = 0;
-        for (const auto& p : polygons)
-        {
-            if (p.points.size() % 2 != 0)
-            {
-                ++count;
-            }
-        }
+    else if (arg == "ODD") {
+        auto count = std::count_if(polygons.begin(), polygons.end(),
+            [](const Polygon& p) {
+                return p.points.size() % 2 != 0;
+            });
         std::cout << count << '\n';
     }
-    else
-    {
-        try
-        {
+    else {
+        try {
             size_t num = std::stoul(arg);
-            if (num < 3)
-            {
+            if (num < 3) {
                 std::cout << "<INVALID COMMAND>\n";
                 return;
             }
-            size_t count = 0;
-            for (const auto& p : polygons)
-            {
-                if (p.points.size() == num)
-                {
-                    ++count;
-                }
-            }
+            auto count = std::count_if(polygons.begin(), polygons.end(),
+                [num](const Polygon& p) {
+                    return p.points.size() == num;
+                });
             std::cout << count << '\n';
         }
-        catch (...)
-        {
+        catch (...) {
             std::cout << "<INVALID COMMAND>\n";
         }
     }
@@ -363,6 +288,7 @@ void inframeCommand(const std::vector<Polygon>& polygons, const std::string& arg
             std::cout << "<INVALID COMMAND>\n";
             return;
         }
+
         Polygon poly;
         std::string pointStr;
         std::getline(std::cin >> std::ws, pointStr);
@@ -387,26 +313,40 @@ void inframeCommand(const std::vector<Polygon>& polygons, const std::string& arg
             return;
         }
 
-        int minX = polygons[0].points[0].x;
-        int maxX = polygons[0].points[0].x;
-        int minY = polygons[0].points[0].y;
-        int maxY = polygons[0].points[0].y;
-        for (const auto& polygon : polygons) {
-            for (const auto& point : polygon.points) {
-                minX = std::min(minX, point.x);
-                maxX = std::max(maxX, point.x);
-                minY = std::min(minY, point.y);
-                maxY = std::max(maxY, point.y);
-            }
-        }
+        // Calculate frame using algorithms
+        auto [minX, maxX] = std::minmax_element(
+            polygons.begin(), polygons.end(),
+            [](const Polygon& a, const Polygon& b) {
+                auto minA = std::min_element(a.points.begin(), a.points.end(),
+                    [](const Point& p1, const Point& p2) { return p1.x < p2.x; });
+                auto minB = std::min_element(b.points.begin(), b.points.end(),
+                    [](const Point& p1, const Point& p2) { return p1.x < p2.x; });
+                return minA->x < minB->x;
+            });
+        auto [minY, maxY] = std::minmax_element(
+            polygons.begin(), polygons.end(),
+            [](const Polygon& a, const Polygon& b) {
+                auto minA = std::min_element(a.points.begin(), a.points.end(),
+                    [](const Point& p1, const Point& p2) { return p1.y < p2.y; });
+                auto minB = std::min_element(b.points.begin(), b.points.end(),
+                    [](const Point& p1, const Point& p2) { return p1.y < p2.y; });
+                return minA->y < minB->y;
+            });
 
-        bool allInside = true;
-        for (const auto& point : poly.points) {
-            if (point.x < minX || point.x > maxX || point.y < minY || point.y > maxY) {
-                allInside = false;
-                break;
-            }
-        }
+        int frameMinX = std::min_element(minX->points.begin(), minX->points.end(),
+            [](const Point& p1, const Point& p2) { return p1.x < p2.x; })->x;
+        int frameMaxX = std::max_element(maxX->points.begin(), maxX->points.end(),
+            [](const Point& p1, const Point& p2) { return p1.x < p2.x; })->x;
+        int frameMinY = std::min_element(minY->points.begin(), minY->points.end(),
+            [](const Point& p1, const Point& p2) { return p1.y < p2.y; })->y;
+        int frameMaxY = std::max_element(maxY->points.begin(), maxY->points.end(),
+            [](const Point& p1, const Point& p2) { return p1.y < p2.y; })->y;
+
+        bool allInside = std::all_of(poly.points.begin(), poly.points.end(),
+            [=](const Point& point) {
+                return point.x >= frameMinX && point.x <= frameMaxX &&
+                       point.y >= frameMinY && point.y <= frameMaxY;
+            });
         std::cout << (allInside ? "<TRUE>" : "<FALSE>") << '\n';
     }
     catch (...) {
@@ -436,21 +376,19 @@ bool doPolygonsIntersect(const Polygon& a, const Polygon& b) {
     return !(aMaxX < bMinX || aMinX > bMaxX || aMaxY < bMinY || aMinY > bMaxY);
 }
 
-void intersectionsCommand(const std::vector<Polygon>& polygons, const std::string& arg)
-{
-    if (polygons.empty())
-    {
+void intersectionsCommand(const std::vector<Polygon>& polygons, const std::string& arg) {
+    if (polygons.empty()) {
         std::cout << "<INVALID COMMAND>\n";
         return;
     }
-    try
-    {
+
+    try {
         size_t vertexCount = std::stoul(arg);
-        if (vertexCount < 3)
-        {
+        if (vertexCount < 3) {
             std::cout << "<INVALID COMMAND>\n";
             return;
         }
+
         Polygon poly;
         std::string pointStr;
         std::getline(std::cin >> std::ws, pointStr);
@@ -475,16 +413,13 @@ void intersectionsCommand(const std::vector<Polygon>& polygons, const std::strin
             return;
         }
 
-        size_t count = 0;
-        for (const auto& p : polygons) {
-            if (doPolygonsIntersect(poly, p)) {
-                ++count;
-            }
-        }
+        auto count = std::count_if(polygons.begin(), polygons.end(),
+            [&poly](const Polygon& p) {
+                return doPolygonsIntersect(poly, p);
+            });
         std::cout << count << '\n';
     }
-    catch (...)
-    {
+    catch (...) {
         std::cout << "<INVALID COMMAND>\n";
     }
 }
