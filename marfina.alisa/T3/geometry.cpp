@@ -335,16 +335,24 @@ void echoCommand(std::vector<Polygon>& polygons, const std::string& arg)
 
         if (poly.points.size() == vertexCount && isPolygonValid(poly))
         {
-            polygons.push_back(poly);
-            size_t count = 0;
+            size_t countBefore = 0;
             for (const auto& p : polygons)
             {
                 if (p.points.size() == vertexCount)
                 {
-                    ++count;
+                    ++countBefore;
                 }
             }
-            std::cout << count << '\n';
+            polygons.push_back(poly);
+            size_t countAfter = 0;
+            for (const auto& p : polygons)
+            {
+                if (p.points.size() == vertexCount)
+                {
+                    ++countAfter;
+                }
+            }
+            std::cout << countAfter << '\n';
         }
         else
         {
@@ -357,21 +365,23 @@ void echoCommand(std::vector<Polygon>& polygons, const std::string& arg)
     }
 }
 
-bool isPointInFrame(const Point& p, const Polygon& frame)
+void getFrame(const std::vector<Polygon>& polygons, int& minX, int& maxX, int& minY, int& maxY)
 {
-    if (frame.points.size() < 3) return false;
-    int minX = frame.points[0].x;
-    int maxX = frame.points[0].x;
-    int minY = frame.points[0].y;
-    int maxY = frame.points[0].y;
-    for (const auto& point : frame.points)
+    if (polygons.empty()) return;
+    minX = polygons[0].points[0].x;
+    maxX = polygons[0].points[0].x;
+    minY = polygons[0].points[0].y;
+    maxY = polygons[0].points[0].y;
+    for (const auto& polygon : polygons)
     {
-        minX = std::min(minX, point.x);
-        maxX = std::max(maxX, point.x);
-        minY = std::min(minY, point.y);
-        maxY = std::max(maxY, point.y);
+        for (const auto& point : polygon.points)
+        {
+            minX = std::min(minX, point.x);
+            maxX = std::max(maxX, point.x);
+            minY = std::min(minY, point.y);
+            maxY = std::max(maxY, point.y);
+        }
     }
-    return p.x >= minX && p.x <= maxX && p.y >= minY && p.y <= maxY;
 }
 
 void inframeCommand(const std::vector<Polygon>& polygons, const std::string& arg)
@@ -421,25 +431,9 @@ void inframeCommand(const std::vector<Polygon>& polygons, const std::string& arg
             std::cout << "<INVALID COMMAND>\n";
             return;
         }
-        if (polygons.empty())
-        {
-            std::cout << "<FALSE>\n";
-            return;
-        }
-        int minX = polygons[0].points[0].x;
-        int maxX = polygons[0].points[0].x;
-        int minY = polygons[0].points[0].y;
-        int maxY = polygons[0].points[0].y;
-        for (const auto& polygon : polygons)
-        {
-            for (const auto& point : polygon.points)
-            {
-                minX = std::min(minX, point.x);
-                maxX = std::max(maxX, point.x);
-                minY = std::min(minY, point.y);
-                maxY = std::max(maxY, point.y);
-            }
-        }
+
+        int minX, maxX, minY, maxY;
+        getFrame(polygons, minX, maxX, minY, maxY);
         bool allInside = true;
         for (const auto& point : poly.points)
         {
