@@ -327,7 +327,7 @@ void echoCommand(std::vector<Polygon>& polygons, const std::string& arg) {
         }
 
         polygons.push_back(poly);
-        std::cout << polygons.size() << '\n'; // Output the new count of polygons
+        std::cout << polygons.size() << '\n';
     }
     catch (...) {
         std::cout << "<INVALID COMMAND>\n";
@@ -363,16 +363,13 @@ void inframeCommand(const std::vector<Polygon>& polygons, const std::string& arg
             std::cout << "<INVALID COMMAND>\n";
             return;
         }
-
         Polygon poly;
         std::string pointStr;
         std::getline(std::cin >> std::ws, pointStr);
         std::istringstream pointStream(pointStr);
-        
         Point p;
         char discard;
         bool valid = true;
-        
         for (size_t i = 0; i < vertexCount && valid; ++i) {
             if (!(pointStream >> discard) || discard != '(' ||
                 !(pointStream >> p.x) ||
@@ -384,18 +381,16 @@ void inframeCommand(const std::vector<Polygon>& polygons, const std::string& arg
             poly.points.push_back(p);
         }
 
-        if (!valid || poly.points.size() != vertexCount || 
+        if (!valid || poly.points.size() != vertexCount ||
             !isPolygonValid(poly) || pointStream.rdbuf()->in_avail() != 0) {
             std::cout << "<INVALID COMMAND>\n";
             return;
         }
 
-        // Calculate frame from all polygons
         int minX = polygons[0].points[0].x;
         int maxX = polygons[0].points[0].x;
         int minY = polygons[0].points[0].y;
         int maxY = polygons[0].points[0].y;
-        
         for (const auto& polygon : polygons) {
             for (const auto& point : polygon.points) {
                 minX = std::min(minX, point.x);
