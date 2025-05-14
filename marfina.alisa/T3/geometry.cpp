@@ -201,10 +201,20 @@ void minCommand(const std::vector<Polygon>& polygons, const std::string& arg) {
 }
 
 void countCommand(const std::vector<Polygon>& polygons, const std::string& arg) {
+    auto isValidPolygon = [](const Polygon& p) {
+        if (p.points.size() < 3) return false;
+        for (size_t i = 0; i < p.points.size(); ++i) {
+            for (size_t j = i + 1; j < p.points.size(); ++j) {
+                if (p.points[i] == p.points[j]) return false;
+            }
+        }
+        return true;
+    };
+
     if (arg == "EVEN") {
         size_t count = 0;
         for (const auto& p : polygons) {
-            if (p.points.size() >= 3 && p.points.size() % 2 == 0) {
+            if (isValidPolygon(p) && p.points.size() % 2 == 0) {
                 count++;
             }
         }
@@ -213,7 +223,7 @@ void countCommand(const std::vector<Polygon>& polygons, const std::string& arg) 
     else if (arg == "ODD") {
         size_t count = 0;
         for (const auto& p : polygons) {
-            if (p.points.size() >= 3 && p.points.size() % 2 != 0) {
+            if (isValidPolygon(p) && p.points.size() % 2 != 0) {
                 count++;
             }
         }
@@ -228,7 +238,7 @@ void countCommand(const std::vector<Polygon>& polygons, const std::string& arg) 
             }
             size_t count = 0;
             for (const auto& p : polygons) {
-                if (p.points.size() == num) {
+                if (isValidPolygon(p) && p.points.size() == num) {
                     count++;
                 }
             }
@@ -278,27 +288,29 @@ void inframeCommand(std::vector<Polygon>& polygons, const std::string& arg) {
 
         auto parsePoint = [](std::istringstream& iss, Point& p) -> bool {
             char discard;
-            if (!(iss >> discard && discard == '(')) return false;
+            if (!(iss >> discard) || discard != '(') return false;
             if (!(iss >> p.x)) return false;
-            if (!(iss >> discard && discard == ';')) return false;
+            if (!(iss >> discard) || discard != ';') return false;
             if (!(iss >> p.y)) return false;
-            return (iss >> discard && discard == ')');
+            if (!(iss >> discard) || discard != ')') return false;
+            return true;
         };
 
         Point p;
-        size_t pointsRead = 0;
-        while (pointsRead < vertexCount) {
+        for (size_t i = 0; i < vertexCount; ++i) {
             if (!parsePoint(iss, p)) {
                 std::cout << "<INVALID COMMAND>\n";
                 return;
             }
             poly.points.push_back(p);
-            pointsRead++;
         }
-        if (iss >> std::ws && !iss.eof()) {
+
+        iss >> std::ws;
+        if (!iss.eof()) {
             std::cout << "<INVALID COMMAND>\n";
             return;
         }
+
         for (size_t i = 0; i < poly.points.size(); ++i) {
             for (size_t j = i + 1; j < poly.points.size(); ++j) {
                 if (poly.points[i] == poly.points[j]) {
@@ -312,10 +324,11 @@ void inframeCommand(std::vector<Polygon>& polygons, const std::string& arg) {
             std::cout << "<INVALID COMMAND>\n";
             return;
         }
-        int minX = std::numeric_limits<int>::max();
-        int maxX = std::numeric_limits<int>::min();
-        int minY = std::numeric_limits<int>::max();
-        int maxY = std::numeric_limits<int>::min();
+
+        int minX = polygons[0].points[0].x;
+        int maxX = polygons[0].points[0].x;
+        int minY = polygons[0].points[0].y;
+        int maxY = polygons[0].points[0].y;
 
         for (const auto& polygon : polygons) {
             for (const auto& point : polygon.points) {
