@@ -295,55 +295,41 @@ void countCommand(const std::vector<Polygon>& polygons, const std::string& arg)
     }
 }
 
-void echoCommand(std::vector<Polygon>& polygons, const std::string& arg)
-{
-    try
-    {
+void echoCommand(std::vector<Polygon>& polygons, const std::string& arg) {
+    try {
         size_t vertexCount = std::stoul(arg);
-        if (vertexCount < 3)
-        {
+        if (vertexCount < 3) {
             std::cout << "<INVALID COMMAND>\n";
             return;
         }
         Polygon poly;
+        std::string pointStr;
+        std::getline(std::cin >> std::ws, pointStr);
+        std::istringstream pointStream(pointStr);
         Point p;
         char discard;
-        std::cin >> discard;
-        if (discard != '(')
-        {
+        bool valid = true;
+        for (size_t i = 0; i < vertexCount && valid; ++i) {
+            if (!(pointStream >> discard) || discard != '(' ||
+                !(pointStream >> p.x) ||
+                !(pointStream >> discard) || discard != ';' ||
+                !(pointStream >> p.y) ||
+                !(pointStream >> discard) || discard != ')') {
+                valid = false;
+            }
+            poly.points.push_back(p);
+        }
+
+        if (!valid || poly.points.size() != vertexCount ||
+            !isPolygonValid(poly) || pointStream.rdbuf()->in_avail() != 0) {
             std::cout << "<INVALID COMMAND>\n";
             return;
         }
-        for (size_t i = 0; i < vertexCount; ++i)
-        {
-            if (!(std::cin >> p.x >> discard >> p.y >> discard) || discard != ')')
-            {
-                std::cout << "<INVALID COMMAND>\n";
-                return;
-            }
-            poly.points.push_back(p);
-            if (i != vertexCount - 1)
-            {
-                std::cin >> discard;
-                if (discard != '(')
-                {
-                    std::cout << "<INVALID COMMAND>\n";
-                    return;
-                }
-            }
-        }
-        if (poly.points.size() == vertexCount && isPolygonValid(poly))
-        {
-            polygons.push_back(poly);
-            std::cout << vertexCount << '\n';
-        }
-        else
-        {
-            std::cout << "<INVALID COMMAND>\n";
-        }
+
+        polygons.push_back(poly);
+        std::cout << polygons.size() << '\n'; // Output the new count of polygons
     }
-    catch (...)
-    {
+    catch (...) {
         std::cout << "<INVALID COMMAND>\n";
     }
 }
@@ -365,86 +351,70 @@ bool isPointInFrame(const Point& p, const Polygon& frame)
     return p.x >= minX && p.x <= maxX && p.y >= minY && p.y <= maxY;
 }
 
-void inframeCommand(const std::vector<Polygon>& polygons, const std::string& arg)
-{
-    if (polygons.empty())
-    {
-        std::cout << "<INVALID COMMAND>\n";
+void inframeCommand(const std::vector<Polygon>& polygons, const std::string& arg) {
+    if (polygons.empty()) {
+        std::cout << "<FALSE>\n";
         return;
     }
 
-    try
-    {
+    try {
         size_t vertexCount = std::stoul(arg);
-        if (vertexCount < 3)
-        {
+        if (vertexCount < 3) {
             std::cout << "<INVALID COMMAND>\n";
             return;
         }
+
         Polygon poly;
+        std::string pointStr;
+        std::getline(std::cin >> std::ws, pointStr);
+        std::istringstream pointStream(pointStr);
+        
         Point p;
         char discard;
-        std::cin >> discard;
-        if (discard != '(')
-        {
-            std::cout << "<INVALID COMMAND>\n";
-            return;
-        }
-        for (size_t i = 0; i < vertexCount; ++i)
-        {
-            if (!(std::cin >> p.x >> discard >> p.y >> discard) || discard != ')')
-            {
-                std::cout << "<INVALID COMMAND>\n";
-                return;
+        bool valid = true;
+        
+        for (size_t i = 0; i < vertexCount && valid; ++i) {
+            if (!(pointStream >> discard) || discard != '(' ||
+                !(pointStream >> p.x) ||
+                !(pointStream >> discard) || discard != ';' ||
+                !(pointStream >> p.y) ||
+                !(pointStream >> discard) || discard != ')') {
+                valid = false;
             }
             poly.points.push_back(p);
-            if (i != vertexCount - 1)
-            {
-                std::cin >> discard;
-                if (discard != '(')
-                {
-                    std::cout << "<INVALID COMMAND>\n";
-                    return;
-                }
-            }
         }
-        if (poly.points.size() != vertexCount || !isPolygonValid(poly))
-        {
+
+        if (!valid || poly.points.size() != vertexCount || 
+            !isPolygonValid(poly) || pointStream.rdbuf()->in_avail() != 0) {
             std::cout << "<INVALID COMMAND>\n";
             return;
         }
-        if (polygons.empty())
-        {
-            std::cout << "<FALSE>\n";
-            return;
-        }
+
+        // Calculate frame from all polygons
         int minX = polygons[0].points[0].x;
         int maxX = polygons[0].points[0].x;
         int minY = polygons[0].points[0].y;
         int maxY = polygons[0].points[0].y;
-        for (const auto& polygon : polygons)
-        {
-            for (const auto& point : polygon.points)
-            {
+        
+        for (const auto& polygon : polygons) {
+            for (const auto& point : polygon.points) {
                 minX = std::min(minX, point.x);
                 maxX = std::max(maxX, point.x);
                 minY = std::min(minY, point.y);
                 maxY = std::max(maxY, point.y);
             }
         }
+
         bool allInside = true;
-        for (const auto& point : poly.points)
-        {
-            if (point.x < minX || point.x > maxX || point.y < minY || point.y > maxY)
-            {
+        for (const auto& point : poly.points) {
+            if (point.x < minX || point.x > maxX || point.y < minY || point.y > maxY) {
                 allInside = false;
                 break;
             }
         }
         std::cout << (allInside ? "<TRUE>" : "<FALSE>") << '\n';
     }
-    catch (...)
-    {
+    catch (...) {
         std::cout << "<INVALID COMMAND>\n";
     }
 }
@@ -487,42 +457,32 @@ void intersectionsCommand(const std::vector<Polygon>& polygons, const std::strin
             return;
         }
         Polygon poly;
+        std::string pointStr;
+        std::getline(std::cin >> std::ws, pointStr);
+        std::istringstream pointStream(pointStr);
         Point p;
         char discard;
-        std::cin >> discard;
-        if (discard != '(')
-        {
-            std::cout << "<INVALID COMMAND>\n";
-            return;
-        }
-        for (size_t i = 0; i < vertexCount; ++i)
-        {
-            if (!(std::cin >> p.x >> discard >> p.y >> discard) || discard != ')')
-            {
-                std::cout << "<INVALID COMMAND>\n";
-                return;
+        bool valid = true;
+        for (size_t i = 0; i < vertexCount && valid; ++i) {
+            if (!(pointStream >> discard) || discard != '(' ||
+                !(pointStream >> p.x) ||
+                !(pointStream >> discard) || discard != ';' ||
+                !(pointStream >> p.y) ||
+                !(pointStream >> discard) || discard != ')') {
+                valid = false;
             }
             poly.points.push_back(p);
-            if (i != vertexCount - 1)
-            {
-                std::cin >> discard;
-                if (discard != '(')
-                {
-                    std::cout << "<INVALID COMMAND>\n";
-                    return;
-                }
-            }
         }
-        if (poly.points.size() != vertexCount || !isPolygonValid(poly))
-        {
+
+        if (!valid || poly.points.size() != vertexCount ||
+            !isPolygonValid(poly) || pointStream.rdbuf()->in_avail() != 0) {
             std::cout << "<INVALID COMMAND>\n";
             return;
         }
+
         size_t count = 0;
-        for (const auto& p : polygons)
-        {
-            if (doPolygonsIntersect(poly, p))
-            {
+        for (const auto& p : polygons) {
+            if (doPolygonsIntersect(poly, p)) {
                 ++count;
             }
         }
