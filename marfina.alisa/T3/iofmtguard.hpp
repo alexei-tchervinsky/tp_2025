@@ -1,6 +1,8 @@
 #ifndef IOFMTGUARD_HPP
 #define IOFMTGUARD_HPP
 #include <ios>
+namespace marfina
+{
 class iofmtguard
 {
 public:
@@ -8,10 +10,9 @@ public:
     ~iofmtguard();
 private:
     std::basic_ios<char>& s_;
-    std::streamsize width_;
-    char fill_;
     std::streamsize precision_;
-    std::basic_ios<char>::fmtflags fmt_;
+    std::basic_ios<char>::fmtflags flags_;
 };
+}
 
 #endif
