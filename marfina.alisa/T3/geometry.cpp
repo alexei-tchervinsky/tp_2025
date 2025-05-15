@@ -195,7 +195,7 @@ namespace {
 
 void marfina::area(const std::vector<Polygon>& value, std::istream& in, std::ostream& out)
 {
-  IoFmtGuard guard(out);
+  iofmtguard guard(out);
   out << std::setprecision(1) << std::fixed;
   std::string argument = "";
   in >> argument;
@@ -252,7 +252,7 @@ void marfina::max(const std::vector<Polygon>& value, std::istream& in, std::ostr
   {
     if (argument == "AREA")
     {
-      IoFmtGuard guard(out);
+      iofmtguard guard(out);
       out << std::setprecision(1) << std::fixed;
       out << getPolygonArea(*std::max_element(value.begin(), value.end(), comparatorArea));
     }
@@ -279,7 +279,7 @@ void marfina::min(const std::vector<Polygon>& value, std::istream& in, std::ostr
   {
     if (argument == "AREA")
     {
-      IoFmtGuard guard(out);
+      iofmtguard guard(out);
       out << std::setprecision(1) << std::fixed;
       out << getPolygonArea(*std::min_element(value.begin(), value.end(), comparatorArea));
     }

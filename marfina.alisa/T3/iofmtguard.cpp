@@ -7,5 +7,5 @@ marfina::iofmtguard::iofmtguard(std::basic_ios<char>& s) :
 marfina::iofmtguard::~iofmtguard()
 {
     s_.precision(precision_);
-    s_.flags(fmt_);
+    s_.flags(flags_);
 }
