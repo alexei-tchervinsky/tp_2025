@@ -2,6 +2,8 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <iterator>
+#include <limits>
 #include "DataStruct.hpp"
 #include "commands.hpp"
 #include "iofmtguard.hpp"

@@ -6,6 +6,7 @@
 #include <numeric>
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 
 namespace nspace
 {
@@ -195,5 +196,3 @@ void echo(std::vector<Polygon>& polygons, const Polygon& target, const std::stri
         std::cout << max_count << '\n';
     }
 }
-
-
