@@ -1,6 +1,8 @@
 #include "DataStruct.hpp"
 #include <iostream>
 #include <numeric>
+#include <algorithm>
+#include <iterator>
 
 namespace nspace
 {
@@ -17,7 +19,6 @@ namespace nspace
     double Polygon::area() const
     {
         if (points.size() < 3) return 0.0;
-        double area = 0.0;
         double sum = std::accumulate(
             points.begin(),
             points.end(),
