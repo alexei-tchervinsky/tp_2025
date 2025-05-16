@@ -43,7 +43,7 @@ namespace nspace
         }
         else if (param == "MEAN")
         {
-            if (polygons.empty()) throw std::invalid_argument("");
+            if (polygons.empty()) std::cout << "<INVALID COMMAND>\n";
             double sum = std::accumulate(polygons.begin(), polygons.end(), 0.0,
                 [](double s, const nspace::Polygon& p) { return s + p.area(); });
             std::cout << sum / polygons.size() << '\n';
@@ -59,12 +59,12 @@ namespace nspace
 
     void max(const std::vector<Polygon>& polygons, const std::string& param)
     {
-        if (polygons.empty()) throw std::invalid_argument("");
+        if (polygons.empty()) std::cout << "<INVALID COMMAND>\n";
 
         if (param == "AREA")
         {
             auto it = std::max_element(polygons.begin(), polygons.end(), AreaComparator{});
-            std::cout << it->area() << '\n';
+            std::cout << std::fixed << std::setprecision(1) << it->area() << '\n';
         }
         else if (param == "VERTEXES")
         {
@@ -73,13 +73,13 @@ namespace nspace
         }
         else
         {
-            throw std::invalid_argument("");
+            std::cout << "<INVALID COMMAND>\n";
         }
     }
 
     void min(const std::vector<Polygon>& polygons, const std::string& param)
     {
-        if (polygons.empty()) throw std::invalid_argument("");
+        if (polygons.empty()) std::cout << "<INVALID COMMAND>\n";
 
         if (param == "AREA")
         {
@@ -93,7 +93,8 @@ namespace nspace
         }
         else
         {
-            throw std::invalid_argument("");
+            std::cout << "<INVALID COMMAND>\n";
+            return;
         }
     }
 
@@ -131,7 +132,7 @@ namespace nspace
             }
             catch(...)
             {
-                throw std::invalid_argument("");
+                std::cout << "<INVALID COMMAND>\n";
                 return;
             }
         }
@@ -158,6 +159,12 @@ void echo(std::vector<Polygon>& polygons, const Polygon& target, const std::stri
 
     size_t count = temp.size() - polygons.size();
 
+    if (count == 0)
+    {
+        std::cout << "<INVALID COMMAND>\n";
+        return;
+    }
+
     polygons = std::move(temp);
 
     std::ofstream out(filename);
@@ -177,7 +184,7 @@ void echo(std::vector<Polygon>& polygons, const Polygon& target, const std::stri
     {
         if (polygons.empty())
         {
-            std::cout << "0\n";
+            std::cout << "<INVALID COMMAND>\n";
             return;
         }
 
