@@ -30,7 +30,7 @@ namespace likhodievskii {
         std::string label;
     };
 
-    std::istream& operator>>(std::istream&, LabelIO&&);
+    std::istream &operator>>(std::istream &, LabelIO &&);
 
 
     std::istream &operator>>(std::istream &in, DelimiterIO &&dest);
