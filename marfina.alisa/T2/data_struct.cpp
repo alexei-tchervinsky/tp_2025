@@ -4,7 +4,6 @@
 #include <string>
 #include <iomanip>
 #include "data_struct.hpp"
-
 namespace marfina
 {
 
@@ -35,6 +34,7 @@ std::istream& operator>>(std::istream& in, CharIO&& dest)
         return in;
     }
     char c;
+
     if (!(in >> c))
     {
         in.setstate(std::ios::failbit);
@@ -55,6 +55,7 @@ std::istream& operator>>(std::istream& in, RationalIO&& dest)
 {
     std::istream::sentry sentry(in);
     if (!sentry) return in;
+
     if (!(in >> DelimiterIO{'('} >> DelimiterIO{':'} >> LabelIO{"N"}))
     {
         in.setstate(std::ios::failbit);
@@ -76,6 +77,7 @@ std::istream& operator>>(std::istream& in, RationalIO&& dest)
     {
         in.setstate(std::ios::failbit);
     }
+
     return in;
 }
 
