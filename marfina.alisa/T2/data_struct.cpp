@@ -4,7 +4,6 @@
 #include <string>
 #include <iomanip>
 #include "data_struct.hpp"
-
 namespace marfina
 {
 
@@ -28,8 +27,6 @@ std::istream& operator>>(std::istream& in, CharIO&& dest)
     {
         return in;
     }
-
-   
 
     if (! (in >> DelimiterIO {'\''}))
     {
