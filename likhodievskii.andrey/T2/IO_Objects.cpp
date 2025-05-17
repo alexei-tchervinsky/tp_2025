@@ -5,7 +5,6 @@
 #include "IO_Objects.hpp"
 
 namespace likhodievskii {
-
     std::istream &operator>>(std::istream &in, LabelIO &&dest) {
         std::istream::sentry sentry(in);
         if (!sentry) {
