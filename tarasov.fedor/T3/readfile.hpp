@@ -1,16 +1,13 @@
-//
-// Created by Федор Тарасов on 20.05.2025.
-//
-
 #ifndef READFILE_HPP
 #define READFILE_HPP
+#include <sstream>
+#include <fstream>
+#include "structures.hpp"
 
+namespace tarasov {
+    Polygon parsePolygon(const std::string& str);
 
+    std::vector<Polygon> readFile(const std::string& fileName);
+}
 
-class readfile {
-
-};
-
-
-
-#endif //READFILE_HPP
+#endif
