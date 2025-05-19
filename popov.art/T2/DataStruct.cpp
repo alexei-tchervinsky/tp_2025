@@ -29,40 +29,32 @@ bool operator<(const DataStruct& lhs, const DataStruct& rhs)
 std::istream& operator>>(std::istream& in, DataStruct& ds)
 {
     std::string line;
-    while (std::getline(in,line))
+    while (std::getline(in, line))
     {
         try
         {
+            DataStruct tmp;                       
             std::istringstream src(line);
-            char p,c; src>>p>>c; if(p!='('||c!=':') throw std::runtime_error("fmt");
-            bool f1=false,f2=false,f3=false;
-            while(src&&src.peek()!=')')
+            char p{}, c{}; src >> p >> c;
+            if (p!='(' || c!=':')                 throw std::runtime_error("");
+            bool f1=false, f2=false, f3=false;
+            while (src && src.peek()!=')')
             {
-                std::string key; src>>key;
-                if(key=="key1")
-                {
-                    std::string tok; src>>tok; ds.key1=parseDbl(tok); f1=true;
-                }
-                else if(key=="key2")
-                {
-                    std::string tok; src>>tok; ds.key2=parseOct(tok); f2=true;
-                }
-                else if(key=="key3")
-                {
-                    char q; src>>q; if(q!='"') throw std::runtime_error("str");
-                    std::getline(src,ds.key3,'"'); f3=true;
-                }
-                else throw std::runtime_error("key");
-
-                char d; src>>d; if(d!=':') throw std::runtime_error("delim");
+                std::string key;  src >> key;
+                if (key=="key1") { std::string t; src>>t; tmp.key1=parseDbl(t); f1=true; }
+                else if(key=="key2"){ std::string t; src>>t; tmp.key2=parseOct(t); f2=true;}
+                else if(key=="key3"){ char q;src>>q; if(q!='"')throw std::runtime_error("");
+                                       std::getline(src,tmp.key3,'"'); f3=true;}
+                else               throw std::runtime_error("");
+                char d; src>>d; if(d!=':')        throw std::runtime_error("");
                 src>>std::ws;
             }
-            char cls; src>>cls; if(cls!=')'||!(f1&&f2&&f3)) throw std::runtime_error("close");
+            char cl{}; src>>cl;
+            if (cl!=')'||!(f1&&f2&&f3))           throw std::runtime_error("");
+            ds = std::move(tmp);                  
             return in;
         }
-        catch(...)
-        {
-        }
+        catch(...) { }                            
     }
     in.setstate(std::ios::failbit);
     return in;
