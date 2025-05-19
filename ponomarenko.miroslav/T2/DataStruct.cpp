@@ -9,11 +9,9 @@ namespace ponomarenko {
     bool DataStruct::operator<(const DataStruct& other) const {
         double firstAbs = std::abs(key1);
         double secondAbs = std::abs(other.key1);
-        
         if (firstAbs != secondAbs) {
             return firstAbs < secondAbs;
         }
-        
         if (key2 != other.key2) {
             return key2 < other.key2;
         }
@@ -25,18 +23,14 @@ namespace ponomarenko {
         if (!guard) {
             return in;
         }
-        
         DataStruct temp;
         bool hasKey1 = false;
         bool hasKey2 = false;
         bool hasKey3 = false;
-        
         in >> DelimiterIO{'('} >> DelimiterIO{':'};
-        
         for (int i = 0; i < 3 && in; ++i) {
             std::string label;
             in >> LabelIO{label};
-            
             if (label == "key1") {
                 in >> ComplexIO{temp.key1} >> DelimiterIO{':'};
                 hasKey1 = in.good();
@@ -51,15 +45,12 @@ namespace ponomarenko {
                 std::getline(in, skip, ':');
             }
         }
-        
         in >> DelimiterIO{')'};
-        
         if (hasKey1 && hasKey2 && hasKey3) {
             data = temp;
         } else {
             in.setstate(std::ios::failbit);
         }
-        
         return in;
     }
 
@@ -68,12 +59,9 @@ namespace ponomarenko {
         if (!guard) {
             return out;
         }
-        
         iofmtguard fmtguard(out);
-        
         double real = data.key1.real();
         double imag = data.key1.imag();
-        
         out << "(:";
         out << "key1 #c(";
         out << std::fixed << std::setprecision(1)

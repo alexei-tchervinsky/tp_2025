@@ -9,7 +9,6 @@ namespace ponomarenko {
     public:
         iofmtguard(std::basic_ios<char>& stream);
         ~iofmtguard();
-        
     private:
         std::basic_ios<char>& stream_;
         char fill_;

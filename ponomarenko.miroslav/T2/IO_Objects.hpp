@@ -32,7 +32,6 @@ namespace ponomarenko {
     std::istream& operator>>(std::istream& in, ComplexIO&&);
     std::istream& operator>>(std::istream& in, CharIO&&);
     std::istream& operator>>(std::istream& in, StringIO&&);
-    
 }
 
 #endif
