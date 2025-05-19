@@ -83,4 +83,3 @@ namespace ponomarenko {
         return out;
     }
 }
-
