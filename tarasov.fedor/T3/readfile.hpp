@@ -2,6 +2,7 @@
 #define READFILE_HPP
 #include <sstream>
 #include <fstream>
+#include <ranges>
 #include "structures.hpp"
 
 namespace tarasov {
