@@ -1,6 +1,0 @@
-(:key1 5.0d:key2 05:key3 "bbb":)
-(:key2 05:key3 "a":key1 5.0D:)
-garbage
-(:key1 3.0d:key2 010:key3 "ccc":)
-(:key1 5.0d:key2 07:key3 "xx":)
-(:key1 42x:key2 07:key3 "broken literal":)
