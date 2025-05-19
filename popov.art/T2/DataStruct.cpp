@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <cctype>
 #include <stdexcept>
-
 namespace
 {
     unsigned long long parseOct(const std::string& s)
@@ -14,7 +13,6 @@ namespace
             throw std::runtime_error("bad octal literal");
         return std::stoull(s, nullptr, 8);
     }
-
     double parseDbl(const std::string& s)
     {
         if (s.size()<2 || (s.back()!='d' && s.back()!='D'))
@@ -22,14 +20,12 @@ namespace
         return std::stod(s.substr(0, s.size()-1));
     }
 }
-
 bool operator<(const DataStruct& lhs, const DataStruct& rhs)
 {
     if (lhs.key1!=rhs.key1) return lhs.key1<rhs.key1;
     if (lhs.key2!=rhs.key2) return lhs.key2<rhs.key2;
     return lhs.key3.size()<rhs.key3.size();
 }
-
 std::istream& operator>>(std::istream& in, DataStruct& ds)
 {
     std::string line;
@@ -71,7 +67,6 @@ std::istream& operator>>(std::istream& in, DataStruct& ds)
     in.setstate(std::ios::failbit);
     return in;
 }
-
 std::ostream& operator<<(std::ostream& out, const DataStruct& ds)
 {
     out<<"(:key1 ";
