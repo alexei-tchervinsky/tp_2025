@@ -43,7 +43,7 @@ std::vector<Polygon> readPolygons(const std::string& filename) {
     return polygons;
 }
 
-auto min_max_x = std::minmax_element(all_points.begin(), all_points.end(), 
+auto min_max_x = std::minmax_element(all_points.begin(), all_points.end(),
     [](const Point& a, const Point& b) { return a.x < b.x; });
 auto min_x = min_max_x.first;
 auto max_x = min_max_x.second;
