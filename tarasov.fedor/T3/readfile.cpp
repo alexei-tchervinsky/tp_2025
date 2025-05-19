@@ -1,6 +1,3 @@
-#include <algorithm>
-#include <ranges>
-#include <cctype>
 #include "readfile.hpp"
 
 namespace tarasov {
@@ -39,7 +36,7 @@ std::vector<Polygon> readFile(const std::string& fileName) {
     std::vector<Polygon> polygons;
     std::string line;
     while (std::getline(file, line)) {
-        if (line.empty() || std::ranges::all_of(line, [](unsigned char c){ return std::isspace(c);})) {
+        if (line.empty() || std::all_of(line.begin(), line.end(), [](unsigned char c){ return std::isspace(c); })) {
             continue;
         }
 

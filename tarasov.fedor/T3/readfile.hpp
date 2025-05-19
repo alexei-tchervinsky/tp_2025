@@ -2,6 +2,8 @@
 #define READFILE_HPP
 #include <sstream>
 #include <fstream>
+#include <algorithm>
+#include <cctype>
 #include "structures.hpp"
 
 namespace tarasov {
