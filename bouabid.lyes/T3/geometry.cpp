@@ -19,9 +19,9 @@ Polygon parsePolygon(const std::string& line) {
     Polygon poly;
     std::string token;
     for (int i = 0; i < numVertices; ++i) {
-        if (!(iss >> token) || token.size() < 3 || token.front() != '(' || token.back() != ')') 
+        if (!(iss >> token) || token.size() < 3 || token.front() != '(' || token.back() != ')')
             return {};
-        
+
         token = token.substr(1, token.size() - 2);
         std::replace(token.begin(), token.end(), ';', ' ');
         std::istringstream pss(token);
