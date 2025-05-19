@@ -1,4 +1,12 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <sstream>
 #include <map>
+#include <functional>
+#include <cctype>
+#include "structures.hpp"
+#include "readfile.hpp"
 #include "command.hpp"
 
 using CommandHandler = std::function<void(const std::vector<Polygon>&, std::stringstream&)>;
