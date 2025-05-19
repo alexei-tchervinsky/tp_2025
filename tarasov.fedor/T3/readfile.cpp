@@ -1,3 +1,6 @@
+#include <algorithm>
+#include <ranges>
+#include <cctype>
 #include "readfile.hpp"
 
 namespace tarasov {
