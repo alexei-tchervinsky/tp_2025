@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <iterator>
 #include <iostream>
-
 int main()
 {
     std::ios_base::sync_with_stdio(false);
