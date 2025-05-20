@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
                 std::cout << "<INVALID COMMAND>\n";
             } else {
                 bool inFrame = handleInFrame(polygons, target);
-                std::cout << (inFrame ? "YES" : "NO") << "\n";
+                std::cout << (inFrame ? "<TRUE>" : "<FALSE>") << "\n";  // <-- Changed format
             }
         } else if (cmd == "COUNT") {
             if (!(std::cin >> subCmd)) {
