@@ -68,7 +68,7 @@ std::istream& operator>>(std::istream& in, DataStruct& ds) {
         if (key == "key1") {
             std::string value;
             if (!(iss >> value)) break;
-            if (!parseLiteralDouble(value, tmp.key1) && 
+            if (!parseLiteralDouble(value, tmp.key1) &&
                 !parseScientificDouble(value, tmp.key1)) {
                 break;
             }
@@ -82,7 +82,7 @@ std::istream& operator>>(std::istream& in, DataStruct& ds) {
                     tmp.key2 = static_cast<unsigned char>(value[1]);
                     hasKey2 = true;
                 }
-            } 
+            }
             else if (!parseULL(value, tmp.key2)) {
                 break;
             } else {
