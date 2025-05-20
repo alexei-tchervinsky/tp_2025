@@ -5,6 +5,7 @@
 #include <iostream>
 #include <sstream>
 #include <cctype>
+#include <iomanip>
 static bool hasVisibleChars(const std::string& s)
 {
     return std::any_of(s.begin(), s.end(), [](unsigned char c){ return !std::isspace(c); });
@@ -29,7 +30,7 @@ int main()
         if (nonEmptyLines == 0)
             std::cout << "Looks like there is no supported record. Cannot determine input. Test skipped\n";
         else
-            std::cout << "Atleast one supported record type\n";
+            std::cout << "At least one supported record type\n";
         return 0;
     }
     std::sort(records.begin(), records.end());
