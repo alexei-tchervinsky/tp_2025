@@ -21,7 +21,7 @@ std::istream& operator>>(std::istream& in, DataStruct& ds)
             std::istringstream src(line);
             char p, c;
             src >> p >> c;
-            if (p != '(' || c != ':') throw std::runtime_error("no opening");
+            if (p != '(' || c != ':') throw std::runtime_error("");
             bool f1 = false, f2 = false, f3 = false;
             while (src && src.peek() != ')')
             {
@@ -29,31 +29,53 @@ std::istream& operator>>(std::istream& in, DataStruct& ds)
                 src >> key;
                 if (key == "key1")
                 {
-                    std::string token; src >> token;
-                    if (token.size() < 2 || (token.back() != 'd' && token.back() != 'D'))
-                        throw std::runtime_error("bad double literal");
-                    tmp.key1 = std::stod(token.substr(0, token.size() - 1));
-                    f1 = true;
+                    std::string token; 
+                    src >> token;
+                    try {
+                        if (!token.empty() && (token.back() == 'd' || token.back() == 'D')) {
+                            tmp.key1 = std::stod(token.substr(0, token.size() - 1));
+                        } else {
+                            tmp.key1 = std::stod(token);
+                        }
+                        f1 = true;
+                    } catch (...) {
+                        throw std::runtime_error("");
+                    }
                 }
                 else if (key == "key2")
                 {
-                    std::string token; src >> token;
-                    if (token.empty() || !std::all_of(token.begin(), token.end(), [](char c){ return c >= '0' && c <= '7'; }))
-                        throw std::runtime_error("not octal");
-                    tmp.key2 = std::stoull(token, nullptr, 8);
-                    f2 = true;
+                    std::string token; 
+                    src >> token;
+                    try {
+                        if (token.empty()) throw std::runtime_error("");
+                        bool isOctal = true;
+                        for (char ch : token) {
+                            if (ch < '0' || ch > '7') {
+                                isOctal = false;
+                                break;
+                            }
+                        }
+                        if (isOctal) {
+                            tmp.key2 = std::stoull(token, nullptr, 8);
+                        } else {
+                            tmp.key2 = std::stoull(token);
+                        }
+                        f2 = true;
+                    } catch (...) {
+                        throw std::runtime_error("");
+                    }
                 }
                 else if (key == "key3")
                 {
-                    char q; src >> q; if (q != '"') throw std::runtime_error("no quote");
+                    char q; src >> q; if (q != '"') throw std::runtime_error("");
                     std::getline(src, tmp.key3, '"'); f3 = true;
                 }
-                else throw std::runtime_error("bad key");
-                char d; src >> d; if (d != ':') throw std::runtime_error("no colon");
+                else throw std::runtime_error("");
+                char d; src >> d; if (d != ':') throw std::runtime_error("");
                 src >> std::ws;
             }
             char cl; src >> cl;
-            if (cl != ')' || !(f1 && f2 && f3)) throw std::runtime_error("bad closing");
+            if (cl != ')' || !(f1 && f2 && f3)) throw std::runtime_error("");
             ds = std::move(tmp);
             return in;
         }
