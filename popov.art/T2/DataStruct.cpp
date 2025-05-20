@@ -49,10 +49,10 @@ std::istream& operator>>(std::istream& in, DataStruct& ds)
                 }
                 else if (key == "key2")
                 {
-                    std::string token;
-                    src >> token;
-                    tmp.key2 = parseOct(token);
-                    f2 = true;
+                    std::string token; src >> token;
+                    if (token.empty() || !std::all_of(token.begin(), token.end(), [](char c){ return c >= '0' && c <= '7'; }))
+                        throw std::runtime_error("not octal");
+                    tmp.key2 = std::stoull(token, nullptr, 8);
                 }
                 else if (key == "key3")
                 {
