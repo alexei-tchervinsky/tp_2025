@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iostream>
 #include <iterator>
+#include <sstream>
 static bool hasVisibleChars(const std::string& s) {
     return std::any_of(s.begin(), s.end(), [](unsigned char c) {
         return !std::isspace(c);
