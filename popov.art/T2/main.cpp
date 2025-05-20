@@ -15,11 +15,13 @@ int main() {
     std::size_t nonEmptyLines = 0;
     std::string line;
     while (std::getline(std::cin, line)) {
-        if (hasVisibleChars(line)) ++nonEmptyLines;
-        std::istringstream iss(line);
-        DataStruct ds;
-        if (iss >> ds) {
-            records.push_back(std::move(ds));
+        if (hasVisibleChars(line)) {
+            nonEmptyLines++;
+            std::istringstream iss(line);
+            DataStruct ds;
+            if (iss >> ds) {
+                records.push_back(ds);
+            }
         }
     }
     if (records.empty()) {
@@ -30,6 +32,6 @@ int main() {
     }
     std::sort(records.begin(), records.end());
     std::copy(records.begin(), records.end(),
-              std::ostream_iterator<DataStruct>(std::cout, "\n"));
+             std::ostream_iterator<DataStruct>(std::cout, "\n"));
     return 0;
 }
