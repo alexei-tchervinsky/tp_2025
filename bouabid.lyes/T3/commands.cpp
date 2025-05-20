@@ -38,7 +38,7 @@ bool handleInFrame(const std::vector<Polygon>& polygons, const Polygon& target) 
 
     return std::all_of(target.points.begin(), target.points.end(),
         [&](const Point& p) {
-            return p.x >= (*min_x).x && p.x <= (*max_x).x && 
+            return p.x >= (*min_x).x && p.x <= (*max_x).x &&
                    p.y >= (*min_y).y && p.y <= (*max_y).y;
         });
 }
