@@ -8,7 +8,7 @@
 static bool hasVisibleChars(const std::string& s)
 {
     return std::any_of(s.begin(), s.end(),
-                       [](unsigned char c){ return !std::isspace(c); });
+                        [](unsigned char c){ return !std::isspace(c); });
 }
 int main()
 {
