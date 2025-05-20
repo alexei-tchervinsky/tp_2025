@@ -61,7 +61,7 @@ double calculateArea(const Polygon& polygon) {
 
 size_t countPolygonsByVertices(const std::vector<Polygon>& polygons, int vertices) {
     return std::count_if(polygons.begin(), polygons.end(),
-        [vertices](const Polygon& p) { return p.points.size() == vertices; });
+        [vertices](const Polygon& p) { return p.points.size() == static_cast<size_t>(vertices); });
 }
 
 size_t countEvenPolygons(const std::vector<Polygon>& polygons) {
@@ -77,7 +77,7 @@ size_t countOddPolygons(const std::vector<Polygon>& polygons) {
 double calculateAreaByVertices(const std::vector<Polygon>& polygons, int vertices) {
     return std::accumulate(polygons.begin(), polygons.end(), 0.0,
         [vertices](double sum, const Polygon& p) {
-            return sum + (p.points.size() == vertices ? calculateArea(p) : 0.0);
+            return sum + (p.points.size() == static_cast<size_t>(vertices) ? calculateArea(p) : 0.0);
         });
 }
 
