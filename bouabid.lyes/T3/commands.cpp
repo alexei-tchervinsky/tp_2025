@@ -28,10 +28,16 @@ bool handleInFrame(const std::vector<Polygon>& polygons, const Polygon& target) 
 
     if (all_points.empty()) return false;
 
-    auto [min_x, max_x] = std::minmax_element(all_points.begin(), all_points.end(),
-        [](auto a, auto b) { return a.x < b.x; });
-    auto [min_y, max_y] = std::minmax_element(all_points.begin(), all_points.end(),
-        [](auto a, auto b) { return a.y < b.y; });
+auto min_max_x = std::minmax_element(all_points.begin(), all_points.end(),
+    [](auto a, auto b) { return a.x < b.x; });
+auto min_x = min_max_x.first;
+auto max_x = min_max_x.second;
+
+auto min_max_y = std::minmax_element(all_points.begin(), all_points.end(),
+    [](auto a, auto b) { return a.y < b.y; });
+auto min_y = min_max_y.first;
+auto max_y = min_max_y.second;
+
 
     return std::all_of(target.points.begin(), target.points.end(),
         [=](auto p) {
