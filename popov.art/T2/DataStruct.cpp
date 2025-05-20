@@ -53,7 +53,7 @@ std::istream& operator>>(std::istream& in, DataStruct& ds) {
         while (ptr < end && !std::isspace(*ptr) && *ptr != ':') {
             ptr++;
         }
-        std::string_view key(key_start, ptr - key_start);
+        std::string key(key_start, ptr - key_start);
         if (ptr == end || *ptr != ' ') {
             in.setstate(std::ios::failbit);
             return in;
