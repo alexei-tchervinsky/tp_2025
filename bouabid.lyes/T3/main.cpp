@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <iomanip>
 
 int main(int argc, char* argv[]) {
     if (argc != 2) {
@@ -19,7 +20,7 @@ int main(int argc, char* argv[]) {
             std::getline(std::cin, line);
             Polygon target = parsePolygon(line);
 
-            if (target.points.empty()) {
+            if (target.points.empty() || target.points.size() < 3) {
                 std::cout << "<INVALID COMMAND>\n";
             } else {
                 size_t count = handleEcho(polygons, target);
@@ -30,7 +31,7 @@ int main(int argc, char* argv[]) {
             std::getline(std::cin, line);
             Polygon target = parsePolygon(line);
 
-            if (target.points.empty()) {
+            if (target.points.empty() || target.points.size() < 3) {
                 std::cout << "<INVALID COMMAND>\n";
             } else {
                 bool inFrame = handleInFrame(polygons, target);
@@ -66,14 +67,14 @@ int main(int argc, char* argv[]) {
             }
 
             if (subCmd == "ODD") {
-                std::cout << calculateOddArea(polygons) << ".0\n";
+                std::cout << std::fixed << std::setprecision(1) << calculateOddArea(polygons) << "\n";
             } else if (subCmd == "EVEN") {
-                std::cout << calculateEvenArea(polygons) << ".0\n";
+                std::cout << std::fixed << std::setprecision(1) << calculateEvenArea(polygons) << "\n";
             } else if (subCmd == "MEAN") {
                 if (polygons.empty()) {
                     std::cout << "<INVALID COMMAND>\n";
                 } else {
-                    std::cout << calculateMeanArea(polygons) << "\n";
+                    std::cout << std::fixed << std::setprecision(1) << calculateMeanArea(polygons) << "\n";
                 }
             } else {
                 // Try to parse as a number
@@ -82,7 +83,7 @@ int main(int argc, char* argv[]) {
                     if (vertices < 3) {
                         std::cout << "<INVALID COMMAND>\n";
                     } else {
-                        std::cout << calculateAreaByVertices(polygons, vertices) << ".0\n";
+                        std::cout << std::fixed << std::setprecision(1) << calculateAreaByVertices(polygons, vertices) << "\n";
                     }
                 } catch (const std::exception&) {
                     std::cout << "<INVALID COMMAND>\n";
@@ -98,7 +99,7 @@ int main(int argc, char* argv[]) {
                 if (polygons.empty()) {
                     std::cout << "<INVALID COMMAND>\n";
                 } else {
-                    std::cout << getMaxArea(polygons) << ".0\n";
+                    std::cout << std::fixed << std::setprecision(1) << getMaxArea(polygons) << "\n";
                 }
             } else if (subCmd == "VERTEXES") {
                 if (polygons.empty()) {

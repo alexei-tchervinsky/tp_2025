@@ -99,7 +99,7 @@ double calculateMeanArea(const std::vector<Polygon>& polygons) {
     if (polygons.empty()) return 0.0;
     double totalArea = std::accumulate(polygons.begin(), polygons.end(), 0.0,
         [](double sum, const Polygon& p) { return sum + calculateArea(p); });
-    return std::round(totalArea / polygons.size() * 10) / 10.0;  // Round to 1 decimal place
+    return totalArea / polygons.size();
 }
 
 double getMaxArea(const std::vector<Polygon>& polygons) {
