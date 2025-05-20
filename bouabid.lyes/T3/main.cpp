@@ -14,20 +14,29 @@ int main(int argc, char* argv[]) {
 
     while (std::cin >> cmd) {
         if (cmd == "ECHO" || cmd == "INFRAME") {
+            // Read the polygon definition after the command
             std::string line;
-            std::getline(std::cin >> std::ws, line);
+            std::getline(std::cin, line);
             Polygon target = parsePolygon(line);
+
             if (target.points.empty()) {
                 std::cout << "<INVALID COMMAND>\n";
                 continue;
             }
+
             if (cmd == "ECHO") {
-                std::cout << handleEcho(polygons, target) << '\n';
-            } else {
-                std::cout << (handleInFrame(polygons, target) ? "<TRUE>" : "<FALSE>") << '\n';
+                size_t count = handleEcho(polygons, target);
+                std::cout << count << "\n";
+            } else if (cmd == "INFRAME") {
+                bool inFrame = handleInFrame(polygons, target);
+                std::cout << (inFrame ? "YES" : "NO") << "\n";
             }
         } else {
+            // Unknown command
             std::cout << "<INVALID COMMAND>\n";
+            // Skip the rest of the line
+            std::string dummy;
+            std::getline(std::cin, dummy);
         }
     }
 }
