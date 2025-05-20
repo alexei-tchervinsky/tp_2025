@@ -1,32 +1,36 @@
 #include "DataStruct.hpp"
-#include <vector>
-#include <algorithm>
-#include <iterator>
-#include <iostream>
 #include <sstream>
-#include <cctype>
 #include <iomanip>
-#include <utility>
+#include <cctype>
+#include <stdexcept>
 namespace {
-    bool parseDoubleFast(const char* start, const char* end, double& value) {
-        char* parse_end;
-        value = std::strtod(start, &parse_end);
-        if (parse_end == end || (*parse_end == 'd' || *parse_end == 'D')) {
-            return true;
+    bool parseDouble(const std::string& str, double& value) {
+        try {
+            size_t pos = 0;
+            std::string num = str;
+            if (!num.empty() && (num.back() == 'd' || num.back() == 'D'))
+                num.pop_back();       
+            value = std::stod(num, &pos);
+            return pos == num.length();
+        } catch (...) {
+            return false;
         }
-        return false;
     }
-    bool parseOctalULLFast(const char* start, const char* end, unsigned long long& value) {
-        char* parse_end;
-        if (*start == '0') {
-            value = std::strtoull(start, &parse_end, 8);
-        } else {
-            value = std::strtoull(start, &parse_end, 10);
+    bool parseOctalULL(const std::string& str, unsigned long long& value) {
+        try {
+            std::string num = str;
+            while (!num.empty() && isalpha(num.back()))
+                num.pop_back();
+            if (num.empty()) return false;
+            if (num.size() > 1 && num[0] == '0') {
+                value = std::stoull(num, nullptr, 8);
+            } else {
+                value = std::stoull(num);
+            }
+            return true;
+        } catch (...) {
+            return false;
         }
-        while (parse_end < end && std::isalpha(*parse_end)) {
-            parse_end++;
-        }
-        return parse_end == end;
     }
 }
 bool operator<(const DataStruct& lhs, const DataStruct& rhs) {
@@ -36,85 +40,49 @@ bool operator<(const DataStruct& lhs, const DataStruct& rhs) {
 }
 std::istream& operator>>(std::istream& in, DataStruct& ds) {
     std::string line;
-    if (!std::getline(in, line)) {
-        return in;
-    }
-    const char* ptr = line.data();
-    const char* end = ptr + line.size();
-    if (ptr == end || *ptr++ != '(') {
+    if (!std::getline(in, line)) return in;
+    std::istringstream iss(line);
+    char ch;
+    DataStruct tmp;
+    bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
+    if (!(iss >> ch) || ch != '(') {
         in.setstate(std::ios::failbit);
         return in;
     }
-    DataStruct tmp;
-    bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
-    while (ptr < end && *ptr == ':') {
-        ptr++;
-        const char* key_start = ptr;
-        while (ptr < end && !std::isspace(*ptr) && *ptr != ':') {
-            ptr++;
-        }
-        std::string key(key_start, ptr - key_start);
-        if (ptr == end || *ptr != ' ') {
-            in.setstate(std::ios::failbit);
-            return in;
-        }
-        ptr++;
+    while (iss >> ch && ch == ':') {
+        std::string key;
+        if (!(iss >> key)) break;
         if (key == "key1") {
-            const char* num_start = ptr;
-            while (ptr < end && !std::isspace(*ptr) && *ptr != ':') {
-                ptr++;
-            }
-            if (!parseDoubleFast(num_start, ptr, tmp.key1)) {
-                in.setstate(std::ios::failbit);
-                return in;
-            }
+            std::string value;
+            if (!(iss >> value) || !parseDouble(value, tmp.key1)) break;
             hasKey1 = true;
         }
         else if (key == "key2") {
-            const char* num_start = ptr;
-            while (ptr < end && !std::isspace(*ptr) && *ptr != ':') {
-                ptr++;
-            }
-            if (!parseOctalULLFast(num_start, ptr, tmp.key2)) {
-                in.setstate(std::ios::failbit);
-                return in;
-            }
+            std::string value;
+            if (!(iss >> value) || !parseOctalULL(value, tmp.key2)) break;
             hasKey2 = true;
         }
         else if (key == "key3") {
-            if (ptr == end || *ptr != '"') {
-                in.setstate(std::ios::failbit);
-                return in;
+            if (!(iss >> ch) || ch != '"') break;
+            std::string value;
+            while (iss.get(ch) && ch != '"') {
+                value += ch;
             }
-            ptr++;
-            const char* str_start = ptr;
-            while (ptr < end && *ptr != '"') {
-                ptr++;
-            }
-            if (ptr == end) {
-                in.setstate(std::ios::failbit);
-                return in;
-            }
-            tmp.key3.assign(str_start, ptr - str_start);
-            ptr++;
+            if (ch != '"') break;
+            tmp.key3 = value;
             hasKey3 = true;
         }
-        while (ptr < end && *ptr != ':') {
-            ptr++;
-        }
+        while (iss.peek() == ' ') iss.get();
     }
-    if (ptr == end || *ptr != ')' || !hasKey1 || !hasKey2 || !hasKey3) {
+    if (iss >> ch && ch == ')' && hasKey1 && hasKey2 && hasKey3) {
+        ds = tmp;
+    } else {
         in.setstate(std::ios::failbit);
-        return in;
     }
-    ds = std::move(tmp);
     return in;
 }
 std::ostream& operator<<(std::ostream& out, const DataStruct& ds) {
-    out << "(:key1 ";
-    auto flags = out.flags();
-    out << std::fixed << std::setprecision(1) << ds.key1 << 'd';
-    out.flags(flags);
+    out << "(:key1 " << std::fixed << std::setprecision(1) << ds.key1 << 'd';
     out << ":key2 0" << std::oct << ds.key2 << std::dec;
     out << ":key3 \"" << ds.key3 << "\":)";
     return out;
