@@ -4,21 +4,6 @@
 #include <algorithm>
 #include <cctype>
 #include <stdexcept>
-namespace
-{
-    double parseDbl(const std::string& s)
-    {
-        if (s.size() < 2 || (s.back() != 'd' && s.back() != 'D'))
-            throw std::runtime_error("bad double literal");
-        return std::stod(s.substr(0, s.size() - 1));
-    }
-    unsigned long long parseOct(const std::string& s)
-    {
-        if (s.empty() || !std::all_of(s.begin(), s.end(), [](char c){ return c >= '0' && c <= '7'; }))
-            throw std::runtime_error("bad octal literal");
-        return std::stoull(s, nullptr, 8);
-    }
-}
 bool operator<(const DataStruct& lhs, const DataStruct& rhs)
 {
     if (lhs.key1 != rhs.key1) return lhs.key1 < rhs.key1;
@@ -45,7 +30,10 @@ std::istream& operator>>(std::istream& in, DataStruct& ds)
                 if (key == "key1")
                 {
                     std::string token; src >> token;
-                    tmp.key1 = parseDbl(token); f1 = true;
+                    if (token.size() < 2 || (token.back() != 'd' && token.back() != 'D'))
+                        throw std::runtime_error("bad double literal");
+                    tmp.key1 = std::stod(token.substr(0, token.size() - 1));
+                    f1 = true;
                 }
                 else if (key == "key2")
                 {
@@ -53,6 +41,7 @@ std::istream& operator>>(std::istream& in, DataStruct& ds)
                     if (token.empty() || !std::all_of(token.begin(), token.end(), [](char c){ return c >= '0' && c <= '7'; }))
                         throw std::runtime_error("not octal");
                     tmp.key2 = std::stoull(token, nullptr, 8);
+                    f2 = true;
                 }
                 else if (key == "key3")
                 {
