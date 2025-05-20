@@ -2,8 +2,7 @@
 #define DATASTRUCT_HPP
 #include <string>
 #include <iosfwd>
-struct DataStruct
-{
+struct DataStruct {
     double key1;
     unsigned long long key2;
     std::string key3;
