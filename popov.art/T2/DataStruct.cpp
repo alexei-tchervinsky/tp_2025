@@ -3,8 +3,18 @@
 #include <iomanip>
 #include <cctype>
 #include <stdexcept>
+#include <cmath>
 namespace {
-    bool parseDouble(const std::string& str, double& value) {
+    bool parseScientificDouble(const std::string& str, double& value) {
+        try {
+            size_t pos = 0;
+            value = std::stod(str, &pos);
+            return pos == str.length();
+        } catch (...) {
+            return false;
+        }
+    }
+    bool parseLiteralDouble(const std::string& str, double& value) {
         try {
             size_t pos = 0;
             std::string num = str;
@@ -16,16 +26,19 @@ namespace {
             return false;
         }
     }
-    bool parseOctalULL(const std::string& str, unsigned long long& value) {
+    bool parseULL(const std::string& str, unsigned long long& value) {
         try {
-            std::string num = str;
-            while (!num.empty() && isalpha(num.back()))
-                num.pop_back();
-            if (num.empty()) return false;
-            if (num.size() > 1 && num[0] == '0') {
-                value = std::stoull(num, nullptr, 8);
+            if (str.empty()) return false;  
+            if (str.size() > 1 && str[0] == '0') {
+                if (str.size() > 2 && (str[1] == 'b' || str[1] == 'B')) {
+                    value = std::stoull(str.substr(2), nullptr, 2);
+                } else if (str.size() > 2 && (str[1] == 'x' || str[1] == 'X')) {
+                    value = std::stoull(str.substr(2), nullptr, 16);
+                } else {
+                    value = std::stoull(str, nullptr, 8);
+                }
             } else {
-                value = std::stoull(num);
+                value = std::stoull(str);
             }
             return true;
         } catch (...) {
@@ -54,13 +67,27 @@ std::istream& operator>>(std::istream& in, DataStruct& ds) {
         if (!(iss >> key)) break;
         if (key == "key1") {
             std::string value;
-            if (!(iss >> value) || !parseDouble(value, tmp.key1)) break;
+            if (!(iss >> value)) break;
+            if (!parseLiteralDouble(value, tmp.key1) && 
+                !parseScientificDouble(value, tmp.key1)) {
+                break;
+            }
             hasKey1 = true;
         }
         else if (key == "key2") {
             std::string value;
-            if (!(iss >> value) || !parseOctalULL(value, tmp.key2)) break;
-            hasKey2 = true;
+            if (!(iss >> value)) break;
+            if (value[0] == '\'') {
+                if (value.size() == 3 && value.back() == '\'') {
+                    tmp.key2 = static_cast<unsigned char>(value[1]);
+                    hasKey2 = true;
+                }
+            } 
+            else if (!parseULL(value, tmp.key2)) {
+                break;
+            } else {
+                hasKey2 = true;
+            }
         }
         else if (key == "key3") {
             if (!(iss >> ch) || ch != '"') break;
