@@ -70,7 +70,7 @@ int main() {
     inputThread.join();
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
     if (records.empty()) {
-        std::cout << (nonEmptyLines == 0 ? 
+        std::cout << (nonEmptyLines == 0 ?
             "Looks like there is no supported record. Cannot determine input. Test skipped\n" :
             "At least one supported record type\n");
         return 0;
