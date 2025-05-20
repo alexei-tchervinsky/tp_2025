@@ -2,6 +2,7 @@
 #include "commands.h"
 #include <iostream>
 #include <string>
+#include <sstream>
 
 int main(int argc, char* argv[]) {
     if (argc != 2) {
@@ -10,33 +11,110 @@ int main(int argc, char* argv[]) {
     }
 
     auto polygons = readPolygons(argv[1]);
-    std::string cmd;
+    std::string cmd, subCmd;
 
     while (std::cin >> cmd) {
-        if (cmd == "ECHO" || cmd == "INFRAME") {
-            // Read the polygon definition after the command
+        if (cmd == "ECHO") {
             std::string line;
             std::getline(std::cin, line);
             Polygon target = parsePolygon(line);
 
             if (target.points.empty()) {
                 std::cout << "<INVALID COMMAND>\n";
-                continue;
-            }
-
-            if (cmd == "ECHO") {
+            } else {
                 size_t count = handleEcho(polygons, target);
                 std::cout << count << "\n";
-            } else if (cmd == "INFRAME") {
+            }
+        } else if (cmd == "INFRAME") {
+            std::string line;
+            std::getline(std::cin, line);
+            Polygon target = parsePolygon(line);
+
+            if (target.points.empty()) {
+                std::cout << "<INVALID COMMAND>\n";
+            } else {
                 bool inFrame = handleInFrame(polygons, target);
                 std::cout << (inFrame ? "YES" : "NO") << "\n";
             }
+        } else if (cmd == "COUNT") {
+            if (!(std::cin >> subCmd)) {
+                std::cout << "<INVALID COMMAND>\n";
+                continue;
+            }
+
+            if (subCmd == "ODD") {
+                std::cout << countOddPolygons(polygons) << "\n";
+            } else if (subCmd == "EVEN") {
+                std::cout << countEvenPolygons(polygons) << "\n";
+            } else {
+                // Try to parse as a number
+                try {
+                    int vertices = std::stoi(subCmd);
+                    if (vertices < 3) {
+                        std::cout << "<INVALID COMMAND>\n";
+                    } else {
+                        std::cout << countPolygonsByVertices(polygons, vertices) << "\n";
+                    }
+                } catch (const std::exception&) {
+                    std::cout << "<INVALID COMMAND>\n";
+                }
+            }
+        } else if (cmd == "AREA") {
+            if (!(std::cin >> subCmd)) {
+                std::cout << "<INVALID COMMAND>\n";
+                continue;
+            }
+
+            if (subCmd == "ODD") {
+                std::cout << calculateOddArea(polygons) << ".0\n";
+            } else if (subCmd == "EVEN") {
+                std::cout << calculateEvenArea(polygons) << ".0\n";
+            } else if (subCmd == "MEAN") {
+                if (polygons.empty()) {
+                    std::cout << "<INVALID COMMAND>\n";
+                } else {
+                    std::cout << calculateMeanArea(polygons) << "\n";
+                }
+            } else {
+                // Try to parse as a number
+                try {
+                    int vertices = std::stoi(subCmd);
+                    if (vertices < 3) {
+                        std::cout << "<INVALID COMMAND>\n";
+                    } else {
+                        std::cout << calculateAreaByVertices(polygons, vertices) << ".0\n";
+                    }
+                } catch (const std::exception&) {
+                    std::cout << "<INVALID COMMAND>\n";
+                }
+            }
+        } else if (cmd == "MAX") {
+            if (!(std::cin >> subCmd)) {
+                std::cout << "<INVALID COMMAND>\n";
+                continue;
+            }
+
+            if (subCmd == "AREA") {
+                if (polygons.empty()) {
+                    std::cout << "<INVALID COMMAND>\n";
+                } else {
+                    std::cout << getMaxArea(polygons) << ".0\n";
+                }
+            } else if (subCmd == "VERTEXES") {
+                if (polygons.empty()) {
+                    std::cout << "<INVALID COMMAND>\n";
+                } else {
+                    std::cout << getMaxVertices(polygons) << "\n";
+                }
+            } else {
+                std::cout << "<INVALID COMMAND>\n";
+            }
         } else {
-            // Unknown command
             std::cout << "<INVALID COMMAND>\n";
-            // Skip the rest of the line
             std::string dummy;
             std::getline(std::cin, dummy);
         }
     }
+
+    return 0;
 }
