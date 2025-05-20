@@ -39,8 +39,9 @@ auto min_y = min_max_y.first;
 auto max_y = min_max_y.second;
 
 
-    return std::all_of(target.points.begin(), target.points.end(),
-        [=](auto p) {
-            return p.x >= min_x->x && p.x <= max_x->x && p.y >= min_y->y && p.y <= max_y->y;
+return std::all_of(target.points.begin(), target.points.end(),
+    [=](auto p) {
+        return p.x >= (*min_x).x && p.x <= (*max_x).x && p.y >= (*min_y).y && p.y <= (*max_y).y;
+    
         });
 }
