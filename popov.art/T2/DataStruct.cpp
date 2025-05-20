@@ -9,7 +9,7 @@ namespace {
             size_t pos = 0;
             std::string num = str;
             if (!num.empty() && (num.back() == 'd' || num.back() == 'D'))
-                num.pop_back();       
+                num.pop_back();
             value = std::stod(num, &pos);
             return pos == num.length();
         } catch (...) {
