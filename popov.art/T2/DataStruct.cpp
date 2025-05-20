@@ -28,7 +28,7 @@ namespace {
     }
     bool parseULL(const std::string& str, unsigned long long& value) {
         try {
-            if (str.empty()) return false;  
+            if (str.empty()) return false;
             if (str.size() > 1 && str[0] == '0') {
                 if (str.size() > 2 && (str[1] == 'b' || str[1] == 'B')) {
                     value = std::stoull(str.substr(2), nullptr, 2);
