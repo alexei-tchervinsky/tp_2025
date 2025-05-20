@@ -23,7 +23,7 @@ std::istream& operator>>(std::istream& in, DataStruct& ds) {
                 std::string key;
                 src >> key;
                 if(key == "key1") {
-                    std::string token; 
+                    std::string token;
                     src >> token;
                     try {
                         if(!token.empty() && (token.back() == 'd' || token.back() == 'D')) {
@@ -37,7 +37,7 @@ std::istream& operator>>(std::istream& in, DataStruct& ds) {
                     }
                 }
                 else if(key == "key2") {
-                    std::string token; 
+                    std::string token;
                     src >> token;
                     try {
                         if(token.empty()) throw std::runtime_error("");
