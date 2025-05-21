@@ -1,0 +1,27 @@
+cmake_minimum_required(VERSION 3.16)
+project(TP2025_T2)
+
+# Указываем стандарт C++
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Дополнительные флаги компиляции (по желанию, полезно при разработке)
+add_compile_options(-Wall -Wextra -pedantic)
+
+# Указываем все исходные (.cpp) файлы
+set(SOURCES
+    main.cpp
+    DataStruct.cpp
+    IO_Objects.cpp
+    iofmtguard.cpp
+)
+
+# Указываем все заголовочные (.hpp) файлы (не обязательно, но удобно для IDE)
+set(HEADERS
+    DataStruct.hpp
+    IO_Objects.hpp
+    iofmtguard.hpp
+)
+
+# Создаём исполняемый файл из исходников
+add_executable(tp2025 ${SOURCES} ${HEADERS})
