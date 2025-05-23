@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef TEST
+#define TEST
 
 #include "RedBlackTree.hpp"
 #include "ReadFunc.hpp"
@@ -47,3 +47,5 @@ void testTextWithStopWords();
 void testLiteratureFragment();
 
 void mainTest();
+
+#endif
