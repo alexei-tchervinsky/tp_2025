@@ -2,4 +2,5 @@
 
 int main() {
     mainTest();
+    return 0;
 }
