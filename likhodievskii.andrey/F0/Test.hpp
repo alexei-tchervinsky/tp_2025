@@ -80,10 +80,10 @@ inline void testRemoveWithTwoChildren() {
 inline void testCustomType() {
     struct Point {
         int x, y;
-        bool operator<(const Point& other) const { return x < other.x; }
-        bool operator>(const Point& other) const { return x > other.x; }
-        bool operator==(const Point& other) const { return x == other.x && y == other.y; }
-        bool operator!=(const Point& other) const { return !(*this == other); }
+        bool operator<(const Point &other) const { return x < other.x; }
+        bool operator>(const Point &other) const { return x > other.x; }
+        bool operator==(const Point &other) const { return x == other.x && y == other.y; }
+        bool operator!=(const Point &other) const { return !(*this == other); }
     };
 
     RedBlackTree<Point> tree;
@@ -129,7 +129,6 @@ inline void testBasicTop3() {
     assert(top3[0].first == "apple" && top3[0].second == 3);
     assert(top3[1].first == "banana" && top3[1].second == 2);
     assert(top3[2].first == "cherry" && top3[2].second == 1);
-
 }
 
 inline void testRepeatedWords() {
@@ -145,7 +144,6 @@ inline void testRepeatedWords() {
     assert(top3[0].first == "world" && top3[0].second == 4);
     assert(top3[1].first == "hello" && top3[1].second == 3);
     assert(top3[2].first == "test" && top3[2].second == 2);
-
 }
 
 inline void testLessThan3Words() {
@@ -159,7 +157,6 @@ inline void testLessThan3Words() {
 
     assert(top.size() == 1);
     assert(top[0].first == "single" && top[0].second == 1);
-
 }
 
 inline void testCaseInsensitive() {
@@ -174,7 +171,6 @@ inline void testCaseInsensitive() {
     assert(top2.size() == 2);
     assert(top2[0].first == "apple" && top2[0].second == 3);
     assert(top2[1].first == "banana" && top2[1].second == 2);
-
 }
 
 
@@ -187,7 +183,6 @@ inline void testEmptyFile() {
     auto top = tree.getTopKFrequent(3);
 
     assert(top.empty());
-
 }
 
 inline void testDifferentDelimiters() {
@@ -199,7 +194,6 @@ inline void testDifferentDelimiters() {
     auto tree = extractWordsFromFile(test_file);
     auto top3 = tree.getTopKFrequent(3);
     assert(top3[0].first == "word" && top3[0].second == 7);
-
 }
 
 inline void testSimpleText() {
@@ -215,7 +209,6 @@ inline void testSimpleText() {
     assert(top3[0].first == "the" && top3[0].second == 3);
     assert(top3[1].first == "fox" && top3[1].second == 2);
     assert(top3[2].first == "quick" && top3[2].second == 2);
-
 }
 
 inline void testTextWithPunctuation() {
@@ -231,7 +224,6 @@ inline void testTextWithPunctuation() {
     assert(top3[0].first == "hello" && top3[0].second == 2);
     assert(top3[1].first == "world" && top3[1].second == 2);
     assert(top3[2].first == "is" || top3[2].first == "beautiful" || top3[2].first == "everyone");
-
 }
 
 inline void testTextWithSpecialChars() {
@@ -245,13 +237,13 @@ inline void testTextWithSpecialChars() {
 
     assert(top3.size() == 3);
 
-    for (const auto& pair : top3) {
+    for (const auto &pair: top3) {
         assert(pair.first == "a" || pair.first == "its" || pair.first == "and" ||
-               pair.first == "are" || pair.first == "fact" || pair.first == "words" ||
-               pair.first == "well" || pair.first == "known" || pair.first == "mother" || pair.first =="in" || pair.first == "law" ||
-               pair.first == "state" || pair.first == "of" || pair.first == "the" || pair.first =="art");
+            pair.first == "are" || pair.first == "fact" || pair.first == "words" ||
+            pair.first == "well" || pair.first == "known" || pair.first == "mother" || pair.first =="in" || pair.first
+            == "law" ||
+            pair.first == "state" || pair.first == "of" || pair.first == "the" || pair.first =="art");
     }
-
 }
 
 inline void testMultilineText() {
@@ -266,8 +258,7 @@ inline void testMultilineText() {
     assert(top3.size() == 3);
     assert(top3[0].first == "line" && top3[0].second == 4);
     assert((top3[1].first == "first" && top3[1].second == 2) ||
-           (top3[1].first == "second" || top3[1].first == "third" || top3[1].first == "again"));
-
+        (top3[1].first == "second" || top3[1].first == "third" || top3[1].first == "again"));
 }
 
 inline void testTextWithStopWords() {
@@ -283,16 +274,15 @@ inline void testTextWithStopWords() {
     assert(top3[0].first == "test" && top3[0].second == 2);
     assert(top3[1].first == "this" && top3[1].second == 2);
     assert(top3[2].first == "a" || top3[2].first == "of" || top3[2].first == "the" ||
-           top3[2].first == "system" || top3[2].first == "should" ||
-           top3[2].first == "work" || top3[2].first == "correctly" || top3[2].first == "is");
-
+        top3[2].first == "system" || top3[2].first == "should" ||
+        top3[2].first == "work" || top3[2].first == "correctly" || top3[2].first == "is");
 }
 
 inline void testLiteratureFragment() {
     const std::string test_file = "test_literature.txt";
     std::ofstream out(test_file);
     out << "It was the best of times, it was the worst of times, "
-        << "it was the age of wisdom, it was the age of foolishness...";
+            << "it was the age of wisdom, it was the age of foolishness...";
     out.close();
 
     auto tree = extractWordsFromFile(test_file);
@@ -302,7 +292,6 @@ inline void testLiteratureFragment() {
     assert(top3[0].first == "it" && top3[0].second == 4);
     assert((top3[1].first == "was" || top3[1].first == "of") && top3[1].second == 4);
     assert(top3[2].first == "the" && top3[2].second == 4);
-
 }
 
 inline void mainTest() {
@@ -329,5 +318,4 @@ inline void mainTest() {
     testLiteratureFragment();
 
     std::cout << "All tests passed successfully!" << std::endl;
-
 }

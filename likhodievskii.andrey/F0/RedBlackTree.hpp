@@ -52,7 +52,6 @@ class RedBlackTree {
     };
 
 public:
-
     RedBlackTree(): root(NIL) {
     };
 
@@ -60,13 +59,11 @@ public:
 
     RedBlackTree &operator=(const RedBlackTree &) = delete;
 
-    RedBlackTree(RedBlackTree &&other) noexcept
-    ;
+    RedBlackTree(RedBlackTree &&other) noexcept;
 
-    RedBlackTree &operator=(RedBlackTree &&other) noexcept
-    ;
+    RedBlackTree &operator=(RedBlackTree &&other) noexcept;
 
-    std::size_t getFrequency(const T& arg) const;
+    std::size_t getFrequency(const T &arg) const;
 
     ~RedBlackTree() = default;
 
@@ -97,6 +94,7 @@ public:
 
     private:
         std::stack<NodePtr> stack;
+
         void fillStack(NodePtr node);
     };
 
@@ -109,8 +107,8 @@ public:
     }
 
 
-    std::vector<std::pair<T, int>> getTopKFrequent(std::size_t k) const {
-        std::vector<std::pair<T, int>> elements;
+    std::vector<std::pair<T, int> > getTopKFrequent(std::size_t k) const {
+        std::vector<std::pair<T, int> > elements;
 
         for (auto it = begin(); it != end(); ++it) {
             elements.push_back(std::make_pair(*it, it.getFrequency()));
@@ -121,7 +119,7 @@ public:
 
         if (k > elements.size()) k = elements.size();
 
-        std::vector<std::pair<T, int>> result;
+        std::vector<std::pair<T, int> > result;
         for (size_t i = 0; i < k; ++i) {
             result.push_back(elements[i]);
         }
@@ -138,9 +136,7 @@ public:
         return countNodes;
     }
 
-
 private:
-
     static NodePtr NIL;
     NodePtr root = NIL;
     std::size_t countNodes = 0;
@@ -162,17 +158,17 @@ private:
     void fixDelete(NodePtr pivot);
 
     static NodePtr createNIL();
-
 };
 
 template<typename T, typename T0>
-RedBlackTree<T, T0>::RedBlackTree(RedBlackTree &&other) noexcept: root(std::move(other.root)), countNodes(other.countNodes) {
+RedBlackTree<T, T0>::RedBlackTree(RedBlackTree &&other) noexcept: root(std::move(other.root)),
+                                                                  countNodes(other.countNodes) {
     other.root = NIL;
     other.countNodes = 0;
 }
 
 template<typename T, typename T0>
-RedBlackTree<T, T0> & RedBlackTree<T, T0>::operator=(RedBlackTree &&other) noexcept {
+RedBlackTree<T, T0> &RedBlackTree<T, T0>::operator=(RedBlackTree &&other) noexcept {
     if (this != &other) {
         root = std::move(other.root);
         countNodes = other.countNodes;
@@ -200,7 +196,7 @@ RedBlackTree<T, T0>::Iterator::Iterator(NodePtr root): stack() {
 
 template<typename T, typename T0>
 typename RedBlackTree<T, T0>::Iterator::reference RedBlackTree<T, T0>::Iterator::operator*() const {
-    if (stack.empty()){
+    if (stack.empty()) {
         throw std::out_of_range("Dereferencing end iterator");
     }
     return stack.top()->key_;
@@ -265,7 +261,6 @@ bool RedBlackTree<T, T0>::search(const T &k) const {
 
 template<typename T, typename T0>
 bool RedBlackTree<T, T0>::insert(const T &key) {
-
     NodePtr found = searchNode(key);
     if (found != NIL) {
         ++(found->frequency_);
