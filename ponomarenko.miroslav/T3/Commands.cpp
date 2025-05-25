@@ -19,7 +19,7 @@ namespace ponomarenko {
         if (arg == "EVEN") {
             double sum = std::accumulate(polygons.begin(), polygons.end(), 0.0,
             [](double acc, const Polygon& p) {
-                return (p.points.size() % 2 == 1) ? acc + getArea(p) : acc;
+                return (p.points.size() % 2 == 0) ? acc + getArea(p) : acc;
             });
             std::cout << sum << "\n";
         } else if (arg == "ODD") {
