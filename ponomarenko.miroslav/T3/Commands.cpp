@@ -144,14 +144,6 @@ namespace ponomarenko {
             return;
         }
 
-        in >> std::ws;
-
-        if (in.peek() != std::char_traits<char>::eof() || inputPolygon.points.size() < 3) {
-            std::cout << "<INVALID COMMAND>\n";
-            return;
-        }
-
-
         double areaRef = getArea(inputPolygon);
         size_t count = std::count_if(polygons.begin(), polygons.end(),
             [areaRef](const Polygon& p) {
@@ -164,11 +156,6 @@ namespace ponomarenko {
     void maxSeqCommand(const std::vector<Polygon>& polygons, std::istream& in) {
         Polygon target;
         if (!(in >> target)) {
-            std::cout << "<INVALID COMMAND>\n";
-            return;
-        }
-        in >> std::ws;
-        if (in.peek() != std::char_traits<char>::eof()) {
             std::cout << "<INVALID COMMAND>\n";
             return;
         }

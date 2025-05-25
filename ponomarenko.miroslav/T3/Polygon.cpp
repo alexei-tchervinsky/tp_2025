@@ -68,6 +68,12 @@ namespace ponomarenko {
         }
 
         polygon.points = std::move(temp);
+
+        in >> std::ws;
+        if (in.peek() != std::char_traits<char>::eof()) {
+            in.setstate(std::ios::failbit);
+            return in;
+        }
         return in;
     }
 
