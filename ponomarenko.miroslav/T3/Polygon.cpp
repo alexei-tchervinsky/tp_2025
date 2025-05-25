@@ -29,6 +29,7 @@ namespace ponomarenko {
         in >> open >> x >> sep >> y >> close;
 
         if (!in || open != '(' || sep != ';' || close != ')') {
+            in.setstate(std::ios::failbit);
             return in;
         }
 
