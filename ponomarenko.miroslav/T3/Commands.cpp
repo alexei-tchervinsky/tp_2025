@@ -139,10 +139,19 @@ namespace ponomarenko {
 
     void lessAreaCommand(const std::vector<Polygon>& polygons, std::istream& in) {
         Polygon inputPolygon;
-        if (!(in >> inputPolygon) || inputPolygon.points.size() < 3) {
+        if (!(in >> inputPolygon)) {
             std::cout << "<INVALID COMMAND>\n";
             return;
         }
+
+        in >> std::ws;
+
+        if (in.peek() != std::char_traits<char>::eof() || inputPolygon.points.size() < 3) {
+            std::cout << "<INVALID COMMAND>\n";
+            return;
+        }
+
+
         double areaRef = getArea(inputPolygon);
         size_t count = std::count_if(polygons.begin(), polygons.end(),
             [areaRef](const Polygon& p) {
@@ -158,6 +167,12 @@ namespace ponomarenko {
             std::cout << "<INVALID COMMAND>\n";
             return;
         }
+        in >> std::ws;
+        if (in.peek() != std::char_traits<char>::eof()) {
+            std::cout << "<INVALID COMMAND>\n";
+            return;
+        }
+
         std::pair<std::size_t, std::size_t> result = std::accumulate(
             polygons.begin(), polygons.end(), std::pair<std::size_t, std::size_t>{0, 0},
             [&target](std::pair<std::size_t, std::size_t> acc, const Polygon& p) {
