@@ -162,7 +162,8 @@ void maxSeqCommand(const std::vector<Polygon>& polygons, std::istream& in) {
             polygons.begin(), polygons.end(), std::pair<std::size_t, std::size_t>{0, 0},
             [&target](std::pair<std::size_t, std::size_t> acc, const Polygon& p) {
                 std::size_t current = (p == target) ? acc.first + 1 : 0;
-                return std::pair<std::size_t, std::size_t>(current, acc.second);
+                std::size_t max = acc.second > acc.first ? acc.second : current;
+                return std::pair<std::size_t, std::size_t>(current, max);
             }
         );
         std::cout << result.second << "\n";    }
