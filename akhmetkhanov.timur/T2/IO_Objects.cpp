@@ -13,14 +13,14 @@ namespace nspace {
     std::istream& operator>>(std::istream& is, LabelIO&& l) {
         std::string temp;
         temp.reserve(l.label.size());
-        
+
         std::istream_iterator<char> it(is);
         std::istream_iterator<char> end;
-        
+
         for (size_t i = 0; i < l.label.size() && it != end; ++i) {
             temp.push_back(*it++);
         }
-        
+
         if (temp.size() != l.label.size() || temp != l.label) {
             is.setstate(std::ios::failbit);
         }
