@@ -11,8 +11,8 @@ namespace nspace {
     }
 
     std::istream& operator>>(std::istream& is, LabelIO&& l) {
-        std::string temp;
-        std::copy_n(std::istream_iterator<char>(is), l.label.size(), std::back_inserter(temp));
+        std::string temp(l.label.size(), '\0');
+        std::copy_n(std::istream_iterator<char>(is), l.label.size(), temp.begin());
         if (temp != l.label) is.setstate(std::ios::failbit);
         return is;
     }

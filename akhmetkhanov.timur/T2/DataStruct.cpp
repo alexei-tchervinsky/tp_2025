@@ -9,14 +9,14 @@ namespace nspace {
         std::istream::sentry sentry(is);
         if (!sentry) return is;
 
-        DataStruct temp;
+        DataStruct temp{0, 0.0, {}};
         is >> DelimiterIO{ '(' };
         if (!is) return is;
 
         for (std::size_t i = 0; i < 3; ++i) {
-            short number;
+            short number = 0;
             is >> DelimiterIO{ ':' } >> LabelIO{ "key" } >> number;
-            if (!is) return is;
+            if (is.fail()) return is;
 
             switch (number) {
                 case 1: is >> ULLHexIO{ temp.key1 }; break;
