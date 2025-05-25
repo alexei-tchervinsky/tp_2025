@@ -1,7 +1,7 @@
 #include "IO_Objects.hpp"
 #include <iterator>
 #include <algorithm>
-#include <cctype>
+//#include <cctype>
 
 namespace nspace {
     std::istream& operator>>(std::istream& is, DelimiterIO&& dlim) {
