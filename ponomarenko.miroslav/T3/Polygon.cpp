@@ -54,7 +54,7 @@ namespace ponomarenko {
         }
         size_t count = 0;
         in >> count;
-        if (count < 3) {
+        if (!in || count < 3) {
             in.setstate(std::ios::failbit);
             return in;
         }
@@ -62,7 +62,7 @@ namespace ponomarenko {
         std::vector<Point> temp;
         std::copy_n(std::istream_iterator<Point>(in), count, std::back_inserter(temp));
 
-        if (temp.size() != count) {
+        if (temp.size() != count || !in) {
             in.setstate(std::ios::failbit);
             return in;
         }

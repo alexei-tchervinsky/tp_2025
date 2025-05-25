@@ -152,13 +152,13 @@ namespace ponomarenko {
 
     }
 
-void maxSeqCommand(const std::vector<Polygon>& polygons, std::istream& in) {
-    Polygon target;
-    if (!(in >> target)) {
-        std::cout << "<INVALID COMMAND>\n";
-        return;
-    }
-    std::pair<std::size_t, std::size_t> result = std::accumulate(
+    void maxSeqCommand(const std::vector<Polygon>& polygons, std::istream& in) {
+        Polygon target;
+        if (!(in >> target)) {
+            std::cout << "<INVALID COMMAND>\n";
+            return;
+        }
+        std::pair<std::size_t, std::size_t> result = std::accumulate(
             polygons.begin(), polygons.end(), std::pair<std::size_t, std::size_t>{0, 0},
             [&target](std::pair<std::size_t, std::size_t> acc, const Polygon& p) {
                 std::size_t current = (p == target) ? acc.first + 1 : 0;
@@ -166,5 +166,6 @@ void maxSeqCommand(const std::vector<Polygon>& polygons, std::istream& in) {
                 return std::pair<std::size_t, std::size_t>(current, max);
             }
         );
-        std::cout << result.second << "\n";    }
+        std::cout << result.second << "\n";
+    }
 }
