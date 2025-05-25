@@ -44,6 +44,6 @@ namespace nspace {
     }
 
     std::istream& operator>>(std::istream& is, StringIO&& s) {
-        return std::getline(is >> DelimiterIO{ '\"' }, s.ref, '\"');
+        return std::getline(is >> DelimiterIO{'\"'}, s.ref, '\"');
     }
 }
