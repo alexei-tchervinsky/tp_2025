@@ -14,16 +14,14 @@ namespace nspace {
         std::string temp;
         temp.reserve(l.label.size());
 
-        for (size_t i = 0; i < l.label.size(); ++i) {
-            char c;
-            if (!(is >> c)) {
-                is.setstate(std::ios::failbit);
-                return is;
-            }
-            temp.push_back(c);
+        std::istream_iterator<char> it(is);
+        std::istream_iterator<char> end;
+
+        for (size_t i = 0; i < l.label.size() && it != end; ++i) {
+            temp.push_back(*it++);
         }
 
-        if (temp != l.label) {
+        if (temp.size() != l.label.size() || temp != l.label) {
             is.setstate(std::ios::failbit);
         }
         return is;
@@ -46,6 +44,6 @@ namespace nspace {
     }
 
     std::istream& operator>>(std::istream& is, StringIO&& s) {
-        return std::getline(is >> DelimiterIO{ '\"' }, s.ref, '\"');
+        return std::getline(is >> DelimiterIO{'\"'}, s.ref, '\"');
     }
 }

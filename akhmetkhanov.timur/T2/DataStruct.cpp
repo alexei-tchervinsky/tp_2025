@@ -3,7 +3,6 @@
 #include "iofmtguard.hpp"
 #include <iostream>
 #include <iomanip>
-#include <sstream>
 
 namespace nspace {
     std::istream& operator>>(std::istream& is, DataStruct& ds) {
@@ -14,53 +13,22 @@ namespace nspace {
         is >> DelimiterIO{ '(' };
         if (!is) return is;
 
-        bool hasValidKeys = false;
         for (std::size_t i = 0; i < 3; ++i) {
             short number = 0;
             is >> DelimiterIO{ ':' } >> LabelIO{ "key" } >> number;
-            if (is.fail()) {
-                is.clear();
-                break;
-            }
-
-            std::streampos pos = is.tellg();
-            bool keyValid = true;
+            if (is.fail()) return is;
 
             switch (number) {
-                case 1:
-                    if (!(is >> ULLHexIO{ temp.key1 })) keyValid = false;
-                    break;
-                case 2:
-                    if (!(is >> DoubleSciIO{ temp.key2 })) {
-                        is.clear();
-                        is.seekg(pos);
-                        if (!(is >> temp.key2)) keyValid = false;
-                    }
-                    break;
-                case 3:
-                    if (!(is >> StringIO{ temp.key3 })) keyValid = false;
-                    break;
-                default:
-                    keyValid = false;
+                case 1: is >> ULLHexIO{ temp.key1 }; break;
+                case 2: is >> DoubleSciIO{ temp.key2 }; break;
+                case 3: is >> StringIO{ temp.key3 }; break;
+                default: is.setstate(std::ios::failbit);
             }
-
-            if (!keyValid) {
-                is.clear();
-                is.seekg(pos);
-                break;
-            }
-
-            hasValidKeys = true;
+            if (!is) return is;
         }
 
-        if (hasValidKeys) {
-            char c;
-            while (is >> c && c != ')') {}
-            if (is) ds = std::move(temp);
-        } else {
-            is.setstate(std::ios::failbit);
-        }
-
+        is >> DelimiterIO{ ':' } >> DelimiterIO{ ')' };
+        if (is) ds = std::move(temp);
         return is;
     }
 
