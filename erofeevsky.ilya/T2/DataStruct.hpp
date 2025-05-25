@@ -4,6 +4,7 @@
 #include <string>
 #include <utility>
 
+
 namespace erofick {
     struct DataStruct {
         long long key1;
