@@ -25,9 +25,17 @@ int main(int argc, char* argv[]) {
     while (std::getline(file, line)) {
         std::istringstream iss(line);
         Polygon p;
-        if (iss >> p) {
-            polygons.push_back(std::move(p));
+        if (!(iss >> p)) {
+            continue;
         }
+
+        iss >> std::ws;
+
+        if (!iss.eof()) {
+            continue;
+        }
+
+        polygons.push_back(std::move(p));
     }
 
     while (std::getline(std::cin, line)) {
