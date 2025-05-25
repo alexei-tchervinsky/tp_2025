@@ -13,14 +13,23 @@ int main(int argc, char* argv[]) {
         std::cerr << "<INVALID COMMAND>\n";
         return 1;
     }
+
     std::ifstream file(argv[1]);
-    std::vector<Polygon> polygons;
-    Polygon p;
-    while (file >> p) {
-        polygons.push_back(p);
+    if (!file) {
+        std::cerr << "<INVALID COMMAND>\n";
+        return 1;
     }
 
+    std::vector<Polygon> polygons;
     std::string line;
+    while (std::getline(file, line)) {
+        std::istringstream iss(line);
+        Polygon p;
+        if (iss >> p) {
+            polygons.push_back(std::move(p));
+        }
+    }
+
     while (std::getline(std::cin, line)) {
         std::istringstream iss(line);
         std::string command;

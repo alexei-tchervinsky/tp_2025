@@ -62,7 +62,7 @@ namespace ponomarenko {
         std::vector<Point> temp;
         std::copy_n(std::istream_iterator<Point>(in), count, std::back_inserter(temp));
 
-        if (temp.size() != count || !in) {
+        if (temp.size() != count || in.fail()) {
             in.setstate(std::ios::failbit);
             return in;
         }
