@@ -1,6 +1,7 @@
 #include "commands.h"
 #include "polygon_operations.h"
 #include <sstream>
+#include "file_io.h"
 #include <iomanip>
 #include <algorithm>
 #include <numeric>
