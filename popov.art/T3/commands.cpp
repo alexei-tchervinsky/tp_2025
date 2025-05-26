@@ -5,16 +5,13 @@
 #include <algorithm>
 #include <numeric>
 #include <iostream>
-
 void processCommand(const std::string& command, std::vector<Polygon>& polygons) {
     std::istringstream iss(command);
     std::string cmd;
     iss >> cmd;
-    
     if (cmd == "AREA") {
         std::string arg;
         iss >> arg;
-        
         if (arg == "EVEN") {
             double sum = std::accumulate(polygons.begin(), polygons.end(), 0.0,
                 [](double acc, const Polygon& p) {
@@ -57,10 +54,8 @@ void processCommand(const std::string& command, std::vector<Polygon>& polygons) 
             std::cout << "<INVALID COMMAND>" << std::endl;
             return;
         }
-        
         std::string arg;
         iss >> arg;
-        
         if (arg == "AREA") {
             auto it = std::max_element(polygons.begin(), polygons.end(),
                 [](const Polygon& a, const Polygon& b) {
@@ -84,10 +79,8 @@ void processCommand(const std::string& command, std::vector<Polygon>& polygons) 
             std::cout << "<INVALID COMMAND>" << std::endl;
             return;
         }
-        
         std::string arg;
         iss >> arg;
-        
         if (arg == "AREA") {
             auto it = std::min_element(polygons.begin(), polygons.end(),
                 [](const Polygon& a, const Polygon& b) {
@@ -109,7 +102,6 @@ void processCommand(const std::string& command, std::vector<Polygon>& polygons) 
     else if (cmd == "COUNT") {
         std::string arg;
         iss >> arg;
-        
         if (arg == "EVEN") {
             int count = std::count_if(polygons.begin(), polygons.end(),
                 [](const Polygon& p) { return p.points.size() % 2 == 0; });
