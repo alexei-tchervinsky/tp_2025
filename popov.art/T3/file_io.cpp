@@ -1,7 +1,5 @@
 #include "file_io.h"
 #include <fstream>
-#include <sstream>
-#include <iostream>
 std::vector<Polygon> readPolygonsFromFile(const std::string& filename) {
     std::vector<Polygon> polygons;
     std::ifstream file(filename);
