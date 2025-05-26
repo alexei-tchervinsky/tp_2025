@@ -3,10 +3,11 @@
 #include <algorithm>
 #include <sstream>
 double calculateArea(const Polygon& poly) {
+    if (poly.points.size() < 3) return 0.0;
     double area = 0.0;
-    int n = poly.points.size();
-    for (int i = 0; i < n; ++i) {
-        int j = (i + 1) % n;
+    size_t n = poly.points.size();
+    for (size_t i = 0; i < n; ++i) {
+        size_t j = (i + 1) % n;
         area += (poly.points[i].x * poly.points[j].y) - (poly.points[j].x * poly.points[i].y);
     }
     return std::abs(area) / 2.0;
