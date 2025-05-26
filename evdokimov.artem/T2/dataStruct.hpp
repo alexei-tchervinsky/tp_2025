@@ -2,17 +2,23 @@
 #define DATASTRUCT_HPP
 
 #include <complex>
-#include <iostream>
 #include <string>
 
-struct DataStruct {
-  unsigned long long key1;
-  std::complex<double> key2;
-  std::string key3;
+namespace evdokimov {
+enum key_type { HEX = 1, COMPLEX = 2, STRING = 3 };
+
+struct DataRecord {
+  unsigned long long val1_;
+  std::complex<double> val2_;
+  std::string val3_;
+  friend std::ostream &operator<<(std::ostream &out, const DataRecord &src);
+  friend std::istream &operator>>(std::istream &in, DataRecord &dest);
+
+private:
+  static void formatDouble(std::ostream &out, double num);
 };
 
-std::istream &operator>>(std::istream &in, DataStruct &data);
-std::ostream &operator<<(std::ostream &out, const DataStruct &data);
-bool compareDataStruct(const DataStruct &a, const DataStruct &b);
+bool sortByCriteria(const DataRecord &a, const DataRecord &b);
+} // namespace evdokimov
 
 #endif
