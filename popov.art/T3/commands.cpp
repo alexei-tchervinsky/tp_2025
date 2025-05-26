@@ -104,7 +104,7 @@ void processCommand(const std::string& command, std::vector<Polygon>& polygons) 
                 auto compareArea = [](const Polygon& a, const Polygon& b) {
                     return calculateArea(a) < calculateArea(b);
                 };
-                auto it = (cmd == "MAX") 
+                auto it = (cmd == "MAX")
                     ? std::max_element(polygons.begin(), polygons.end(), compareArea)
                     : std::min_element(polygons.begin(), polygons.end(), compareArea);
                 std::cout << std::fixed << std::setprecision(1) << calculateArea(*it) << std::endl;
@@ -113,7 +113,7 @@ void processCommand(const std::string& command, std::vector<Polygon>& polygons) 
                 auto compareVertexes = [](const Polygon& a, const Polygon& b) {
                     return a.points.size() < b.points.size();
                 };
-                auto it = (cmd == "MAX") 
+                auto it = (cmd == "MAX")
                     ? std::max_element(polygons.begin(), polygons.end(), compareVertexes)
                     : std::min_element(polygons.begin(), polygons.end(), compareVertexes);
                 std::cout << it->points.size() << std::endl;
@@ -122,8 +122,8 @@ void processCommand(const std::string& command, std::vector<Polygon>& polygons) 
                 printInvalid();
             }
         }
-        else if (cmd == "INTERSECTIONS" || cmd == "LESSAREA" || cmd == "RMECHO" || 
-                 cmd == "ECHO" || cmd == "PERMS" || cmd == "MAXSEQ" || 
+        else if (cmd == "INTERSECTIONS" || cmd == "LESSAREA" || cmd == "RMECHO" ||
+                 cmd == "ECHO" || cmd == "PERMS" || cmd == "MAXSEQ" ||
                  cmd == "INFRAME" || cmd == "SAME" || cmd == "RECTS" || cmd == "RIGHTSHAPES") {
             std::string polygonStr;
             std::getline(iss, polygonStr);
