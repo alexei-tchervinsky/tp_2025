@@ -2,6 +2,8 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <map>
+#include <functional>
 #include <string>
 #include "Polygon.hpp"
 #include "Commands.hpp"
@@ -38,22 +40,23 @@ int main(int argc, char* argv[]) {
         polygons.push_back(std::move(p));
     }
 
+    std::map<std::string, std::function<void(const std::vector<Polygon>&, std::istream&)>> commands = {
+        {"AREA", areaCommand},
+        {"COUNT", countCommand},
+        {"MAX", maxCommand},
+        {"MIN", minCommand},
+        {"LESSAREA", lessAreaCommand},
+        {"MAXSEQ", maxSeqCommand}
+      };
+
     while (std::getline(std::cin, line)) {
         std::istringstream iss(line);
         std::string command;
         iss >> command;
-        if (command == "AREA") {
-            areaCommand(polygons, iss);
-        } else if (command == "COUNT") {
-            countCommand(polygons, iss);
-        } else if (command == "MAX") {
-            maxCommand(polygons, iss);
-        } else if (command == "MIN") {
-            minCommand(polygons, iss);
-        } else if (command == "LESSAREA") {
-            lessAreaCommand(polygons, iss);
-        } else if (command == "MAXSEQ") {
-            maxSeqCommand(polygons, iss);
+
+        auto it = commands.find(command);
+        if (it != commands.end()) {
+            it->second(polygons, iss);
         } else {
             std::cout << "<INVALID COMMAND>\n";
         }
