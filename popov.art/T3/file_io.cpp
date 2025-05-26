@@ -35,7 +35,6 @@ Polygon parsePolygon(const std::string& input) {
     std::istringstream iss(input);
     int vertexCount;
     iss >> vertexCount;
-    
     Polygon poly;
     for (int i = 0; i < vertexCount; ++i) {
         char c1, c2, c3;
