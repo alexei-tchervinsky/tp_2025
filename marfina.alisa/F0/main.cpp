@@ -72,6 +72,12 @@ int main(int argc, char* argv[])
     const std::string encodedFilename = argv[2];
     const std::string decodedFilename = argv[3];
 
+    if (!isFileSizeValid(inputFilename))
+    {
+        printError("Input file size exceeds 1 MB limit or is empty");
+        return 1;
+    }
+
     std::vector<char> text = readFile(inputFilename);
     if (text.empty())
     {

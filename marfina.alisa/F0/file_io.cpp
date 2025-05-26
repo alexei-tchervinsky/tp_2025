@@ -7,9 +7,30 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <memory>
+
+constexpr size_t MAX_FILE_SIZE = 1024 * 1024; // 1 MB
+
+bool isFileSizeValid(const std::string& filename)
+{
+    std::ifstream file(filename, std::ios::binary | std::ios::ate);
+    if (!file.is_open())
+    {
+        std::cerr << "Error opening file: " << filename << "\n";
+        return false;
+    }
+    std::streamsize size = file.tellg();
+    return size > 0 && static_cast<size_t>(size) <= MAX_FILE_SIZE;
+}
 
 std::vector<char> readFile(const std::string& filename)
 {
+    if (!isFileSizeValid(filename))
+    {
+        std::cerr << "File size exceeds 1 MB limit or is empty: " << filename << "\n";
+        return {};
+    }
+
     std::ifstream file(filename, std::ios::binary | std::ios::ate);
     if (!file.is_open())
     {

@@ -8,6 +8,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 /**
  * @brief Reading file in memory
@@ -24,4 +25,10 @@ std::vector<char> readFile(const std::string& filename);
  */
 bool writeFile(const std::string& filename, const std::string& content);
 
+/**
+ * @brief Check if file size is within limits (1 MB)
+ * @param filename Name of file to check
+ * @return true if file size <= 1 MB, false otherwise
+ */
+bool isFileSizeValid(const std::string& filename);
 #endif
