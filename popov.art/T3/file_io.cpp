@@ -25,7 +25,7 @@ std::vector<Polygon> readPolygonsFromFile(const std::string& filename) {
             }
             poly.points.push_back({x, y});
         }
-        if (valid && poly.points.size() == vertexCount) {
+        if (valid && poly.points.size() == static_cast<size_t>(vertexCount)) {
             polygons.push_back(poly);
         }
     }
@@ -35,6 +35,7 @@ Polygon parsePolygon(const std::string& input) {
     std::istringstream iss(input);
     int vertexCount;
     iss >> vertexCount;
+    
     Polygon poly;
     for (int i = 0; i < vertexCount; ++i) {
         char c1, c2, c3;
