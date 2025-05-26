@@ -18,51 +18,75 @@ void processCommand(const string& command, vector<Polygon>& polygons) {
     }
     auto printInvalid = []() { cout << "<INVALID COMMAND>" << endl; };
     try {
-        if (cmd == "AREA") {
+        if (cmd == "COUNT") {
             string arg;
             if (!(iss >> arg)) {
                 printInvalid();
                 return;
             }
+            auto isValidPolygon = [](const Polygon& p) { return p.points.size() >= 3; };
             if (arg == "EVEN") {
-                double sum = accumulate(polygons.begin(), polygons.end(), 0.0,
-                    [](double acc, const Polygon& p) {
-                        return p.points.size() >= 3 && p.points.size() % 2 == 0 ? acc + calculateArea(p) : acc;
+                int count = count_if(polygons.begin(), polygons.end(),
+                    [&](const Polygon& p) {
+                        return isValidPolygon(p) && p.points.size() % 2 == 0;
                     });
-                cout << fixed << setprecision(1) << sum << endl;
+                cout << count << endl;
             }
             else if (arg == "ODD") {
-                double sum = accumulate(polygons.begin(), polygons.end(), 0.0,
-                    [](double acc, const Polygon& p) {
-                        return p.points.size() >= 3 && p.points.size() % 2 != 0 ? acc + calculateArea(p) : acc;
+                int count = count_if(polygons.begin(), polygons.end(),
+                    [&](const Polygon& p) {
+                        return isValidPolygon(p) && p.points.size() % 2 != 0;
                     });
-                cout << fixed << setprecision(1) << sum << endl;
-            }
-            else if (arg == "MEAN") {
-                if (polygons.empty()) {
-                    printInvalid();
-                    return;
-                }
-                double sum = accumulate(polygons.begin(), polygons.end(), 0.0,
-                    [](double acc, const Polygon& p) {
-                        return p.points.size() >= 3 ? acc + calculateArea(p) : acc;
-                    });
-                cout << fixed << setprecision(1) << sum / polygons.size() << endl;
+                cout << count << endl;
             }
             else {
                 try {
                     int num = stoi(arg);
                     if (num < 3) throw invalid_argument("Invalid vertex count");
-                    double sum = accumulate(polygons.begin(), polygons.end(), 0.0,
-                        [num](double acc, const Polygon& p) {
-                            return p.points.size() == static_cast<size_t>(num) ? acc + calculateArea(p) : acc;
+                    int count = count_if(polygons.begin(), polygons.end(),
+                        [&](const Polygon& p) {
+                            return isValidPolygon(p) && p.points.size() == static_cast<size_t>(num);
                         });
-                    cout << fixed << setprecision(1) << sum << endl;
+                    cout << count << endl;
                 }
                 catch (...) {
                     printInvalid();
                 }
             }
+        }
+        else if (cmd == "INTERSECTIONS" || cmd == "LESSAREA") {
+            string polygonStr;
+            getline(iss, polygonStr);
+            size_t openParen = count(polygonStr.begin(), polygonStr.end(), '(');
+            size_t closeParen = count(polygonStr.begin(), polygonStr.end(), ')');
+            size_t semicolons = count(polygonStr.begin(), polygonStr.end(), ';');
+            if (openParen < 3 || openParen != closeParen || semicolons < openParen) {
+                printInvalid();
+                return;
+            }
+            try {
+                Polygon poly = parsePolygon(polygonStr);
+                if (poly.points.size() < 3) throw invalid_argument("Invalid polygon");
+                if (cmd == "INTERSECTIONS") {
+                    int count = count_if(polygons.begin(), polygons.end(),
+                        [&](const Polygon& p) {
+                            return p.points.size() >= 3 && doPolygonsIntersect(poly, p);
+                        });
+                    cout << count << endl;
+                }
+                else { // LESSAREA
+                    double area = calculateArea(poly);
+                    int count = count_if(polygons.begin(), polygons.end(),
+                        [&](const Polygon& p) {
+                            return p.points.size() >= 3 && calculateArea(p) < area;
+                        });
+                    cout << count << endl;
+                }
+            }
+            catch (...) {
+                printInvalid();
+            }
+        }
         }
         else if (cmd == "COUNT") {
             string arg;
