@@ -37,13 +37,21 @@ bool isPolygonInFrame(const Polygon& poly, const vector<Polygon>& polygons) {
 }
 bool doPolygonsIntersect(const Polygon& a, const Polygon& b) {
     if (a.points.size() < 3 || b.points.size() < 3) return false;
-    auto [a_min_x, a_max_x] = minmax_element(a.points.begin(), a.points.end(),
+    auto a_min_x = min_element(a.points.begin(), a.points.end(),
         [](const Point& p1, const Point& p2) { return p1.x < p2.x; });
-    auto [a_min_y, a_max_y] = minmax_element(a.points.begin(), a.points.end(),
+    auto a_max_x = max_element(a.points.begin(), a.points.end(),
+        [](const Point& p1, const Point& p2) { return p1.x < p2.x; });
+    auto a_min_y = min_element(a.points.begin(), a.points.end(),
         [](const Point& p1, const Point& p2) { return p1.y < p2.y; });
-    auto [b_min_x, b_max_x] = minmax_element(b.points.begin(), b.points.end(),
+    auto a_max_y = max_element(a.points.begin(), a.points.end(),
+        [](const Point& p1, const Point& p2) { return p1.y < p2.y; });
+    auto b_min_x = min_element(b.points.begin(), b.points.end(),
         [](const Point& p1, const Point& p2) { return p1.x < p2.x; });
-    auto [b_min_y, b_max_y] = minmax_element(b.points.begin(), b.points.end(),
+    auto b_max_x = max_element(b.points.begin(), b.points.end(),
+        [](const Point& p1, const Point& p2) { return p1.x < p2.x; });
+    auto b_min_y = min_element(b.points.begin(), b.points.end(),
+        [](const Point& p1, const Point& p2) { return p1.y < p2.y; });
+    auto b_max_y = max_element(b.points.begin(), b.points.end(),
         [](const Point& p1, const Point& p2) { return p1.y < p2.y; });
     return !(a_max_x->x < b_min_x->x || a_min_x->x > b_max_x->x ||
              a_max_y->y < b_min_y->y || a_min_y->y > b_max_y->y);
