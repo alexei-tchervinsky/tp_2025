@@ -38,7 +38,6 @@ std::istream& operator>>(std::istream& in, DataStruct& data) {
             else if (key == "key2")
             {
                 std::string octStr;
-                char chgrid;
                 std::getline(iss, octStr, ':');
                 //const char* str = octStr.c_str();
                 //std::cout << "step1: " << octStr << ", "<< octStr.at(1)<<'\n';
