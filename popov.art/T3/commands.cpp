@@ -5,16 +5,13 @@
 #include <algorithm>
 #include <numeric>
 #include <iostream>
-
 void processCommand(const std::string& command, std::vector<Polygon>& polygons) {
     std::istringstream iss(command);
     std::string cmd;
     iss >> cmd;
-    
     if (cmd == "AREA") {
         std::string arg;
         iss >> arg;
-        
         if (arg == "EVEN") {
             double sum = std::accumulate(polygons.begin(), polygons.end(), 0.0,
                 [](double acc, const Polygon& p) {
