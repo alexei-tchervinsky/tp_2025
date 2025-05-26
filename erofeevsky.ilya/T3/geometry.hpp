@@ -43,7 +43,8 @@ namespace erofick
   int findMaxY(const Polygon& polygon);
   int findMinX(const Polygon& polygon);
   int findMinY(const Polygon& polygon);
-  Polygon getBoundingBox(const std::vector< Polygon >& polygon);//получение ограничивающего прямоугольника
+  Polygon getBoundingBox(const std::vector< Polygon >& polygon);//получение \\
+  ограничивающего прямоугольника
 
   //функтор для вычисления площади полигона
   struct AreaPolygon
