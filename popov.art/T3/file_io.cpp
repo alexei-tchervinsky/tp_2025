@@ -2,6 +2,8 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <vector>
+using namespace std;
 vector<Polygon> readPolygonsFromFile(const string& filename) {
     vector<Polygon> polygons;
     ifstream file(filename);
