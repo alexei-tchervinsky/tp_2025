@@ -14,7 +14,9 @@ inline Polygon parsePolygon(const std::string& input) {
     for (int i = 0; i < vertexCount; ++i) {
         char c1, c2, c3;
         int x, y;
-        iss >> c1 >> x >> c2 >> y >> c3;
+        if (!(iss >> c1 >> x >> c2 >> y >> c3)) {
+            break;
+        }
         poly.points.push_back({x, y});
     }
     return poly;
