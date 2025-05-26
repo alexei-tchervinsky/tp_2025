@@ -47,15 +47,17 @@ bool handleInFrame(const std::vector<Polygon>& polygons, const Polygon& target) 
 double calculateArea(const Polygon& polygon) {
     if (polygon.points.size() < 3) return 0.0;
 
-    double area = 0.0;
     size_t n = polygon.points.size();
-
-    for (size_t i = 0; i < n; ++i) {
-        size_t j = (i + 1) % n;
-        area += polygon.points[i].x * polygon.points[j].y;
-        area -= polygon.points[j].x * polygon.points[i].y;
-    }
-
+    std::vector<double> products(n);
+    
+    std::transform(polygon.points.begin(), polygon.points.end(), products.begin(),
+        [&polygon, n](const Point& p) {
+            size_t i = &p - &polygon.points[0];
+            size_t j = (i + 1) % n;
+            return static_cast<double>(p.x * polygon.points[j].y - polygon.points[j].x * p.y);
+        });
+    
+    double area = std::accumulate(products.begin(), products.end(), 0.0);
     return std::abs(area) / 2.0;
 }
 
