@@ -102,7 +102,6 @@ void processCommand(const std::string& command, std::vector<Polygon>& polygons) 
     else if (cmd == "COUNT") {
         std::string arg;
         iss >> arg;
-        
         if (arg == "EVEN") {
             int count = std::count_if(polygons.begin(), polygons.end(),
                 [](const Polygon& p) { return p.points.size() % 2 == 0; });
