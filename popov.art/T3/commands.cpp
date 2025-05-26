@@ -5,13 +5,16 @@
 #include <algorithm>
 #include <numeric>
 #include <iostream>
+
 void processCommand(const std::string& command, std::vector<Polygon>& polygons) {
     std::istringstream iss(command);
     std::string cmd;
     iss >> cmd;
+    
     if (cmd == "AREA") {
         std::string arg;
         iss >> arg;
+        
         if (arg == "EVEN") {
             double sum = std::accumulate(polygons.begin(), polygons.end(), 0.0,
                 [](double acc, const Polygon& p) {
@@ -40,7 +43,7 @@ void processCommand(const std::string& command, std::vector<Polygon>& polygons) 
                 int num = std::stoi(arg);
                 double sum = std::accumulate(polygons.begin(), polygons.end(), 0.0,
                     [num](double acc, const Polygon& p) {
-                        return acc + (p.points.size() == num ? calculateArea(p) : 0.0);
+                        return acc + (p.points.size() == static_cast<size_t>(num) ? calculateArea(p) : 0.0);
                     });
                 std::cout << std::fixed << std::setprecision(1) << sum << std::endl;
             }
@@ -102,6 +105,7 @@ void processCommand(const std::string& command, std::vector<Polygon>& polygons) 
     else if (cmd == "COUNT") {
         std::string arg;
         iss >> arg;
+        
         if (arg == "EVEN") {
             int count = std::count_if(polygons.begin(), polygons.end(),
                 [](const Polygon& p) { return p.points.size() % 2 == 0; });
@@ -116,7 +120,7 @@ void processCommand(const std::string& command, std::vector<Polygon>& polygons) 
             try {
                 int num = std::stoi(arg);
                 int count = std::count_if(polygons.begin(), polygons.end(),
-                    [num](const Polygon& p) { return p.points.size() == num; });
+                    [num](const Polygon& p) { return p.points.size() == static_cast<size_t>(num); });
                 std::cout << count << std::endl;
             }
             catch (...) {
