@@ -49,14 +49,14 @@ double calculateArea(const Polygon& polygon) {
 
     size_t n = polygon.points.size();
     std::vector<double> products(n);
-    
+
     std::transform(polygon.points.begin(), polygon.points.end(), products.begin(),
         [&polygon, n](const Point& p) {
             size_t i = &p - &polygon.points[0];
             size_t j = (i + 1) % n;
             return static_cast<double>(p.x * polygon.points[j].y - polygon.points[j].x * p.y);
         });
-    
+
     double area = std::accumulate(products.begin(), products.end(), 0.0);
     return std::abs(area) / 2.0;
 }
