@@ -4,6 +4,7 @@
 #include <iostream>
 
 namespace erofick {
+
     class iofmtguard {
     public:
         iofmtguard(std::basic_ios<char>&);
@@ -18,3 +19,4 @@ namespace erofick {
 }
 
 #endif
+
