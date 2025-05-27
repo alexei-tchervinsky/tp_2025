@@ -15,10 +15,10 @@ int main(int argc, char* argv[]) {
 
     auto polygons = readPolygons(argv[1]);
     std::string cmd, subCmd;
-
+    
     // Command handlers map
     std::map<std::string, std::function<void(void)>> cmdHandlers;
-
+    
     // ECHO command
     cmdHandlers["ECHO"] = [&]() {
         std::string line;
@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
             std::cout << count << "\n";
         }
     };
-
+    
     // INFRAME command
     cmdHandlers["INFRAME"] = [&]() {
         std::string line;
@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
             std::cout << (inFrame ? "<TRUE>" : "<FALSE>") << "\n";
         }
     };
-
+    
     // COUNT command
     cmdHandlers["COUNT"] = [&]() {
         if (!(std::cin >> subCmd)) {
@@ -71,7 +71,7 @@ int main(int argc, char* argv[]) {
             }
         }
     };
-
+    
     // AREA command
     cmdHandlers["AREA"] = [&]() {
         if (!(std::cin >> subCmd)) {
@@ -102,7 +102,7 @@ int main(int argc, char* argv[]) {
             }
         }
     };
-
+    
     // MAX command
     cmdHandlers["MAX"] = [&]() {
         if (!(std::cin >> subCmd)) {
