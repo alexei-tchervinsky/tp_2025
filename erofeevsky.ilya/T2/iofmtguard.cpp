@@ -1,6 +1,7 @@
 #include "iofmtguard.hpp"
 
 namespace erofick {
+
     iofmtguard::iofmtguard(std::basic_ios<char>& s) :
         s_(s),
         width_(s.width()),
@@ -16,3 +17,4 @@ namespace erofick {
         s_.flags(fmt_);
     }
 }
+
