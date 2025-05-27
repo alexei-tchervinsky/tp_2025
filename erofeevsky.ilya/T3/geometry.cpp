@@ -145,10 +145,10 @@ double erofick::getPolygonArea(const Polygon& polygon)
 {
   using namespace std::placeholders;
   // Связываем первую точку для использования в accumulate
-  auto accumulateArea = std::bind(AreaPolygon{ polygon.points[1] }, \
+  auto accumulateArea = std::bind(AreaPolygon{ polygon.points[1] },
     _1, _2, polygon.points[0]);
   // Накопление площади через все точки полигона
-  return std::accumulate(polygon.points.cbegin(), \
+  return std::accumulate(polygon.points.cbegin(),
   polygon.points.cend(), 0.0, accumulateArea);
 }
 
@@ -161,7 +161,7 @@ bool erofick::isRightAngle(const Polygon& polygon)
     polygon.points[polygon.points.size() - 1]
   };
   // Ищем точку, образующую прямой угол
-  return (std::find_if(polygon.points.cbegin(), polygon.points.cend(), \
+  return (std::find_if(polygon.points.cbegin(), polygon.points.cend(),
   countAngle) != polygon.points.cend());
 }
 
@@ -180,17 +180,17 @@ bool erofick::accumulateRightAngle::operator()(const Point& p3)
 
 // Вспомогательные функции сравнения для точек и полигонов
 namespace {
-  bool compareByX(const erofick::Point& lhs, const erofick::Point& rhs)\
+  bool compareByX(const erofick::Point& lhs, const erofick::Point& rhs)
    { return lhs.x < rhs.x; }
-  bool compareByY(const erofick::Point& lhs, const erofick::Point& rhs) \
+  bool compareByY(const erofick::Point& lhs, const erofick::Point& rhs)
   { return lhs.y < rhs.y; }
-  bool comparePolygonsByMaxX(const erofick::Polygon& lhs, const erofick::Polygon& rhs) \
+  bool comparePolygonsByMaxX(const erofick::Polygon& lhs, const erofick::Polygon& rhs)
   { return findMaxX(lhs) < findMaxX(rhs); }
-  bool comparePolygonsByMaxY(const erofick::Polygon& lhs, const erofick::Polygon& rhs) \
+  bool comparePolygonsByMaxY(const erofick::Polygon& lhs, const erofick::Polygon& rhs)
   { return findMaxY(lhs) < findMaxY(rhs); }
-  bool comparePolygonsByMinX(const erofick::Polygon& lhs, const erofick::Polygon& rhs) \
+  bool comparePolygonsByMinX(const erofick::Polygon& lhs, const erofick::Polygon& rhs)
   { return findMinX(lhs) < findMinX(rhs); }
-  bool comparePolygonsByMinY(const erofick::Polygon& lhs, const erofick::Polygon& rhs)\
+  bool comparePolygonsByMinY(const erofick::Polygon& lhs, const erofick::Polygon& rhs)
    { return findMinY(lhs) < findMinY(rhs); }
 }
 
@@ -222,13 +222,13 @@ int erofick::findMinY(const Polygon& polygon)
 erofick::Polygon erofick::getBoundingBox(const std::vector<Polygon>& polygon)
 {
   // Находим границы всех полигонов
-  int pointMaxX = findMaxX(*std::max_element(polygon.cbegin(),\
+  int pointMaxX = findMaxX(*std::max_element(polygon.cbegin(),
    polygon.cend(), comparePolygonsByMaxX));
-  int pointMaxY = findMaxY(*std::max_element(polygon.cbegin(),\
+  int pointMaxY = findMaxY(*std::max_element(polygon.cbegin(),
    polygon.cend(), comparePolygonsByMaxY));
-  int pointMinX = findMinX(*std::min_element(polygon.cbegin(),\
+  int pointMinX = findMinX(*std::min_element(polygon.cbegin(),
    polygon.cend(), comparePolygonsByMinX));
-  int pointMinY = findMinY(*std::min_element(polygon.cbegin(),\
+  int pointMinY = findMinY(*std::min_element(polygon.cbegin(),
    polygon.cend(), comparePolygonsByMinY));
   // Создаем прямоугольник из крайних точек
   std::vector< Point > res{ {pointMinX, pointMinY}, {pointMinX, pointMaxY},
@@ -240,11 +240,11 @@ erofick::Polygon erofick::getBoundingBox(const std::vector<Polygon>& polygon)
 namespace {
   bool isEven(const erofick::Polygon& polygon) { return (polygon.points.size() % 2 == 0); }
   bool isOdd(const erofick::Polygon& polygon) { return !(polygon.points.size() % 2 == 0); }
-  bool isSize(const erofick::Polygon& polygon, size_t numPoints)\
+  bool isSize(const erofick::Polygon& polygon, size_t numPoints)
    { return (polygon.points.size() == numPoints); }
-  bool comparatorPoints(const erofick::Polygon& lhs, const erofick::Polygon& rhs) \
+  bool comparatorPoints(const erofick::Polygon& lhs, const erofick::Polygon& rhs)
   { return lhs.points.size() < rhs.points.size(); }
-  bool comparatorArea(const erofick::Polygon& lhs, const erofick::Polygon& rhs)\
+  bool comparatorArea(const erofick::Polygon& lhs, const erofick::Polygon& rhs)
    { return getPolygonArea(lhs) < getPolygonArea(rhs); }
 }
 
@@ -288,7 +288,7 @@ void erofick::area(const std::vector<Polygon>& value, std::istream& in, std::ost
 
   // Вычисление площадей выбранных полигонов
   std::vector< double > areas;
-  std::transform(polygons.cbegin(), polygons.cend(), \
+  std::transform(polygons.cbegin(), polygons.cend(),
   std::back_inserter(areas), getPolygonArea);
   double res = std::accumulate(areas.cbegin(), areas.cend(), 0.0);
 
@@ -387,7 +387,7 @@ void erofick::count(const std::vector<Polygon>& value, std::istream& in, std::os
 
 
 // Команда INFRAME: проверка вхождения полигона в ограничивающий прямоугольник
-void erofick::inframe(const std::vector<Polygon>& value, \
+void erofick::inframe(const std::vector<Polygon>& value,
   std::istream& in, std::ostream& out)
 {
   Polygon argument;
