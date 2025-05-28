@@ -10,25 +10,71 @@ namespace nspace {
         if (!sentry) return is;
 
         DataStruct temp{0, 0.0, {}};
-        is >> DelimiterIO{ '(' };
-        if (!is) return is;
+
+        if (!(is >> DelimiterIO{ '(' })) {
+            return is;
+        }
+
+        bool key1_read = false, key2_read = false, key3_read = false;
 
         for (std::size_t i = 0; i < 3; ++i) {
             short number = 0;
-            is >> DelimiterIO{ ':' } >> LabelIO{ "key" } >> number;
-            if (is.fail()) return is;
+
+            if (!(is >> DelimiterIO{ ':' } >> LabelIO{ "key" } >> number)) {
+                is.setstate(std::ios::failbit);
+                return is;
+            }
 
             switch (number) {
-                case 1: is >> ULLHexIO{ temp.key1 }; break;
-                case 2: is >> DoubleSciIO{ temp.key2 }; break;
-                case 3: is >> StringIO{ temp.key3 }; break;
-                default: is.setstate(std::ios::failbit);
+                case 1:
+                    if (key1_read) {
+                        is.setstate(std::ios::failbit);
+                        return is;
+                    }
+                    if (!(is >> ULLHexIO{ temp.key1 })) {
+                        return is;
+                    }
+                    key1_read = true;
+                    break;
+
+                case 2:
+                    if (key2_read) {
+                        is.setstate(std::ios::failbit);
+                        return is;
+                    }
+                    if (!(is >> DoubleSciIO{ temp.key2 })) {
+                        return is;
+                    }
+                    key2_read = true;
+                    break;
+
+                case 3:
+                    if (key3_read) {
+                        is.setstate(std::ios::failbit);
+                        return is;
+                    }
+                    if (!(is >> StringIO{ temp.key3 })) {
+                        return is;
+                    }
+                    key3_read = true;
+                    break;
+
+                default:
+                    is.setstate(std::ios::failbit);
+                    return is;
             }
-            if (!is) return is;
         }
 
-        is >> DelimiterIO{ ':' } >> DelimiterIO{ ')' };
-        if (is) ds = std::move(temp);
+        if (!key1_read || !key2_read || !key3_read) {
+            is.setstate(std::ios::failbit);
+            return is;
+        }
+
+        if (!(is >> DelimiterIO{ ':' } >> DelimiterIO{ ')' })) {
+            return is;
+        }
+
+        ds = std::move(temp);
         return is;
     }
 
@@ -37,7 +83,8 @@ namespace nspace {
         if (!sentry) return os;
 
         iofmtguard fmtguard(os);
-        os << "(:key1 0x" << std::hex << std::uppercase << ds.key1 << std::dec
+
+        os << "(:key1 0x" << std::hex << std::uppercase << ds.key1
            << ":key2 " << std::scientific << ds.key2
            << ":key3 \"" << ds.key3 << "\":)";
         return os;
