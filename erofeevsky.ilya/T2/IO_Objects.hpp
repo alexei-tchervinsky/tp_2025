@@ -32,4 +32,6 @@ namespace erofick {
     std::istream& operator>>(std::istream&, StringIO&&);
 }
 
+
 #endif
+
