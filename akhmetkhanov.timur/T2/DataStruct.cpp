@@ -85,7 +85,7 @@ namespace nspace {
         iofmtguard fmtguard(os);
 
         os << "(:key1 0x" << std::hex << std::uppercase << ds.key1
-           << ":key2 " << std::scientific << ds.key2
+           << ":key2 " << std::scientific << std::setprecision(1) << ds.key2
            << ":key3 \"" << ds.key3 << "\":)";
         return os;
     }
