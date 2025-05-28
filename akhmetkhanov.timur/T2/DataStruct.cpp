@@ -3,8 +3,28 @@
 #include "iofmtguard.hpp"
 #include <iostream>
 #include <iomanip>
+#include <sstream>
 
 namespace nspace {
+    // Функция для форматирования double в научную нотацию с одной цифрой в экспоненте
+    std::string formatScientific(double value) {
+        std::ostringstream oss;
+        oss << std::scientific << std::setprecision(1) << value;
+        std::string result = oss.str();
+
+        // Заменяем e+0X на e+X и e-0X на e-X
+        size_t pos = result.find("e+0");
+        if (pos != std::string::npos && pos + 3 < result.length()) {
+            result.erase(pos + 2, 1); // удаляем ведущий 0
+        }
+        pos = result.find("e-0");
+        if (pos != std::string::npos && pos + 3 < result.length()) {
+            result.erase(pos + 2, 1); // удаляем ведущий 0
+        }
+
+        return result;
+    }
+
     std::istream& operator>>(std::istream& is, DataStruct& ds) {
         std::istream::sentry sentry(is);
         if (!sentry) return is;
@@ -85,7 +105,7 @@ namespace nspace {
         iofmtguard fmtguard(os);
 
         os << "(:key1 0x" << std::hex << std::uppercase << ds.key1
-           << ":key2 " << std::scientific << std::nouppercase << std::setprecision(1) << ds.key2
+           << ":key2 " << formatScientific(ds.key2)
            << ":key3 \"" << ds.key3 << "\":)";
         return os;
     }
