@@ -6,7 +6,6 @@
 #include <sstream>
 
 namespace nspace {
-    // Функция для форматирования double в научную нотацию с одной цифрой в экспоненте
     std::string formatScientific(double value) {
         std::ostringstream oss;
         oss << std::scientific << std::setprecision(1) << value;
