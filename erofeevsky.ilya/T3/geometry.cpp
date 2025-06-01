@@ -1,386 +1,474 @@
-#include <iostream>
-#include <functional>
-#include <algorithm>
-#include <fstream>
-#include <iterator>
-#include <map>
-#include <limits>
-#include <vector>
-#include <cmath>
-#include <iomanip>
 #include "geometry.hpp"
 #include "iofmtguard.hpp"
+#include <algorithm>
+#include <functional>
+#include <iterator>
+#include <numeric>
+#include <iomanip>
+#include <string>
+#include <limits>
 
-namespace ilyaerofick {
-
-struct DelimiterChar {
-    char expected;
-};
-
-struct DelimiterString {
-    const char* expected;
-};
-
-struct Point {
-    int x;
-    int y;
-};
-
-struct Polygon {
-    std::vector<Point> points;
-};
-
-class IOFmtGuard {
-public:
-    explicit IOFmtGuard(std::basic_ios<char>& s);
-    ~IOFmtGuard();
-private:
-    std::basic_ios<char>& s_;
-    std::streamsize precision_;
-    std::basic_ios<char>::fmtflags flags_;
-};
-
-} // namespace ilyaerofick
-
-// Реализации операторов и функций
-namespace ilyaerofick {
-
-std::istream& operator>>(std::istream& in, DelimiterChar&& exp) {
-    std::istream::sentry guard(in);
-    if (!guard) return in;
-    char c = 0;
-    in >> c;
-    if (std::tolower(c) != exp.expected) {
-        in.setstate(std::ios::failbit);
-    }
+// Оператор чтения символа-разделителя с проверкой
+std::istream& erofick::operator>>(std::istream& in, DelimiterChar&& exp)
+{
+  std::istream::sentry guard(in); // Проверка состояния потока
+  if (!guard)
+  {
     return in;
+  }
+  char c = 0;
+  in >> c;
+  c = std::tolower(c);
+  if (c != exp.expected) // Если символ не совпадает с ожидаемым
+  {
+    in.setstate(std::ios::failbit); // Устанавливаем флаг ошибки
+  }
+  return in;
 }
 
-std::istream& operator>>(std::istream& in, DelimiterString&& exp) {
-    std::istream::sentry guard(in);
-    if (!guard) return in;
-    size_t i = 0;
-    while (exp.expected[i] != '\0') {
-        in >> DelimiterChar{exp.expected[i]};
-        ++i;
-    }
+// Оператор чтения строки-разделителя с проверкой
+std::istream& erofick::operator>>(std::istream& in, DelimiterString&& exp)
+{
+  std::istream::sentry guard(in);
+  if (!guard)
+  {
     return in;
+  }
+  size_t i = 0;
+  while (exp.expected[i] != '\0') // Читаем символы до конца строки
+  {
+    in >> DelimiterChar{ exp.expected[i] }; // Проверяем каждый символ
+    ++i;
+  }
+  return in;
 }
 
-std::istream& operator>>(std::istream& in, Point& point) {
-    std::istream::sentry guard(in);
-    if (!guard) return in;
-    Point temp{0, 0};
-    in >> DelimiterChar{'('} >> temp.x >> DelimiterChar{';'}
-       >> temp.y >> DelimiterChar{')'};
-    if (in) point = temp;
+// Оператор чтения точки из потока в формате (x;y)
+std::istream& erofick::operator>>(std::istream& in, Point& point)
+{
+  std::istream::sentry guard(in);
+  if (!guard)
+  {
     return in;
+  }
+  using delChar = DelimiterChar;
+  Point temp = { 0, 0 };
+  // Чтение в формате: ( число ; число )
+  in >> delChar{ '(' }
+   >> temp.x >> delChar{ ';' } >> temp.y >> delChar{ ')' };
+  if (in) // Если чтение успешно
+  {
+    point = temp; // Сохраняем результат
+  }
+  return in;
 }
 
-bool operator==(const Point& lhs, const Point& rhs) {
-    return lhs.x == rhs.x && lhs.y == rhs.y;
+// Оператор сравнения точек
+bool erofick::operator==(const Point& lhs, const Point& rhs)
+{
+  return ((lhs.x == rhs.x) && (lhs.y == rhs.y));
 }
 
-std::istream& operator>>(std::istream& in, Polygon& polygon) {
-    std::istream::sentry guard(in);
-    if (!guard) return in;
-    size_t count = 0;
-    in >> count;
-    if (count < 3) {
-        in.setstate(std::ios::failbit);
-        return in;
-    }
-    std::vector<Point> temp;
-    using InputIt = std::istream_iterator<Point>;
-    std::copy_n(InputIt{in}, count, std::back_inserter(temp));
-    if (in && temp.size() == count) {
-        polygon.points = temp;
-    } else {
-        in.setstate(std::ios::failbit);
-    }
+// Оператор сравнения полигонов
+bool erofick::operator==(const Polygon& lhs, const Polygon& rhs)
+{
+  if (lhs.points.size() != rhs.points.size()) // Если разное количество точек
+  {
+    return false;
+  }
+  // Сравниваем точки поэлементно
+  return std::equal(lhs.points.cbegin(),
+   lhs.points.cend(), rhs.points.cbegin());
+}
+
+// Проверка вхождения одного полигона...
+//в другой (по ограничивающим прямоугольникам)
+bool erofick::operator<=(const Polygon& lhs, const Polygon& rhs)
+{
+  // Находим границы полигонов
+  int innerMinX = findMinX(lhs);
+  int innerMinY = findMinY(lhs);
+  int innerMaxX = findMaxX(lhs);
+  int innerMaxY = findMaxY(lhs);
+  int outerMinX = findMinX(rhs);
+  int outerMinY = findMinY(rhs);
+  int outerMaxX = findMaxX(rhs);
+  int outerMaxY = findMaxY(rhs);
+  // Проверяем полное вхождение
+  return (innerMinX >= outerMinX) && (innerMaxX <= outerMaxX) &&
+         (innerMinY >= outerMinY) && (innerMaxY <= outerMaxY);
+}
+
+// Оператор чтения полигона из потока
+std::istream& erofick::operator>>(std::istream& in, Polygon& polygon)
+{
+  std::istream::sentry guard(in);
+  if (!guard)
+  {
     return in;
+  }
+  size_t countPoints = 0;
+  in >> countPoints; // Читаем количество точек
+  if (countPoints < 3) // Полигон должен иметь хотя бы 3 точки
+  {
+    in.setstate(std::ios::failbit);
+    return in;
+  }
+  std::vector< Point > temp;
+  using input_iterator_t = std::istream_iterator< Point >;
+  // Читаем точки (countPoints-1 раз)
+  std::copy_n(input_iterator_t{ in },
+     (countPoints - 1), std::back_inserter(temp));
+  if (in.peek() != '\n') // Если осталась еще одна точка
+  {
+    std::copy_n(input_iterator_t{ in },
+       1, std::back_inserter(temp));
+  }
+  // Проверяем успешность чтения и количество точек
+  if (in && (temp.size() == countPoints)
+   && ((in.peek() == '\n')))
+  {
+    polygon.points = temp; // Сохраняем результат
+  }
+  else
+  {
+    in.setstate(std::ios::failbit);
+  }
+  return in;
 }
 
-bool operator==(const Polygon& lhs, const Polygon& rhs) {
-    if (lhs.points.size() != rhs.points.size()) return false;
-    return std::equal(lhs.points.begin(), lhs.points.end(), rhs.points.begin());
+// Функтор для вычисления площади (метод трапеций)
+double erofick::AreaPolygon::operator()
+(double area, const Point& p2, const Point& p3)
+{
+  // Формула площади через векторное произведение
+  area += 0.5 * std::abs((p3.y - p1.y) *
+  (p2.x - p1.x) - (p3.x - p1.x) * (p2.y - p1.y));
+  p1 = p2; // Запоминаем текущую точку для следующего вызова
+  return area;
 }
 
-double getArea(const Polygon& polygon) {
-    double area = 0.0;
-    for (size_t i = 0; i < polygon.points.size(); ++i) {
-        const Point& p1 = polygon.points[i];
-        const Point& p2 = polygon.points[(i + 1) % polygon.points.size()];
-        area += (p1.x * p2.y) - (p2.x * p1.y);
+// Вычисление площади полигона
+double erofick::getPolygonArea(const Polygon& polygon)
+{
+  using namespace std::placeholders;
+  // Связываем первую точку для использования в accumulate
+  auto accumulateArea = std::bind(AreaPolygon{ polygon.points[1] },
+    _1, _2, polygon.points[0]);
+  // Накопление площади через все точки полигона
+  return std::accumulate(polygon.points.cbegin(),
+  polygon.points.cend(), 0.0, accumulateArea);
+}
+
+// Проверка наличия прямого угла в полигоне
+bool erofick::isRightAngle(const Polygon& polygon)
+{
+  // Инициализируем функтор последними двумя точками
+  auto countAngle = accumulateRightAngle{
+    polygon.points[polygon.points.size() - 2],
+    polygon.points[polygon.points.size() - 1]
+  };
+  // Ищем точку, образующую прямой угол
+  return (std::find_if(polygon.points.cbegin(), polygon.points.cend(),
+  countAngle) != polygon.points.cend());
+}
+
+// Функтор для проверки прямого угла между тремя точками
+bool erofick::accumulateRightAngle::operator()(const Point& p3)
+{
+  // Векторы между точками
+  Point vec1{ p2.x - p1.x, p2.y - p1.y };
+  Point vec2{ p2.x - p3.x, p2.y - p3.y };
+  // Сдвигаем точки для следующей проверки
+  p1 = p2;
+  p2 = p3;
+  // Проверка ортогональности (скалярное произведение = 0)
+  return ((vec1.x * vec2.x + vec1.y * vec2.y) == 0);
+}
+
+// Вспомогательные функции сравнения для точек и полигонов
+namespace {
+  bool compareByX(const erofick::Point& lhs,
+     const erofick::Point& rhs)
+   { return lhs.x < rhs.x; }
+  bool compareByY(const erofick::Point& lhs,
+     const erofick::Point& rhs)
+  { return lhs.y < rhs.y; }
+  bool comparePolygonsByMaxX(const erofick::Polygon& lhs,
+     const erofick::Polygon& rhs)
+  { return findMaxX(lhs) < findMaxX(rhs); }
+  bool comparePolygonsByMaxY(const erofick::Polygon& lhs,
+     const erofick::Polygon& rhs)
+  { return findMaxY(lhs) < findMaxY(rhs); }
+  bool comparePolygonsByMinX(const erofick::Polygon& lhs,
+     const erofick::Polygon& rhs)
+  { return findMinX(lhs) < findMinX(rhs); }
+  bool comparePolygonsByMinY(const erofick::Polygon& lhs,
+     const erofick::Polygon& rhs)
+   { return findMinY(lhs) < findMinY(rhs); }
+}
+
+// Нахождение максимальной X-координаты в полигоне
+int erofick::findMaxX(const Polygon& polygon)
+{
+  return std::max_element(polygon.points.cbegin(),
+   polygon.points.cend(), compareByX)->x;
+}
+
+// Нахождение максимальной Y-координаты в полигоне
+int erofick::findMaxY(const Polygon& polygon)
+{
+  return std::max_element(polygon.points.cbegin(),
+   polygon.points.cend(), compareByY)->y;
+}
+
+// Нахождение минимальной X-координаты в полигоне
+int erofick::findMinX(const Polygon& polygon)
+{
+  return std::min_element(polygon.points.cbegin(),
+   polygon.points.cend(), compareByX)->x;
+}
+
+// Нахождение минимальной Y-координаты в полигоне
+int erofick::findMinY(const Polygon& polygon)
+{
+  return std::min_element(polygon.points.cbegin(),
+   polygon.points.cend(), compareByY)->y;
+}
+
+// Получение ограничивающего прямоугольника для набора полигонов
+erofick::Polygon erofick::getBoundingBox(const
+   std::vector<Polygon>& polygon)
+{
+  // Находим границы всех полигонов
+  int pointMaxX = findMaxX(*std::max_element(polygon.cbegin(),
+   polygon.cend(), comparePolygonsByMaxX));
+  int pointMaxY = findMaxY(*std::max_element(polygon.cbegin(),
+   polygon.cend(), comparePolygonsByMaxY));
+  int pointMinX = findMinX(*std::min_element(polygon.cbegin(),
+   polygon.cend(), comparePolygonsByMinX));
+  int pointMinY = findMinY(*std::min_element(polygon.cbegin(),
+   polygon.cend(), comparePolygonsByMinY));
+  // Создаем прямоугольник из крайних точек
+  std::vector< Point > res{ {pointMinX, pointMinY}, {pointMinX, pointMaxY},
+  {pointMaxX, pointMaxY}, {pointMaxX, pointMinY} };
+  return Polygon{ res };
+}
+
+// Вспомогательные предикаты для полигонов
+namespace {
+  bool isEven(const erofick::Polygon& polygon)
+   { return (polygon.points.size() % 2 == 0); }
+  bool isOdd(const erofick::Polygon& polygon)
+   { return !(polygon.points.size() % 2 == 0); }
+  bool isSize(const erofick::Polygon& polygon,
+     size_t numPoints)
+   { return (polygon.points.size() == numPoints); }
+  bool comparatorPoints(const erofick::Polygon& lhs,
+     const erofick::Polygon& rhs)
+  { return lhs.points.size() < rhs.points.size(); }
+  bool comparatorArea(const erofick::Polygon& lhs,
+     const erofick::Polygon& rhs)
+   { return getPolygonArea(lhs) < getPolygonArea(rhs); }
+}
+
+// Команда AREA: вычисление площади полигонов по условию
+void erofick::area(const std::vector<Polygon>& value,
+   std::istream& in, std::ostream& out)
+{
+  iofmtguard guard(out); // Сохраняем форматирование
+  out << std::setprecision(1) << std::fixed; // Устанавливаем точность вывода
+  std::string argument = "";
+  in >> argument;
+  std::vector< Polygon > polygons;
+  using namespace std::placeholders;
+
+  // Выбор полигонов по условию
+  if (argument == "EVEN")
+  {
+    std::copy_if(value.cbegin(), value.cend(),
+     std::back_inserter(polygons), isEven);
+  }
+  else if (argument == "ODD")
+  {
+    std::copy_if(value.cbegin(), value.cend(),
+     std::back_inserter(polygons), isOdd);
+  }
+  else if (argument == "MEAN")
+  {
+    if (value.empty())
+    {
+      throw std::logic_error("No polygons");
     }
-    return std::abs(area) / 2.0;
-}
-
-Polygon getFrame(const std::vector<Polygon>& polygons) {
-    if (polygons.empty()) return Polygon{};
-
-    auto compareX = [](const Point& a, const Point& b) { return a.x < b.x; };
-    auto compareY = [](const Point& a, const Point& b) { return a.y < b.y; };
-
-    int minX = std::numeric_limits<int>::max();
-    int maxX = std::numeric_limits<int>::min();
-    int minY = std::numeric_limits<int>::max();
-    int maxY = std::numeric_limits<int>::min();
-
-    for (const auto& poly : polygons) {
-        const auto [minXIt, maxXIt] = std::minmax_element(
-            poly.points.begin(), poly.points.end(), compareX);
-        const auto [minYIt, maxYIt] = std::minmax_element(
-            poly.points.begin(), poly.points.end(), compareY);
-
-        minX = std::min(minX, minXIt->x);
-        maxX = std::max(maxX, maxXIt->x);
-        minY = std::min(minY, minYIt->y);
-        maxY = std::max(maxY, maxYIt->y);
+    std::copy_if(value.cbegin(), value.cend(),
+     std::back_inserter(polygons), isOdd);
+  }
+  else
+  {
+    size_t countPoints = std::stoull(argument);
+    if (countPoints < 3)
+    {
+      throw std::logic_error("Wrong number");
     }
+    std::function< bool(const Polygon&)
+     > isCorrectCount = std::bind(isSize, _1, countPoints);
+    std::copy_if(value.cbegin(), value.cend(),
+     std::back_inserter(polygons), isCorrectCount);
+  }
 
-    return Polygon{{minX, minY}, {minX, maxY}, {maxX, maxY}, {maxX, minY}};
+  // Вычисление площадей выбранных полигонов
+  std::vector< double > areas;
+  std::transform(polygons.cbegin(), polygons.cend(),
+  std::back_inserter(areas), getPolygonArea);
+  double res = std::accumulate(areas.cbegin(), areas.cend(), 0.0);
+
+  // Вывод результата
+  if (argument == "MEAN")
+  {
+    out << res / value.size(); // Среднее значение
+  }
+  else
+  {
+    out << res; // Сумма площадей
+  }
 }
 
-bool isInside(const Polygon& poly, const Polygon& frame) {
-    if (frame.points.size() != 4) return false;
-
-    const auto& [minX, minY] = frame.points[0];
-    const auto& [maxX, maxY] = frame.points[2];
-
-    return std::all_of(poly.points.begin(), poly.points.end(),
-        [minX, maxX, minY, maxY](const Point& p) {
-            return p.x >= minX && p.x <= maxX && p.y >= minY && p.y <= maxY;
-        });
-}
-
-void areaCommand(const std::vector<Polygon>& polygons,
-                std::istream& in, std::ostream& out) {
-    IOFmtGuard guard(out);
-    out << std::fixed << std::setprecision(1);
-
-    std::string arg;
-    in >> arg;
-
-    auto condition = [](const Polygon&) { return true; };
-
-    if (arg == "EVEN") {
-        condition = [](const Polygon& p) { return p.points.size() % 2 == 0; };
-    } else if (arg == "ODD") {
-        condition = [](const Polygon& p) { return p.points.size() % 2 != 0; };
-    } else if (arg == "MEAN") {
-        if (polygons.empty()) {
-            throw std::invalid_argument("No polygons");
-        }
-        double total = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-            [](double sum, const Polygon& p) { return sum + getArea(p); });
-        out << total / polygons.size();
-        return;
-    } else {
-        size_t num = std::stoul(arg);
-        if (num < 3) throw std::invalid_argument("Invalid vertex count");
-        condition = [num](const Polygon& p) { return p.points.size() == num; };
+// Команда MAX: поиск максимального значения площади или количества вершин
+void erofick::max(const std::vector<Polygon>& value,
+   std::istream& in, std::ostream& out)
+{
+  std::string argument = "";
+  in >> argument;
+  if (value.empty())
+  {
+    throw std::logic_error("No polygons");
+  }
+  else
+  {
+    if (argument == "AREA")
+    {
+      iofmtguard guard(out);
+      out << std::setprecision(1) << std::fixed;
+      out << getPolygonArea(*std::max_element(value.begin(),
+       value.end(), comparatorArea));
     }
-
-    double total = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-        [&condition](double sum, const Polygon& p) {
-            return condition(p) ? sum + getArea(p) : sum;
-        });
-    out << total;
-}
-
-void maxCommand(const std::vector<Polygon>& polygons,
-               std::istream& in, std::ostream& out) {
-    if (polygons.empty()) throw std::invalid_argument("No polygons");
-
-    std::string arg;
-    in >> arg;
-
-    IOFmtGuard guard(out);
-    out << std::fixed << std::setprecision(1);
-
-    if (arg == "AREA") {
-        auto it = std::max_element(polygons.begin(), polygons.end(),
-            [](const Polygon& a, const Polygon& b) {
-                return getArea(a) < getArea(b);
-            });
-        out << getArea(*it);
-    } else if (arg == "VERTEXES") {
-        auto it = std::max_element(polygons.begin(), polygons.end(),
-            [](const Polygon& a, const Polygon& b) {
-                return a.points.size() < b.points.size();
-            });
-        out << it->points.size();
-    } else {
-        throw std::invalid_argument("Invalid argument");
+    else if (argument == "VERTEXES")
+    {
+      out << std::max_element(value.begin(), value.end(),
+       comparatorPoints)->points.size();
     }
-}
-
-void minCommand(const std::vector<Polygon>& polygons,
-               std::istream& in, std::ostream& out) {
-    if (polygons.empty()) throw std::invalid_argument("No polygons");
-
-    std::string arg;
-    in >> arg;
-
-    IOFmtGuard guard(out);
-    out << std::fixed << std::setprecision(1);
-
-    if (arg == "AREA") {
-        auto it = std::min_element(polygons.begin(), polygons.end(),
-            [](const Polygon& a, const Polygon& b) {
-                return getArea(a) < getArea(b);
-            });
-        out << getArea(*it);
-    } else if (arg == "VERTEXES") {
-        auto it = std::min_element(polygons.begin(), polygons.end(),
-            [](const Polygon& a, const Polygon& b) {
-                return a.points.size() < b.points.size();
-            });
-        out << it->points.size();
-    } else {
-        throw std::invalid_argument("Invalid argument");
+    else
+    {
+      throw std::logic_error("Wrong argument");
     }
+  }
 }
 
-void countCommand(const std::vector<Polygon>& polygons,
-                 std::istream& in, std::ostream& out) {
-    std::string arg;
-    in >> arg;
-
-    size_t count = 0;
-
-    if (arg == "EVEN") {
-        count = std::count_if(polygons.begin(), polygons.end(),
-            [](const Polygon& p) { return p.points.size() % 2 == 0; });
-    } else if (arg == "ODD") {
-        count = std::count_if(polygons.begin(), polygons.end(),
-            [](const Polygon& p) { return p.points.size() % 2 != 0; });
-    } else {
-        size_t num = std::stoul(arg);
-        if (num < 3) throw std::invalid_argument("Invalid vertex count");
-        count = std::count_if(polygons.begin(), polygons.end(),
-            [num](const Polygon& p) { return p.points.size() == num; });
+// Команда MIN: поиск минимального значения площади или количества вершин
+void erofick::min(const std::vector<Polygon>& value,
+   std::istream& in, std::ostream& out)
+{
+  std::string argument = "";
+  in >> argument;
+  if (value.empty())
+  {
+    throw std::logic_error("Wrong number");
+  }
+  else
+  {
+    if (argument == "AREA")
+    {
+      iofmtguard guard(out);
+      out << std::setprecision(1) << std::fixed;
+      out << getPolygonArea(*std::min_element(value.begin(),
+       value.end(), comparatorArea));
     }
-    out << count;
-}
-
-void rmEchoCommand(std::vector<Polygon>& polygons,
-                  std::istream& in, std::ostream& out) {
-    Polygon target;
-    in >> target;
-    if (!in) throw std::invalid_argument("Invalid polygon");
-
-    size_t removed = 0;
-    auto it = polygons.begin();
-    while (it != polygons.end()) {
-        if (*it == target && it + 1 != polygons.end() && *(it + 1) == target) {
-            it = polygons.erase(it + 1);
-            ++removed;
-        } else {
-            ++it;
-        }
+    else if (argument == "VERTEXES")
+    {
+      out << std::min_element(value.begin(), value.end(),
+       comparatorPoints)->points.size();
     }
-    out << removed;
-}
-
-void inframeCommand(const std::vector<Polygon>& polygons,
-                   std::istream& in, std::ostream& out) {
-    Polygon target;
-    in >> target;
-    if (!in) throw std::invalid_argument("Invalid polygon");
-
-    Polygon frame = getFrame(polygons);
-    out << (isInside(target, frame) ? "<TRUE>" : "<FALSE>");
-}
-
-void rightshapesCommand(const std::vector<Polygon>& polygons,
-                       std::ostream& out) {
-    auto isRightAngle = [](const Polygon& poly) {
-        if (poly.points.size() < 3) return false;
-
-        for (size_t i = 0; i < poly.points.size(); ++i) {
-            const Point& a = poly.points[i];
-            const Point& b = poly.points[(i + 1) % poly.points.size()];
-            const Point& c = poly.points[(i + 2) % poly.points.size()];
-
-            int dx1 = b.x - a.x;
-            int dy1 = b.y - a.y;
-            int dx2 = c.x - b.x;
-            int dy2 = c.y - b.y;
-
-            if (dx1 * dx2 + dy1 * dy2 == 0) return true;
-        }
-        return false;
-    };
-
-    out << std::count_if(polygons.begin(), polygons.end(), isRightAngle);
-}
-
-IOFmtGuard::IOFmtGuard(std::basic_ios<char>& s) :
-    s_(s), precision_(s.precision()), flags_(s.flags()) {}
-
-IOFmtGuard::~IOFmtGuard() {
-    s_.precision(precision_);
-    s_.flags(flags_);
-}
-
-} // namespace ilyaerofick
-
-int main(int argc, char* argv[]) {
-    using namespace ilyaerofick;
-
-    if (argc != 2) {
-        std::cerr << "Wrong arguments\n";
-        return 1;
+    else
+    {
+      throw std::logic_error("Wrong argument");
     }
+  }
+}
 
-    std::ifstream in(argv[1]);
-    if (!in.is_open()) {
-        std::cerr << "File not open\n";
-        return 1;
+// Команда COUNT: подсчет полигонов по условию
+void erofick::count(const std::vector<Polygon>& value,
+   std::istream& in, std::ostream& out)
+{
+  std::string argument = "";
+  in >> argument;
+  if (argument == "EVEN")
+  {
+    out << std::count_if(value.begin(), value.end(), isEven);
+  }
+  else if (argument == "ODD")
+  {
+    out << std::count_if(value.begin(), value.end(), isOdd);
+  }
+  else
+  {
+    size_t countPoints = std::stoull(argument);
+    if (countPoints < 3)
+    {
+      throw std::logic_error("Wrong number");
     }
-
-    std::vector<Polygon> polygons;
-    using InputIt = std::istream_iterator<Polygon>;
-    while (!in.eof()) {
-        std::copy(InputIt{in}, InputIt{}, std::back_inserter(polygons));
-        if (in.fail() && !in.eof()) {
-            in.clear();
-            in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        }
-    }
-    in.close();
-
-    std::map<std::string,
-        std::function<void(std::istream&, std::ostream&)>> commands;
     using namespace std::placeholders;
+    std::function< bool(const Polygon&)
+     > isCorrectCount = std::bind(isSize, _1, countPoints);
+    out << std::count_if(value.begin(), value.end(), isCorrectCount);
+  }
+}
 
-    commands["AREA"] = std::bind(areaCommand, std::cref(polygons), _1, _2);
-    commands["MAX"] = std::bind(maxCommand, std::cref(polygons), _1, _2);
-    commands["MIN"] = std::bind(minCommand, std::cref(polygons), _1, _2);
-    commands["COUNT"] = std::bind(countCommand, std::cref(polygons), _1, _2);
-    commands["RMECHO"] = std::bind(rmEchoCommand, std::ref(polygons), _1, _2);
-    commands["INFRAME"] = std::bind(inframeCommand, std::cref(polygons), _1, _2);
-    commands["RIGHTSHAPES"] =
-        std::bind(rightshapesCommand, std::cref(polygons), _2);
 
-    std::string cmd;
-    while (std::cin >> cmd) {
-        try {
-            auto it = commands.find(cmd);
-            if (it != commands.end()) {
-                it->second(std::cin, std::cout);
-            } else {
-                throw std::invalid_argument("Invalid command");
-            }
-            std::cout << "\n";
-        } catch (const std::exception&) {
-            std::cout << "<INVALID COMMAND>\n";
-        }
-        std::cin.clear();
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    }
+// Команда INFRAME: проверка вхождения полигона в ограничивающий прямоугольник
+void erofick::inframe(const std::vector<Polygon>& value,
+  std::istream& in, std::ostream& out)
+{
+  Polygon argument;
+  in >> argument;
+  if (!in)
+  {
+    throw std::invalid_argument("Wrong argument");
+  }
+  // Получаем ограничивающий прямоугольник
+  Polygon frameRectangle = getBoundingBox(value);
+  if (argument <= frameRectangle) // Проверяем вхождение
+  {
+    out << "<TRUE>";
+  }
+  else
+  {
+    out << "<FALSE>";
+  }
+}
 
-    return 0;
+// Команда RMECHO: удаление последовательных дубликатов указанного полигона
+void erofick::rmecho(std::vector<Polygon>& value,
+   std::istream& in, std::ostream& out)
+{
+  Polygon polygon;
+  in >> polygon;
+  if (!in)
+  {
+    throw std::logic_error("Wrong argument");
+  }
+
+  size_t removedCount = 0;
+  // Удаляем последовательные дубликаты указанного полигона
+  auto newEnd = std::unique(value.begin(), value.end(),
+    [&polygon, &removedCount](const Polygon& lhs, const Polygon& rhs) {
+      if (lhs == rhs && lhs == polygon) {
+        removedCount++;
+        return true;
+      }
+      return false;
+    });
+
+  // Удаляем "лишние" элементы
+  value.erase(newEnd, value.end());
+  out << removedCount; // Выводим количество удаленных полигонов
 }

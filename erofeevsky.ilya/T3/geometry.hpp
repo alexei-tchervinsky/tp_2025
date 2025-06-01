@@ -1,64 +1,81 @@
 #ifndef GEOMETRY_HPP
 #define GEOMETRY_HPP
-
 #include <iostream>
 #include <vector>
 #include <functional>
 
-namespace ilyaerofick {
-
-struct DelimiterChar {
+namespace erofick
+{
+//структура для чтения символа-разделителя с проверкой
+  struct DelimiterChar
+  {
     char expected;
-};
-
-struct DelimiterString {
-    const char* expected;
-};
-
-struct Point {
+  };
+  std::istream & operator>>(std::istream& in, DelimiterChar&& exp);
+//структура для чтения строки-разделителя с проверкой
+  struct DelimiterString
+  {
+    const char * expected;
+  };
+  std::istream& operator>>(std::istream& in, DelimiterString&& exp);
+//точка с координатами x и y
+  struct Point
+  {
     int x;
     int y;
-};
+  };
+//операторы для работы с точкой
+  std::istream& operator>>(std::istream& in, Point& point);
+  bool operator==(const Point& lhs, const Point& rhs);
+//полигон набор точек
+  struct Polygon
+  {
+    std::vector< Point > points;
+  };
+//ф-ции для работы с полигоном
+  double getPolygonArea(const Polygon& polygon);
+  std::istream& operator>>(std::istream& in, Polygon& polygon);
+  bool operator==(const Polygon& lhs, const Polygon& rhs);
+  //проверка вхождения полигона в другой
+  bool operator<=(const Polygon& lhs, const Polygon& rhs);
+  //проверка на наличие прямых углов
+  bool isRightAngle(const Polygon& polygon);
+  //ф-ции для нахождения границ полигона
+  int findMaxX(const Polygon& polygon);
+  int findMaxY(const Polygon& polygon);
+  int findMinX(const Polygon& polygon);
+  int findMinY(const Polygon& polygon);
+   //получение ограничивающего прямоугольника
+  Polygon getBoundingBox(const std::vector< Polygon >& polygon);
 
-struct Polygon {
-    std::vector<Point> points;
-};
+  //функтор для вычисления площади полигона
+  struct AreaPolygon
+  {
+    Point p1;//первая точка
+    double operator()(double area, const Point& p2, const Point& p3);
+  };
 
-class IOFmtGuard {
-public:
-    explicit IOFmtGuard(std::basic_ios<char>& s);
-    ~IOFmtGuard();
-private:
-    std::basic_ios<char>& s_;
-    std::streamsize precision_;
-    std::basic_ios<char>::fmtflags flags_;
-};
+  //функтор проверки прямого угла между тремя точками
+  struct accumulateRightAngle
+  {
+    Point p1;
+    Point p2;
+    bool operator()(const Point& p3);
+  };
 
-std::istream& operator>>(std::istream& in, DelimiterChar&& exp);
-std::istream& operator>>(std::istream& in, DelimiterString&& exp);
-std::istream& operator>>(std::istream& in, Point& point);
-bool operator==(const Point& lhs, const Point& rhs);
-std::istream& operator>>(std::istream& in, Polygon& polygon);
-bool operator==(const Polygon& lhs, const Polygon& rhs);
-double getArea(const Polygon& polygon);
-Polygon getFrame(const std::vector<Polygon>& polygons);
-bool isInside(const Polygon& poly, const Polygon& frame);
-
-void areaCommand(const std::vector<Polygon>& polygons,
-                std::istream& in, std::ostream& out);
-void maxCommand(const std::vector<Polygon>& polygons,
-               std::istream& in, std::ostream& out);
-void minCommand(const std::vector<Polygon>& polygons,
-               std::istream& in, std::ostream& out);
-void countCommand(const std::vector<Polygon>& polygons,
-                 std::istream& in, std::ostream& out);
-void rmEchoCommand(std::vector<Polygon>& polygons,
-                  std::istream& in, std::ostream& out);
-void inframeCommand(const std::vector<Polygon>& polygons,
-                   std::istream& in, std::ostream& out);
-void rightshapesCommand(const std::vector<Polygon>& polygons,
-                       std::ostream& out);
-
-} // namespace ilyaerofick
+  //команды обработки полигонов
+  void area(const std::vector< Polygon >& value,
+     std::istream& in, std::ostream& out);
+  void max(const std::vector< Polygon >& value,
+     std::istream& in, std::ostream& out);
+  void min(const std::vector< Polygon >& value,
+     std::istream& in, std::ostream& out);
+  void count(const std::vector< Polygon >& value,
+     std::istream& in, std::ostream& out);
+  void inframe(const std::vector< Polygon >& value,
+     std::istream& in, std::ostream& out);
+  void rmecho(std::vector< Polygon >& value,
+     std::istream& in, std::ostream& out);
+}
 
 #endif

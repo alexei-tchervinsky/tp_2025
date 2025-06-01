@@ -1,13 +1,11 @@
 #include "iofmtguard.hpp"
-
-namespace ilyaerofick {
-
-IOFmtGuard::IOFmtGuard(std::basic_ios<char>& s) :
+#include <ios>
+//сохраняем текущее состояние потока
+erofick::iofmtguard::iofmtguard(std::basic_ios<char>& s) :
     s_(s), precision_(s.precision()), flags_(s.flags()) {}
-
-IOFmtGuard::~IOFmtGuard() {
+//восстанавливаем соъраненное состояние потока
+erofick::iofmtguard::~iofmtguard()
+{
     s_.precision(precision_);
     s_.flags(flags_);
 }
-
-} // namespace ilyaerofick
