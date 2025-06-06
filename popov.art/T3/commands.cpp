@@ -50,20 +50,20 @@ void processCommand(const string& command, vector<Polygon>& polygons) {
                 return;
             }
             if (arg == "EVEN") {
-                cout << countIfValid(polygons, [](const Polygon& p) { 
-                    return p.points.size() % 2 == 0; 
+                cout << countIfValid(polygons, [](const Polygon& p) {
+                    return p.points.size() % 2 == 0;
                 }) << endl;
             }
             else if (arg == "ODD") {
-                cout << countIfValid(polygons, [](const Polygon& p) { 
-                    return p.points.size() % 2 != 0; 
+                cout << countIfValid(polygons, [](const Polygon& p) {
+                    return p.points.size() % 2 != 0;
                 }) << endl;
             }
             else {
                 int num = stoi(arg);
                 if (num < 3) throw invalid_argument("Invalid vertex count");
-                cout << countIfValid(polygons, [num](const Polygon& p) { 
-                    return p.points.size() == static_cast<size_t>(num); 
+                cout << countIfValid(polygons, [num](const Polygon& p) {
+                    return p.points.size() == static_cast<size_t>(num);
                 }) << endl;
             }
         }
@@ -92,7 +92,6 @@ void processCommand(const string& command, vector<Polygon>& polygons) {
             }
             iofmtguard guard(cout);
             cout << fixed << setprecision(1);
-
             if (arg == "EVEN") {
                 cout << accumulateIfValid(polygons, [](const Polygon& p) {
                     return p.points.size() % 2 == 0 ? calculateArea(p) : 0.0;
@@ -121,7 +120,6 @@ void processCommand(const string& command, vector<Polygon>& polygons) {
         else if (cmd == "MAX" || cmd == "MIN") {
             vector<Polygon> validPolygons;
             copy_if(polygons.begin(), polygons.end(), back_inserter(validPolygons), isValidPolygon);
-            
             if (validPolygons.empty()) throw logic_error("No valid polygons");
             string arg;
             if (!(iss >> arg)) {
