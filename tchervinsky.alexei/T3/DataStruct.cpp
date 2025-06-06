@@ -160,7 +160,6 @@ namespace nspace
 #endif // ALEXEIT
 
 
-// Если фактическое количество считанных точек не соответствует заявленному, выбрасываем ошибку
         if (temp_points.size() != numPoints)
         {
             in.setstate(std::ios::failbit);
