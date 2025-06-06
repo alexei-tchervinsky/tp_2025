@@ -1,4 +1,3 @@
-#pragma once
 #include <string>
 #include <iostream>
 #include <iomanip>
@@ -53,7 +52,6 @@ private:
     std::basic_ios<char>::fmtflags fmt_;
 };
 
-// Перегрузки ввода
 std::istream& operator>>(std::istream& in, DelimiterIO&& d);
 std::istream& operator>>(std::istream& in, LongLongIO&& d);
 std::istream& operator>>(std::istream& in, ULongLongOctIO&& d);
@@ -61,5 +59,4 @@ std::istream& operator>>(std::istream& in, StringIO&& d);
 std::istream& operator>>(std::istream& in, LabelIO&& d);
 std::istream& operator>>(std::istream& in, DataStruct& d);
 
-// Перегрузка вывода
 std::ostream& operator<<(std::ostream& out, const DataStruct& d);
