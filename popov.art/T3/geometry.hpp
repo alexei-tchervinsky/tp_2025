@@ -3,30 +3,17 @@
 #include <iostream>
 #include <vector>
 #include <functional>
+#include <limits>
 namespace popov
 {
-  bool doPolygonsIntersect(const Polygon& poly1, const Polygon& poly2);
-  struct DelimiterChar
-  {
-    char expected;
-  };
-  std::istream & operator>>(std::istream& in, DelimiterChar&& exp);
-  struct DelimiterString
-  {
-    const char * expected;
-  };
+  struct DelimiterChar { char expected; };
+  std::istream& operator>>(std::istream& in, DelimiterChar&& exp);
+  struct DelimiterString { const char* expected; };
   std::istream& operator>>(std::istream& in, DelimiterString&& exp);
-  struct Point
-  {
-    int x;
-    int y;
-  };
+  struct Point { int x; int y; };
   std::istream& operator>>(std::istream& in, Point& point);
   bool operator==(const Point& lhs, const Point& rhs);
-  struct Polygon
-  {
-    std::vector< Point > points;
-  };
+  struct Polygon { std::vector<Point> points; };
   double getPolygonArea(const Polygon& polygon);
   std::istream& operator>>(std::istream& in, Polygon& polygon);
   bool operator==(const Polygon& lhs, const Polygon& rhs);
@@ -36,14 +23,13 @@ namespace popov
   int findMaxY(const Polygon& polygon);
   int findMinX(const Polygon& polygon);
   int findMinY(const Polygon& polygon);
-  Polygon getBoundingBox(const std::vector< Polygon >& polygon);
-  struct AreaPolygon
-  {
+  Polygon getBoundingBox(const std::vector<Polygon>& polygon);
+  bool doPolygonsIntersect(const Polygon& poly1, const Polygon& poly2);
+  struct AreaPolygon {
     Point p1;
     double operator()(double area, const Point& p2, const Point& p3);
   };
-  struct accumulateRightAngle
-  {
+  struct accumulateRightAngle {
     Point p1;
     Point p2;
     bool operator()(const Point& p3);
