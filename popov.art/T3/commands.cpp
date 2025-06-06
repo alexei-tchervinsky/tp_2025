@@ -2,7 +2,7 @@
 #include "polygon_operations.hpp"
 #include <functional>
 #include <map>
-#include <vector>
+#include <string>
 namespace popov
 {
   CommandMap createCommandMap(std::vector<Polygon>& polygons)
