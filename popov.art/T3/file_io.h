@@ -25,6 +25,11 @@ inline Polygon parsePolygon(const std::string& input) {
     if (poly.points.size() != static_cast<size_t>(vertexCount)) {
         throw std::invalid_argument("Vertex count mismatch");
     }
+    for (size_t i = 1; i < poly.points.size(); ++i) {
+        if (poly.points[i] == poly.points[i-1]) {
+            throw std::invalid_argument("Duplicate points");
+        }
+    }
     return poly;
 }
-#endif // FILE_IO_H
+#endif
