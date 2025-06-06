@@ -1,5 +1,7 @@
 #include "geometry.hpp"
 #include <algorithm>
+#include <iterator>
+#include <numeric>
 namespace popov {
 bool doPolygonsIntersect(const Polygon& poly1, const Polygon& poly2) {
     auto getProjections = [](const Polygon& poly, double nx, double ny) {
@@ -92,8 +94,8 @@ std::istream& operator>>(std::istream& in, Polygon& polygon) {
         return in;
     }
     std::vector<Point> temp;
-    using input_iterator_t = std::istream_iterator<Point>;
-    std::copy_n(input_iterator_t{in}, countPoints, std::back_inserter(temp));
+    std::istream_iterator<Point> input_it(in);
+    std::copy_n(input_it, countPoints, std::back_inserter(temp));
     if (in && temp.size() == countPoints) {
         polygon.points = temp;
     } else {
