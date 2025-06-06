@@ -1,6 +1,9 @@
 #include "Comands.h"
 #include <numeric>
 #include <iomanip>
+#include <tuple>
+#include <limits>
+#include <algorithm>
 
 namespace wheatman
 {
@@ -208,33 +211,27 @@ namespace wheatman
     {
         if (polygon.empty() || figure.points.empty()) return false;
 
-        auto [minX, maxX, minY, maxY] = std::accumulate(polygon.begin(), polygon.end(),
-                                                        std::make_tuple(
-                                                                std::numeric_limits<int>::max(),
-                                                                std::numeric_limits<int>::min(),
-                                                                std::numeric_limits<int>::max(),
-                                                                std::numeric_limits<int>::min()
-                                                        ),
-                                                        [](auto acc, const Polygon& poly) {
-                                                            auto [currentMinX, currentMaxX, currentMinY, currentMaxY] = acc;
+        int minX = std::numeric_limits<int>::max();
+        int maxX = std::numeric_limits<int>::min();
+        int minY = std::numeric_limits<int>::max();
+        int maxY = std::numeric_limits<int>::min();
 
-                                                            for (const auto& point : poly.points) {
-                                                                currentMinX = std::min(currentMinX, point.x);
-                                                                currentMaxX = std::max(currentMaxX, point.x);
-                                                                currentMinY = std::min(currentMinY, point.y);
-                                                                currentMaxY = std::max(currentMaxY, point.y);
-                                                            }
+        for (const auto& poly : polygon) {
+            for (const auto& point : poly.points) {
+                minX = std::min(minX, point.x);
+                maxX = std::max(maxX, point.x);
+                minY = std::min(minY, point.y);
+                maxY = std::max(maxY, point.y);
+            }
+        }
+        for (const auto& point : figure.points) {
+            if (point.x < minX || point.x > maxX ||
+                point.y < minY || point.y > maxY) {
+                return false;
+            }
+        }
 
-                                                            return std::make_tuple(currentMinX, currentMaxX, currentMinY, currentMaxY);
-                                                        }
-        );
-
-        return std::all_of(figure.points.begin(), figure.points.end(),
-                           [minX, maxX, minY, maxY](const Point& p) {
-                               return p.x >= minX && p.x <= maxX &&
-                                      p.y >= minY && p.y <= maxY;
-                           }
-        );
+        return true;
     }
 }
 
