@@ -79,7 +79,7 @@ namespace wheatman
                 area = std::accumulate(polygon.begin(), polygon.end(), 0.0,
                                 [&number_of_vertexes](double sum, const Polygon& p)
                                 {
-                                    if (!(p.points.size() == number_of_vertexes))
+                                    if (p.points.size() == number_of_vertexes)
                                     {
                                         return sum + calculateArea(p);
                                     }
