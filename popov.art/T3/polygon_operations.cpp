@@ -213,8 +213,11 @@ void popov::inframe(const std::vector<Polygon>& value, std::istream& in, std::os
 void popov::echo(std::vector<Polygon>& value, std::istream& in, std::ostream& out)
 {
     Polygon polygon;
-    in >> polygon;
-    if (!in || polygon.points.size() < 3)
+    std::string line;
+    std::getline(in >> std::ws, line);
+    std::istringstream iss(line);
+    iss >> polygon;
+    if (iss.fail() || polygon.points.size() < 3 || !iss.eof())
     {
         throw std::invalid_argument("<INVALID COMMAND>");
     }
