@@ -4,6 +4,7 @@
 #include <functional>
 #include <istream>
 #include <string>
+#include <vector>
 namespace popov
 {
   using CommandFunction = std::function<void(std::istream&, std::ostream&)>;
