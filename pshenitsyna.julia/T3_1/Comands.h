@@ -1,12 +1,12 @@
-#ifndef T3_COMANDS_H
-#define T3_COMANDS_H
+#ifndef T3_1_COMANDS_H
+#define T3_1_COMANDS_H
 #include "helpFunctions.h"
 #include "Struct.h"
 
 namespace wheatman
 {
-    double calculateArea(const Polygon& polygon); // подсчёт площади для использования в area
-    void area (std::vector<Polygon> polygon, std::string& parameter); // у площади есть несколько вариантов параметра
+    double calculateArea(const Polygon& polygon);
+    void area (std::vector<Polygon> polygon, std::string& parameter);
     void max (std::vector<Polygon> polygon, std::string& parameter);
     void min (std::vector<Polygon> polygon, std::string& parameter);
     void count (std::vector<Polygon> polygon, std::string& parameter);
@@ -14,4 +14,4 @@ namespace wheatman
     bool inframe (std::vector<Polygon>& polygon, const Polygon& figure);
 }
 
-#endif //T3_COMANDS_H
+#endif //T3_1_COMANDS_H
