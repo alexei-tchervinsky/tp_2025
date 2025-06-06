@@ -193,9 +193,12 @@ void popov::rightshapes(const std::vector<Polygon>& value, std::ostream& out)
 }
 void popov::inframe(const std::vector<Polygon>& value, std::istream& in, std::ostream& out)
 {
+    std::string line;
+    std::getline(in >> std::ws, line);
+    std::istringstream iss(line);
     Polygon target;
-    in >> target;
-    if (!in || target.points.size() < 3)
+    iss >> target;
+    if (iss.fail() || target.points.size() < 3 || !iss.eof())
     {
         throw std::invalid_argument("<INVALID COMMAND>");
     }
