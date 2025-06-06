@@ -35,21 +35,77 @@ namespace nspace
     std::istream& operator>>(std::istream& in, Point& point)
     {
         char ignore;
-        return in >> ignore >> point.x >> ignore >> point.y >> ignore;
+        if (!(in >> ignore)) return in;
+        if (ignore != '(')
+        {
+            in.setstate(std::ios::failbit);
+            return in;
+        }
+
+        if (!(in >> point.x))
+        {
+            in.setstate(std::ios::failbit);
+            return in;
+        }
+
+        if (!(in >> ignore)) return in;
+        if (ignore != ';')
+        {
+            in.setstate(std::ios::failbit);
+            std::cout << "точка хуйня\n";
+            return in;
+        }
+
+        if (!(in >> point.y))
+        {
+            in.setstate(std::ios::failbit);
+            return in;
+        }
+
+        if (!(in >> ignore)) return in;
+        if (ignore != ')')
+        {
+            in.setstate(std::ios::failbit);
+            return in;
+        }
+
+        return in;
     }
 
-    std::istream& operator>>(std::istream& in, Polygon& poly)
-    {
+    std::istream& operator>>(std::istream& in, Polygon& poly) {
         size_t numPoints;
-        if (!(in >> numPoints)) return in;
+        if (!(in >> numPoints))
+        {
+            return in;
+        }
+
+        if (numPoints < 3)
+        {
+            in.setstate(std::ios::failbit);
+            return in;
+        }
 
         poly.points.resize(numPoints);
-        std::generate(poly.points.begin(), poly.points.end(), [&in]()
-        {
-            Point p;
-            in >> p;
-            return p;
-        });
+
+        std::generate(poly.points.begin(), poly.points.end(),
+            [&in]() {
+                Point p;
+                in >> p;
+                return p;
+            });
+
+        if (in.fail()) {
+            poly.points.clear();
+            in.setstate(std::ios::failbit);
+            return in;
+        }
+
+        if (std::adjacent_find(poly.points.begin(), poly.points.end()) != poly.points.end()) {
+            poly.points.clear();
+            in.setstate(std::ios::failbit);
+            return in;
+        }
+
         return in;
     }
 

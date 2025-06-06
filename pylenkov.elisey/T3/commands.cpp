@@ -43,7 +43,11 @@ namespace nspace
         }
         else if (param == "MEAN")
         {
-            if (polygons.empty()) std::cout << "<INVALID COMMAND>\n";
+            if (polygons.empty())
+            {
+                std::cout << "<INVALID COMMAND>\n";
+                return;
+            }
             double sum = std::accumulate(polygons.begin(), polygons.end(), 0.0,
                 [](double s, const nspace::Polygon& p) { return s + p.area(); });
             std::cout << sum / polygons.size() << '\n';
@@ -53,13 +57,22 @@ namespace nspace
             size_t num = std::stoul(param);
             auto pred = [num](const nspace::Polygon& p) { return p.points.size() == num; };
             double sum = std::accumulate(polygons.begin(), polygons.end(), 0.0, makeAreaAccumulator(pred));
+            if (sum == 0.0)
+            {
+                std::cout << "<INVALID COMMAND>\n";
+                return;
+            }
             std::cout << sum << '\n';
         }
     }
 
     void max(const std::vector<Polygon>& polygons, const std::string& param)
     {
-        if (polygons.empty()) std::cout << "<INVALID COMMAND>\n";
+        if (polygons.empty())
+        {
+            std::cout << "<INVALID COMMAND>\n";
+            return;
+        }
 
         if (param == "AREA")
         {
@@ -74,12 +87,17 @@ namespace nspace
         else
         {
             std::cout << "<INVALID COMMAND>\n";
+            return;
         }
     }
 
     void min(const std::vector<Polygon>& polygons, const std::string& param)
     {
-        if (polygons.empty()) std::cout << "<INVALID COMMAND>\n";
+        if (polygons.empty())
+        {
+            std::cout << "<INVALID COMMAND>\n";
+            return;
+        }
 
         if (param == "AREA")
         {
@@ -98,7 +116,7 @@ namespace nspace
         }
     }
 
-    void count(const std::vector<Polygon>& polygons, const std::string& param)
+   void count(const std::vector<Polygon>& polygons, const std::string& param)
     {
         if (param == "EVEN")
         {
@@ -123,6 +141,11 @@ namespace nspace
             try
             {
                 size_t num = std::stoul(param);
+                if (num < 3)
+                {
+                    std::cout << "<INVALID COMMAND>\n";
+                    return;
+                }
                 auto pred = [num](const Polygon& p)
                 {
                     return p.points.size() == num;
@@ -182,25 +205,36 @@ void echo(std::vector<Polygon>& polygons, const Polygon& target, const std::stri
 
     void maxSeq(const std::vector<Polygon>& polygons, const Polygon& target)
     {
-        if (polygons.empty())
+        if (polygons.empty() || target.points.size() < 3)
         {
-            std::cout << "<INVALID COMMAND>\n";
-            return;
+            throw std::invalid_argument("");
         }
 
         std::vector<bool> matches;
         std::transform(polygons.begin(), polygons.end(), std::back_inserter(matches),
-                        [&target](const Polygon& p) {return p == target;});
+                        [&target](const Polygon& p) { return p == target; });
+
         size_t max_count = 0;
-        auto it = matches.begin();
-        while (it != matches.end())
+        auto it_match = matches.begin();
+
+        // Проходим по всем возможным подряд идущим элементам, чтобы найти максимальную длину
+        while (it_match != matches.end())
         {
-            it = std::find(it, matches.end(), true);
-            if (it == matches.end()) break;
-            auto end_it = std::find(it, matches.end(), false);
-            max_count = std::max(max_count, static_cast<size_t>(std::distance(it, end_it)));
-            it = end_it;
+            it_match = std::find(it_match, matches.end(), true);  // Поиск начала последовательности
+            if (it_match == matches.end()) break;  // Если не найдено, завершаем цикл
+
+            auto end_it = std::find(it_match, matches.end(), false);  // Поиск конца последовательности
+            max_count = std::max(max_count, static_cast<size_t>(std::distance(it_match, end_it)));  // Обновляем максимальную длину последовательности
+            it_match = end_it;  // Продолжаем с конца найденной последовательности
         }
+
+        // Если длина последовательности 0, то выводим ошибку
+        if (max_count == 0)
+        {
+            throw std::invalid_argument("");
+        }
+
         std::cout << max_count << '\n';
     }
+
 }

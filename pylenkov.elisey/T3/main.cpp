@@ -12,7 +12,6 @@ using namespace nspace;
 
 int main(int argc, char* argv[])
 {
-
     if (argc != 2)
     {
         std::cerr << "Usage: " << argv[0] << " <filename>\n";
@@ -70,18 +69,24 @@ int main(int argc, char* argv[])
             {
                 Polygon target;
                 std::cin >> target;
+
+                if (std::cin.fail())
+                {
+                    throw std::invalid_argument("<INVALID COMMAND>");
+                }
+
                 maxSeq(polygons, target);
             }
             else
             {
-                throw std::invalid_argument("");
+                throw std::invalid_argument("<INVALID COMMAND>");
             }
         }
-        catch (...)
+        catch (const std::invalid_argument& e)
         {
-            std::cout << "<INVALID COMMAND>\n";
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << e.what() << '\n';  // Выводим ошибку один раз
+            std::cin.clear();  // Очищаем состояние ошибки
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // Игнорируем оставшийся ввод
         }
     }
 
