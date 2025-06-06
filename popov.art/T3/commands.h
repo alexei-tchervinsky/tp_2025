@@ -1,10 +1,13 @@
-#ifndef COMMANDS_H
-#define COMMANDS_H
-
-#include "geometry.h"
-#include <vector>
+#ifndef COMMANDS_HPP
+#define COMMANDS_HPP
+#include <map>
+#include <functional>
+#include <istream>
 #include <string>
-
-void processCommand(const std::string& command, std::vector<Polygon>& polygons);
-
-#endif // COMMANDS_H
+namespace popov
+{
+  using CommandFunction = std::function<void(std::istream&, std::ostream&)>;
+  using CommandMap = std::map<std::string, CommandFunction>;
+  CommandMap createCommandMap(std::vector<Polygon>& polygons);
+}
+#endif
