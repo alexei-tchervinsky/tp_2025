@@ -42,9 +42,9 @@ namespace nspace
         if (ignore != '(')
         {
 
-            LOG(ignore)
+            // LOG(ignore)
 
-            LOG("** ошибка со чтением точки ( **\n")
+            // LOG("** ошибка со чтением точки ( **\n")
 #ifndef ALEXEIT
             in.setstate(std::ios::failbit);
 #endif
@@ -67,7 +67,7 @@ namespace nspace
 
         if (!(in >> point.x))
         {
-            LOG("** ошибка со чтением точки x **\n")
+            // LOG("** ошибка со чтением точки x **\n")
             in.setstate(std::ios::failbit);
             return in;
         }
@@ -75,14 +75,14 @@ namespace nspace
         if (!(in >> ignore)) return in;
         if (ignore != ';')
         {
-            LOG("** ошибка со чтением точки ; **\n")
+            // LOG("** ошибка со чтением точки ; **\n")
             in.setstate(std::ios::failbit);
             return in;
         }
 
         if (!(in >> point.y))
         {
-            LOG("** ошибка со чтением точки y **\n")
+            // LOG("** ошибка со чтением точки y **\n")
             in.setstate(std::ios::failbit);
             return in;
         }
@@ -90,7 +90,7 @@ namespace nspace
         if (!(in >> ignore)) return in;
         if (ignore != ')')
         {
-            LOG("** ошибка со чтением точки )**\n")
+            // LOG("** ошибка со чтением точки )**\n")
             in.setstate(std::ios::failbit);
             return in;
         }
@@ -108,7 +108,7 @@ namespace nspace
 
         if (numPoints < 3)
         {
-            LOG("** точек < 3 **\n")
+            // LOG("** точек < 3 **\n")
             in.setstate(std::ios::failbit);
             return in;
         }
@@ -127,7 +127,7 @@ namespace nspace
         auto it_end = temp_points.end();
         if ((static_cast<size_t>(it_end - it_start)) != numPoints)
         {
-            LOG("** copy_n copy less than expected **\n")
+            // LOG("** copy_n copy less than expected **\n")
             in.setstate(std::ios::failbit);
             return in;
         }
@@ -137,7 +137,7 @@ namespace nspace
 
         if (in.fail())
         {
-            LOG("** ошибка std::copy_n **\n")
+            // LOG("** ошибка std::copy_n **\n")
 #ifdef ALEXEIT
             std::cin.clear();  // Очищаем состояние ошибки
             // std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // Игнорируем оставшийся ввод
@@ -154,7 +154,7 @@ namespace nspace
             // std::cout << in.get();
             // in.putback('X');
             // in.putback('\n');
-            LOG("** ошибка, лишние точки: ") LOG(tail) LOG(" **\n")
+            // LOG("** ошибка, лишние точки: ") LOG(tail) LOG(" **\n")
             return in;
         }
 #endif // ALEXEIT
@@ -164,14 +164,14 @@ namespace nspace
         if (temp_points.size() != numPoints)
         {
             in.setstate(std::ios::failbit);
-            LOG("** ошибка, неверное количество точек **\n")
+            // LOG("** ошибка, неверное количество точек **\n")
             return in;
         }
 
         // Проверка на дубликаты
         if (std::adjacent_find(temp_points.begin(), temp_points.end()) != temp_points.end())
         {
-            LOG("** ошибка, дубликаты точек **\n")
+            // LOG("** ошибка, дубликаты точек **\n")
             temp_points.clear();
             in.setstate(std::ios::failbit);
             return in;
@@ -180,7 +180,7 @@ namespace nspace
         // Если все в порядке, присваиваем точки полигону
         poly.points = std::move(temp_points);
 
-        LOG("** Полигон: ") LOG(poly) LOG(" **\n")
+        // LOG("** Полигон: ") LOG(poly) LOG(" **\n")
 #ifdef ALEXEIT
         in.clear();
 #endif // ALEXEIT
