@@ -138,7 +138,7 @@ namespace wheatman
     }
     void count (std::vector<Polygon> polygon, std::string& parameter)
     {
-        size_t nFigures;
+        size_t nFigures {0};
         if (parameter == "EVEN")
         {
             std::accumulate(polygon.begin(), polygon.end(), nFigures,
