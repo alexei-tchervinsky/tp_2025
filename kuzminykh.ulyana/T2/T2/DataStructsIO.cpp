@@ -19,7 +19,7 @@ iofmtguard::~iofmtguard()
 std::istream& operator>>(std::istream& in, DelimiterIO&& d)
 {
     std::istream::sentry sentry(in);
-    if (!sentry) 
+    if (!sentry)
     {
         return in;
     }
