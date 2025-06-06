@@ -14,13 +14,22 @@ int main(int args, char* argv[]) {
         return 1;
     }
     std::string filename = argv[1];
-    std::vector<Polygon> geometry = readFile(filename);
-
-    std::string command;
-    while (std::getline(std::cin, command))
+    try
     {
-        if(std::cin.eof()) break;
-        CommandsHandler(command, geometry);
+        std::vector<Polygon> geometry = readFile(filename);
+
+        std::string command;
+        while (std::getline(std::cin, command))
+        {
+            if(std::cin.eof() || command.empty()) continue;
+            CommandsHandler(command, geometry);
+        }
     }
+    catch (const std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+        return 1;
+    }
+
     return 0;
 }
