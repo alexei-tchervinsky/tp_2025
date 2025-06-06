@@ -16,12 +16,11 @@ namespace wheatman {
         polygon.points.resize(number);
         for (size_t i = 0; i < number; ++i)
         {
-            Point point;
-            if(!(in>>point))
+            if(!(in>>polygon.points[i]))
             {
                 throw std::runtime_error("Error. Wrong coordinates!");
             }
-            polygon.points.push_back(point);
+            in >> polygon.points[i];
         }
 
         std::string remaining;
@@ -93,12 +92,16 @@ namespace wheatman {
         {
             std::string polygonStr;
             std::getline(in, polygonStr);
+            if (polygonStr.empty()) {
+                std::cout << "<INVALID COMMAND>\n";
+                return;
+            }
             try
             {
                 Polygon figure = splitPolygon(polygonStr);
                 echo(p, figure);
             }
-            catch (...)
+            catch (const std::exception& e)
             {
                 std::cout << "<INVALID COMMAND>\n";
             }
@@ -107,12 +110,16 @@ namespace wheatman {
         {
             std::string polygonStr;
             std::getline(in, polygonStr);
+            if (polygonStr.empty()) {
+                std::cout << "<INVALID COMMAND>\n";
+                return;
+            }
             try
             {
                 Polygon figure = splitPolygon(polygonStr);
                 inframe(p, figure);
             }
-            catch (...)
+            catch (const std::exception& e)
             {
                 std::cout << "<INVALID COMMAND>\n";
             }
