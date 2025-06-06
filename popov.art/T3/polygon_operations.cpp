@@ -38,10 +38,11 @@ void popov::intersections(const std::vector<Polygon>& value, std::istream& in, s
     {
         throw std::invalid_argument("<INVALID COMMAND>");
     }
-
     size_t count = 0;
+    Polygon targetBB = getBoundingBox({target});
     for (const auto& poly : value) {
-        if (doPolygonsIntersect(poly, target)) {
+        Polygon polyBB = getBoundingBox({poly});
+        if (!(polyBB <= targetBB) && !(targetBB <= polyBB)) {
             count++;
         }
     }
@@ -49,13 +50,11 @@ void popov::intersections(const std::vector<Polygon>& value, std::istream& in, s
 }
 void popov::lessArea(const std::vector<Polygon>& value, std::istream& in, std::ostream& out)
 {
-    iofmtguard guard(out);
-    out << std::setprecision(1) << std::fixed;
     Polygon target;
     in >> target;
-    if (!in)
+    if (!in || target.points.size() < 3)
     {
-        throw std::invalid_argument("Wrong argument");
+        throw std::invalid_argument("<INVALID COMMAND>");
     }
     double targetArea = getPolygonArea(target);
     size_t count = std::count_if(value.begin(), value.end(),
@@ -199,9 +198,16 @@ void popov::inframe(const std::vector<Polygon>& value, std::istream& in, std::os
     {
         throw std::invalid_argument("<INVALID COMMAND>");
     }
-
     Polygon frame = getBoundingBox(value);
-    out << (target <= frame ? "<TRUE>" : "<FALSE>");
+    bool isInside = true;
+    for (const auto& p : target.points) {
+        if (p.x < findMinX(frame) || p.x > findMaxX(frame) ||
+            p.y < findMinY(frame) || p.y > findMaxY(frame)) {
+            isInside = false;
+            break;
+        }
+    }
+    out << (isInside ? "<TRUE>" : "<FALSE>");
 }
 void popov::echo(std::vector<Polygon>& value, std::istream& in, std::ostream& out)
 {
@@ -211,8 +217,9 @@ void popov::echo(std::vector<Polygon>& value, std::istream& in, std::ostream& ou
     {
         throw std::invalid_argument("<INVALID COMMAND>");
     }
-
     size_t count = std::count(value.begin(), value.end(), polygon);
-    value.insert(value.end(), count, polygon);
+    for (size_t i = 0; i < count; ++i) {
+        value.push_back(polygon);
+    }
     out << count;
 }
