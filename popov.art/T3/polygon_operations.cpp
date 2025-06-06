@@ -4,9 +4,9 @@
 #include <algorithm>
 #include <functional>
 #include <numeric>
-#include <vector>
-#include <iomanip>
 #include <string>
+#include <iomanip>
+#include <vector>
 namespace {
   bool isEven(const popov::Polygon& polygon) { return (polygon.points.size() % 2 == 0); }
   bool isOdd(const popov::Polygon& polygon) { return !(polygon.points.size() % 2 == 0); }
