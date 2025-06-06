@@ -1,5 +1,5 @@
-#ifndef T3_1_STRUCT_H
-#define T3_1_STRUCT_H
+#ifndef T3_STRUCT_H
+#define T3_STRUCT_H
 #include <iostream>
 #include <vector>
 
@@ -22,4 +22,4 @@ namespace wheatman
     std::ostream& operator << (std::ostream& out, const Point& p);
 
 }
-#endif //T3_1_STRUCT_H
+#endif //T3_STRUCT_H

@@ -1,5 +1,5 @@
-#ifndef T3_1_COMANDS_H
-#define T3_1_COMANDS_H
+#ifndef T3_COMANDS_H
+#define T3_COMANDS_H
 #include "helpFunctions.h"
 #include "Struct.h"
 
@@ -14,4 +14,4 @@ namespace wheatman
     bool inframe (std::vector<Polygon>& polygon, const Polygon& figure);
 }
 
-#endif //T3_1_COMANDS_H
+#endif //T3_COMANDS_H
