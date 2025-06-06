@@ -119,7 +119,7 @@ int main() {
     }
     }
 
-    std::ranges::sort(items.begin(), items.end(), [](auto const & a, auto const & b) {
+    std::sort(items.begin(), items.end(), [](auto const & a, auto const & b) {
         if (a.key1 == b.key1) {
             if (a.key2 == b.key2) {
                 return a.key3.length() < b.key3.length();
