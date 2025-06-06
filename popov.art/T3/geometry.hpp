@@ -5,6 +5,7 @@
 #include <functional>
 namespace popov
 {
+  bool doPolygonsIntersect(const Polygon& poly1, const Polygon& poly2);
   struct DelimiterChar
   {
     char expected;
