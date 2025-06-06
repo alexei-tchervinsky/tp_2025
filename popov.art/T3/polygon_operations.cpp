@@ -1,12 +1,14 @@
 #include "polygon_operations.hpp"
 #include "geometry.hpp"
 #include "iofmtguard.hpp"
+
 #include <algorithm>
 #include <functional>
 #include <numeric>
 #include <string>
 #include <iomanip>
 #include <vector>
+#include <iterator>
 namespace {
   bool isEven(const popov::Polygon& polygon) { return (polygon.points.size() % 2 == 0); }
   bool isOdd(const popov::Polygon& polygon) { return !(polygon.points.size() % 2 == 0); }
@@ -16,6 +18,8 @@ namespace {
 }
 void popov::intersections(const std::vector<Polygon>& value, std::istream& in, std::ostream& out)
 {
+    iofmtguard guard(out);
+    out << std::setprecision(1) << std::fixed;
     Polygon target;
     in >> target;
     if (!in || target.points.size() < 3) {
