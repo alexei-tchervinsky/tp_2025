@@ -29,6 +29,7 @@ int main() {
         std::cout << "  (Ctrl+D / Ctrl+Z) - завершить ввод\n";
     };
 
+
     commands["read"] = [&](std::istream& in) {
         std::string filename;
         if (!(in >> filename)) {
@@ -67,7 +68,7 @@ int main() {
         }
     };
 
-    commands["clear"] = [&](std::istream& in) {
+    commands["clear"] = [&](std::istream&) {
         dict.clear();
     };
 
@@ -80,11 +81,11 @@ int main() {
         std::cout << dict.getFreq(word) << "\n";
     };
 
-    commands["print"] = [&](std::istream& in) {
-        dict.printAll(std::cout);
+    commands["print"] = [&](std::istream&) {
+        writer.write(std::cout, dict);
     };
 
-    commands["top"] = [&](std::istream& in) {
+    commands["top"] = [&](std::istream&) {
         dict.printTopThree(std::cout);
     };
 
