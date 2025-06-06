@@ -14,5 +14,6 @@ namespace popov
   void inframe(const std::vector<Polygon>& value, std::istream& in, std::ostream& out);
   void lessArea(const std::vector<Polygon>& value, std::istream& in, std::ostream& out);
   void intersections(const std::vector<Polygon>& value, std::istream& in, std::ostream& out);
+  void rmecho(std::vector<Polygon>& value, std::istream& in, std::ostream& out);
 }
 #endif
