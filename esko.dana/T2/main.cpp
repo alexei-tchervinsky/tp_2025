@@ -3,7 +3,6 @@
 #include <iterator>
 #include <algorithm>
 #include <iomanip>
-#include <windows.h>
 
 struct DataStruct {
     double      key1;
@@ -108,7 +107,6 @@ std::ostream& operator<<(std::ostream & out, DataStruct const & o) {
 }
 
 int main() {
-    SetConsoleOutputCP(CP_UTF8);
     std::vector<DataStruct> items;
 
     while (std::cin) {
