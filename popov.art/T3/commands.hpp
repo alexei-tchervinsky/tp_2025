@@ -5,6 +5,7 @@
 #include <istream>
 #include <string>
 #include <vector>
+#include "geometry.hpp"
 namespace popov
 {
   using CommandFunction = std::function<void(std::istream&, std::ostream&)>;
