@@ -9,13 +9,6 @@
 #include <stdexcept>
 #include <string>
 using namespace std;
-bool isValidPolygon(const Polygon& p) {
-    if (p.points.size() < 3) return false;
-    for (const auto& point : p.points) {
-        if (point.x == 0 && point.y == 0) return false;
-    }
-    return true;
-}
 void processCommand(const string& command, vector<Polygon>& polygons) {
     istringstream iss(command);
     string cmd;
