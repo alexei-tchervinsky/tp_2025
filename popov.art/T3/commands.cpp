@@ -167,7 +167,7 @@ void processCommand(const string& command, vector<Polygon>& polygons) {
             auto compareVertexes = [](const Polygon& a, const Polygon& b) {
                 return a.points.size() < b.points.size();
             };
-            auto it = (cmd == "MAX") 
+            auto it = (cmd == "MAX")
                 ? max_element(polygons.begin(), valid_end, compareVertexes)
                 : min_element(polygons.begin(), valid_end, compareVertexes);
             cout << it->points.size() << endl;
