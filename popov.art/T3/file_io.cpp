@@ -1,6 +1,7 @@
 #include "file_io.hpp"
 #include <iterator>
 #include <limits>
+#include <vector>
 std::vector<popov::Polygon> popov::readPolygonsFromFile(const std::string& filename)
 {
   std::ifstream in(filename);
