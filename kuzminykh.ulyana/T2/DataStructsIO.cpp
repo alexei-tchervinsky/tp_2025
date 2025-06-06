@@ -40,12 +40,15 @@ std::istream& operator>>(std::istream& in, LongLongIO&& d)
     long long value = 0;
     in >> value;
 
-    std::string suffix;
-    in >> suffix;
-    if (suffix != "ll" && suffix != "LL")
+    if (in.peek() == 'l' || in.peek() == 'L')
     {
-        in.setstate(std::ios::failbit);
-        return in;
+        std::string suffix;
+        in >> suffix;
+        if (suffix != "ll" && suffix != "LL")
+        {
+            in.setstate(std::ios::failbit);
+            return in;
+        }
     }
 
     d.ref = value;
@@ -60,21 +63,21 @@ std::istream& operator>>(std::istream& in, ULongLongOctIO&& d)
         return in;
     }
 
-    std::string token;
-    in >> token;
-    if (token.empty() || token[0] != '0')
+    unsigned long long value = 0;
+    in >> value;
+
+    if (in.peek() == 'u' || in.peek() == 'U')
     {
-        in.setstate(std::ios::failbit);
-        return in;
+        std::string suffix;
+        in >> suffix;
+        if (suffix != "ull" && suffix != "ULL")
+        {
+            in.setstate(std::ios::failbit);
+            return in;
+        }
     }
 
-    std::istringstream iss(token);
-    iss >> std::oct >> d.ref;
-
-    if (!iss)
-    {
-        in.setstate(std::ios::failbit);
-    }
+    d.ref = value;
     return in;
 }
 
@@ -128,49 +131,40 @@ std::istream& operator>>(std::istream& in, DataStruct& d)
     bool read1 = false, read2 = false, read3 = false;
     while (record)
     {
-        std::string label;
-        if (!(record >> DelimiterIO{ ':' } >> LabelIO{ "key1" }))
+        if (!(record >> DelimiterIO{ ':' }))
         {
-            record.clear();
-        }
-        else
-        {
-            record >> DelimiterIO{ ' ' } >> LongLongIO{ temp.key1 };
-            read1 = true;
-            continue;
+            std::string label;
+            if (record >> label)
+            {
+                if (label == "key1" && (record >> LongLongIO{ temp.key1 }))
+                {
+                    read1 = true;
+                    continue;
+                }
+                else if (label == "key2" && (record >> ULongLongOctIO{ temp.key2 }))
+                {
+                    read2 = true;
+                    continue;
+                }
+                else if (label == "key3" && (record >> StringIO{ temp.key3 }))
+                {
+                    read3 = true;
+                    continue;
+                }
+            }
         }
 
-        if (!(record >> DelimiterIO{ ':' } >> LabelIO{ "key2" }))
-        {
-            record.clear();
-        }
-        else
-        {
-            record >> DelimiterIO{ ' ' } >> ULongLongOctIO{ temp.key2 };
-            read2 = true;
-            continue;
-        }
-
-        if (!(record >> DelimiterIO{ ':' } >> LabelIO{ "key3" })) {
-            record.clear();
-        }
-        else
-        {
-            record >> DelimiterIO{ ' ' } >> StringIO{ temp.key3 };
-            read3 = true;
-            continue;
-        }
-
-        break;
+        record.clear();
+        record.ignore(std::numeric_limits<std::streamsize>::max(), ':');
     }
 
-    if (!read1 || !read2 || !read3)
+    if (read1 && read2 && read3)
     {
-        in.setstate(std::ios::failbit);
+        d = temp;
     }
     else
     {
-        d = temp;
+        in.setstate(std::ios::failbit);
     }
 
     return in;
