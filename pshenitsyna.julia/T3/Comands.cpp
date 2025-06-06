@@ -185,6 +185,7 @@ namespace wheatman
     }
     size_t echo (std::vector<Polygon>& polygon, const Polygon& figure)
     {
+        if (figure.points.empty()) return 0;
         auto isEqual = [](const Polygon& p1, const Polygon& p2)
         {
             if (p1.points.size() != p2.points.size()) return false;
@@ -197,22 +198,30 @@ namespace wheatman
         size_t countFigure = 0;
         auto it = polygon.begin();
 
-        while ((it = std::find_if(it, polygon.end(),
-                                  [&figure, &isEqual](const Polygon& p)
-                                  {
-                                      return isEqual(p, figure);
-                                  }
-        )) != polygon.end())
+        while (it != polygon.end())
         {
-            it = polygon.insert(it + 1, *it);
-            countFigure++;
-            it += 2; // чтобы пропустить копию
+            it = std::find_if(it, polygon.end(),
+                               [&figure, &isEqual](const Polygon& p)
+                               {
+                                   return isEqual(p, figure);
+                               });
+            if (it != polygon.end())
+            {
+                it = polygon.insert(it + 1, *it);
+                countFigure++;
+                it += 2; // чтобы пропустить копию
+            }
         }
+        std::cout << countFigure << "\n";
         return countFigure;
     }
     bool inframe (std::vector<Polygon>& polygon, const Polygon& figure)
     {
-        if (polygon.empty() || figure.points.empty()) return false;
+        if (polygon.empty() || figure.points.empty())
+        {
+            std::cout << "INVALID COMMAND\n";
+            return false;
+        }
 
         int minX = std::numeric_limits<int>::max();
         int maxX = std::numeric_limits<int>::min();
@@ -230,10 +239,11 @@ namespace wheatman
         for (const auto& point : figure.points) {
             if (point.x < minX || point.x > maxX ||
                 point.y < minY || point.y > maxY) {
+                std::cout << "<FALSE>\n";
                 return false;
             }
         }
-
+        std::cout << "<TRUE>\n";
         return true;
     }
 }
