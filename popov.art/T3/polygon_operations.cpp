@@ -50,26 +50,6 @@ void popov::lessArea(const std::vector<Polygon>& value, std::istream& in, std::o
         });
     out << count;
 }
-void popov::intersections(const std::vector<Polygon>& value, std::istream& in, std::ostream& out)
-{
-    iofmtguard guard(out);
-    out << std::setprecision(1) << std::fixed;
-    Polygon target;
-    in >> target;
-    if (!in)
-    {
-        throw std::invalid_argument("Wrong argument");
-    }
-    Polygon targetBB = getBoundingBox({target});
-    std::vector<double> areas;
-    for (const auto& poly : value)
-    {
-        Polygon polyBB = getBoundingBox({poly});
-        bool intersects = !(polyBB <= targetBB) && !(targetBB <= polyBB);
-        areas.push_back(intersects ? getPolygonArea(poly) : 0.0);
-    }
-    std::copy(areas.begin(), areas.end(), std::ostream_iterator<double>(out, " "));
-}
 void popov::area(const std::vector<Polygon>& value, std::istream& in, std::ostream& out)
 {
   iofmtguard guard(out);
