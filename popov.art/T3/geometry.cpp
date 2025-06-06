@@ -7,6 +7,42 @@
 #include <string>
 #include <limits>
 #include <vector>
+namespace popov {
+    bool doPolygonsIntersect(const Polygon& poly1, const Polygon& poly2) {
+        auto getProjections = [](const Polygon& poly, double nx, double ny) {
+            double minProj = std::numeric_limits<double>::max();
+            double maxProj = -std::numeric_limits<double>::max();
+            for (const auto& p : poly.points) {
+                double proj = p.x * nx + p.y * ny;
+                minProj = std::min(minProj, proj);
+                maxProj = std::max(maxProj, proj);
+            }
+            return std::make_pair(minProj, maxProj);
+        };
+        for (size_t i = 0; i < poly1.points.size(); i++) {
+            const Point& p1 = poly1.points[i];
+            const Point& p2 = poly1.points[(i + 1) % poly1.points.size()];
+            double nx = -(p2.y - p1.y);
+            double ny = p2.x - p1.x;
+            auto [min1, max1] = getProjections(poly1, nx, ny);
+            auto [min2, max2] = getProjections(poly2, nx, ny);
+            if (max1 < min2 || max2 < min1) {
+                return false;
+            }
+        }
+        for (size_t i = 0; i < poly2.points.size(); i++) {
+            const Point& p1 = poly2.points[i];
+            const Point& p2 = poly2.points[(i + 1) % poly2.points.size()];
+            double nx = -(p2.y - p1.y);
+            double ny = p2.x - p1.x;
+            auto [min1, max1] = getProjections(poly1, nx, ny);
+            auto [min2, max2] = getProjections(poly2, nx, ny);
+            if (max1 < min2 || max2 < min1) {
+                return false;
+            }
+        }
+        return true;
+    }
 std::istream& popov::operator>>(std::istream& in, DelimiterChar&& exp)
 {
   std::istream::sentry guard(in);
