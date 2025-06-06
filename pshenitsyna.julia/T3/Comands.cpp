@@ -21,13 +21,13 @@ namespace wheatman
                                         }
         )) / 2.0; // деление на 2 так как по ф-ле Гаусса получаем удвоенную площадь
     }
-    void area (std::vector<Polygon> polygon, std::string& parameter)
+    void area (std::vector<Polygon>& polygon, std::string& parameter)
     {
         double area {0.0};
         if (parameter == "EVEN")
         {
-            area = std::accumulate(polygon.begin(), polygon.end(), area,
-                            [](const double sum, const Polygon& p)
+            area = std::accumulate(polygon.begin(), polygon.end(), 0.0,
+                            [](double sum, const Polygon& p)
                             {
                                 if (p.points.size() % 2)
                                 {
@@ -39,8 +39,8 @@ namespace wheatman
         }
         else if (parameter == "ODD")
         {
-           area = std::accumulate(polygon.begin(), polygon.end(), area,
-                            [](const double sum, const Polygon& p)
+           area = std::accumulate(polygon.begin(), polygon.end(), 0.0,
+                            [](double sum, const Polygon& p)
                             {
                                 if (!(p.points.size() % 2))
                                 {
@@ -53,8 +53,8 @@ namespace wheatman
         else if (parameter == "MEAN")
         {
             if(polygon.empty()) std::cout << "<INVALID COMMAND>" << std::endl;
-            area = std::accumulate(polygon.begin(), polygon.end(), area,
-                            [](const double sum, Polygon& p)
+            area = std::accumulate(polygon.begin(), polygon.end(), 0.0,
+                            [](double sum, Polygon& p)
                             {
                                 return sum + calculateArea(p);
                             }
@@ -72,8 +72,8 @@ namespace wheatman
                     std::cout << "<INVALID COMMAND>" << std::endl;
                     return;
                 }
-                area = std::accumulate(polygon.begin(), polygon.end(), area,
-                                [&number_of_vertexes](const double sum, const Polygon& p)
+                area = std::accumulate(polygon.begin(), polygon.end(), 0.0,
+                                [&number_of_vertexes](double sum, const Polygon& p)
                                 {
                                     if (!(p.points.size() == number_of_vertexes))
                                     {
@@ -90,7 +90,7 @@ namespace wheatman
         }
 
     }
-    void max (std::vector<Polygon> polygon, std::string& parameter)
+    void max (std::vector<Polygon>& polygon, std::string& parameter)
     {
         if (polygon.empty())
         {
@@ -118,7 +118,7 @@ namespace wheatman
             std::cout << maxVertex << std::endl;
         }
     }
-    void min (std::vector<Polygon> polygon, std::string& parameter)
+    void min (std::vector<Polygon>& polygon, std::string& parameter)
     {
         if (polygon.empty())
         {
@@ -146,34 +146,22 @@ namespace wheatman
             std::cout << minVertex << std::endl;
         }
     }
-    void count (std::vector<Polygon> polygon, std::string& parameter)
+    void count (std::vector<Polygon>& polygon, std::string& parameter)
     {
         size_t nFigures {0};
         if (parameter == "EVEN")
         {
-            nFigures = std::accumulate(polygon.begin(), polygon.end(), nFigures,
-                            [](size_t sum, const Polygon& p)
-                            {
-                                if (p.points.size() % 2)
-                                {
-                                    return ++ sum;
-                                }
-                                return sum;
-                            });
-            std::cout << std::fixed << std::setprecision(1) << nFigures << std::endl;
+            nFigures = std::count_if(polygon.begin(), polygon.end(),
+                                     [](const Polygon& p)
+                                     {return p.points.size()%2 == 0;});
+            std::cout << nFigures << std::endl;
         }
         else if (parameter == "ODD")
         {
-            nFigures = std::accumulate(polygon.begin(), polygon.end(), nFigures,
-                            [](size_t sum, const Polygon& p)
-                            {
-                                if (!(p.points.size() % 2))
-                                {
-                                    return ++ sum;
-                                }
-                                return sum;
-                            });
-            std::cout << std::fixed << std::setprecision(1) << nFigures << std::endl;
+            nFigures = std::count_if(polygon.begin(), polygon.end(),
+                                     [](const Polygon& p)
+                                     {return p.points.size()%2 != 0;});
+            std::cout << nFigures << std::endl;
         }
         else
         {
@@ -184,16 +172,10 @@ namespace wheatman
                     std::cout << "<INVALID COMMAND>" << std::endl;
                     return;
                 }
-                nFigures = std::accumulate(polygon.begin(), polygon.end(), nFigures,
-                                [nVertex](size_t sum, const Polygon& p)
-                                {
-                                    if (p.points.size() == nVertex)
-                                    {
-                                        return ++ sum;
-                                    }
-                                    return sum;
-                                });
-                std::cout << std::fixed << std::setprecision(1) << nFigures << std::endl;
+                nFigures = std::count_if(polygon.begin(), polygon.end(),
+                                         [&nVertex](const Polygon& p)
+                                         {return p.points.size() == nVertex;});
+                std::cout << nFigures << std::endl;
             }
             catch (const std::exception& e)
             {
