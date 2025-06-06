@@ -29,7 +29,7 @@ namespace wheatman
             area = std::accumulate(polygon.begin(), polygon.end(), 0.0,
                             [](double sum, const Polygon& p)
                             {
-                                if (p.points.size() % 2)
+                                if (p.points.size() % 2 == 0)
                                 {
                                     return sum + calculateArea(p);
                                 }
@@ -42,7 +42,7 @@ namespace wheatman
            area = std::accumulate(polygon.begin(), polygon.end(), 0.0,
                             [](double sum, const Polygon& p)
                             {
-                                if (!(p.points.size() % 2))
+                                if (p.points.size() % 2 != 0)
                                 {
                                     return sum + calculateArea(p);
                                 }
@@ -52,7 +52,11 @@ namespace wheatman
         }
         else if (parameter == "MEAN")
         {
-            if(polygon.empty()) std::cout << "<INVALID COMMAND>" << std::endl;
+            if(polygon.empty())
+            {
+                std::cout << "<INVALID COMMAND>" << std::endl;
+                return;
+            }
             area = std::accumulate(polygon.begin(), polygon.end(), 0.0,
                             [](double sum, Polygon& p)
                             {
