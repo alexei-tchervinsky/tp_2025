@@ -7,6 +7,7 @@
 #include <string>
 #include <iomanip>
 #include <vector>
+#include <iterator>
 namespace {
   bool isEven(const popov::Polygon& polygon) { return (polygon.points.size() % 2 == 0); }
   bool isOdd(const popov::Polygon& polygon) { return !(polygon.points.size() % 2 == 0); }
