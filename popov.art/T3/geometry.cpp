@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <string>
 #include <limits>
+#include <vector>
 std::istream& popov::operator>>(std::istream& in, DelimiterChar&& exp)
 {
   std::istream::sentry guard(in);
