@@ -1,52 +1,24 @@
-#include "file_io.h"
-#include <fstream>
-#include <sstream>
-#include <iostream>
-#include <vector>
-using namespace std;
-bool isValidPolygon(const Polygon& p) {
-    if (p.points.size() < 3) return false;
-    for (const auto& point : p.points) {
-        if (point.x == 0 && point.y == 0) return false;
+#include "file_io.hpp"
+#include <iterator>
+#include <limits>
+std::vector<popov::Polygon> popov::readPolygonsFromFile(const std::string& filename)
+{
+  std::ifstream in(filename);
+  if (!in.is_open())
+  {
+    throw std::runtime_error("File not open");
+  }
+  std::vector<Polygon> polygons;
+  using input_it_t = std::istream_iterator<Polygon>;
+  while (!in.eof())
+  {
+    std::copy(input_it_t{in}, input_it_t{}, std::back_inserter(polygons));
+    if (in.fail())
+    {
+      in.clear();
+      in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
-    return true;
-}
-vector<Polygon> readPolygonsFromFile(const string& filename) {
-    vector<Polygon> polygons;
-    ifstream file(filename);
-    if (!file.is_open()) {
-        cerr << "Error: Could not open file " << filename << endl;
-        exit(1);
-    }
-    string line;
-    while (getline(file, line)) {
-        try {
-            Polygon poly = parsePolygon(line);
-            if (isValidPolygon(poly)) {
-                polygons.push_back(poly);
-            }
-        } catch (...) {
-        }
-    }
-    return polygons;
-}
-Polygon parsePolygon(const string& input) {
-    istringstream iss(input);
-    int vertexCount;
-    if (!(iss >> vertexCount) || vertexCount < 3) {
-        throw invalid_argument("Invalid number of vertices");
-    }
-    Polygon poly;
-    for (int i = 0; i < vertexCount; ++i) {
-        char c1, c2, c3;
-        int x, y;
-        if (!(iss >> c1 >> x >> c2 >> y >> c3) || c1 != '(' || c2 != ';' || c3 != ')') {
-            throw invalid_argument("Invalid point format");
-        }
-        poly.points.push_back({x, y});
-    }
-    if (poly.points.size() != static_cast<size_t>(vertexCount)) {
-        throw invalid_argument("Vertex count mismatch");
-    }
-    return poly;
+  }
+  in.close();
+  return polygons;
 }
