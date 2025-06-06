@@ -4,6 +4,13 @@
 #include <iostream>
 #include <vector>
 using namespace std;
+bool isValidPolygon(const Polygon& p) {
+    if (p.points.size() < 3) return false;
+    for (const auto& point : p.points) {
+        if (point.x == 0 && point.y == 0) return false;
+    }
+    return true;
+}
 vector<Polygon> readPolygonsFromFile(const string& filename) {
     vector<Polygon> polygons;
     ifstream file(filename);
