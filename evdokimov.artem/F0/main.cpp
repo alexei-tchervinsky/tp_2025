@@ -67,13 +67,10 @@ int main() {
         if (!(iss >> N)) {
           throw DictionaryError("Command 4 requires an integer N");
         }
-        if (N <= 0) {
-          throw DictionaryError("Number of top words must be positive");
-        }
         auto top = dict.getTopWords(N);
         std::cout << "Top " << N << " words:" << std::endl;
-        for (const auto &[word, count] : top) {
-          std::cout << word << ": " << count << std::endl;
+        for (const auto &pair : top) {
+          std::cout << pair.first << ": " << pair.second << std::endl;
         }
         break;
       }
