@@ -33,17 +33,17 @@ void popov::rmecho(std::vector<Polygon>& value, std::istream& in, std::ostream& 
 void popov::intersections(const std::vector<Polygon>& value, std::istream& in, std::ostream& out)
 {
     Polygon target;
-    in >> target;
-    if (!in || target.points.size() < 3)
+    std::string line;
+    std::getline(in >> std::ws, line);
+    std::istringstream iss(line);
+    iss >> target;
+    if (iss.fail() || target.points.size() < 3 || !iss.eof())
     {
         throw std::invalid_argument("<INVALID COMMAND>");
     }
     size_t count = 0;
-    Polygon targetBB = getBoundingBox({target});
     for (const auto& poly : value) {
-        Polygon polyBB = getBoundingBox({poly});
-        bool intersects = !(polyBB <= targetBB) && !(targetBB <= polyBB);
-        if (intersects) {
+        if (doPolygonsIntersect(poly, target)) {
             count++;
         }
     }
