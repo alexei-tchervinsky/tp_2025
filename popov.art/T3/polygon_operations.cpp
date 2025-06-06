@@ -16,15 +16,29 @@ namespace {
   bool comparatorPoints(const popov::Polygon& lhs, const popov::Polygon& rhs) { return lhs.points.size() < rhs.points.size(); }
   bool comparatorArea(const popov::Polygon& lhs, const popov::Polygon& rhs) { return getPolygonArea(lhs) < getPolygonArea(rhs); }
 }
-void popov::intersections(const std::vector<Polygon>& value, std::istream& in, std::ostream& out)
+void popov::rmecho(std::vector<Polygon>& value, std::istream& in, std::ostream& out)
 {
-    iofmtguard guard(out);
-    out << std::setprecision(1) << std::fixed;
-    Polygon target;
-    in >> target;
-    if (!in || target.points.size() < 3) {
+    Polygon polygon;
+    in >> polygon;
+    if (!in || polygon.points.size() < 3)
+    {
         throw std::invalid_argument("<INVALID COMMAND>");
     }
+
+    auto it = std::remove(value.begin(), value.end(), polygon);
+    size_t count = std::distance(it, value.end());
+    value.erase(it, value.end());
+    out << count;
+}
+void popov::intersections(const std::vector<Polygon>& value, std::istream& in, std::ostream& out)
+{
+    Polygon target;
+    in >> target;
+    if (!in || target.points.size() < 3)
+    {
+        throw std::invalid_argument("<INVALID COMMAND>");
+    }
+
     size_t count = 0;
     for (const auto& poly : value) {
         if (doPolygonsIntersect(poly, target)) {
@@ -179,42 +193,26 @@ void popov::rightshapes(const std::vector<Polygon>& value, std::ostream& out)
 }
 void popov::inframe(const std::vector<Polygon>& value, std::istream& in, std::ostream& out)
 {
-  Polygon argument;
-  in >> argument;
-  if (!in)
-  {
-    throw std::invalid_argument("Wrong argument");
-  }
-  Polygon frameRectangle = getBoundingBox(value);
-  if (argument <= frameRectangle)
-  {
-    out << "<TRUE>";
-  }
-  else
-  {
-    out << "<FALSE>";
-  }
+    Polygon target;
+    in >> target;
+    if (!in || target.points.size() < 3)
+    {
+        throw std::invalid_argument("<INVALID COMMAND>");
+    }
+
+    Polygon frame = getBoundingBox(value);
+    out << (target <= frame ? "<TRUE>" : "<FALSE>");
 }
 void popov::echo(std::vector<Polygon>& value, std::istream& in, std::ostream& out)
 {
-  Polygon polygon;
-  in >> polygon;
-  if (!in)
-  {
-    throw std::logic_error("Wrong argument");
-  }
-  size_t duplicateCount = std::count(value.begin(), value.end(), polygon);
-  std::vector< Polygon > tempValue(value.size() + duplicateCount);
-  size_t polygonCount = 0;
-  for (const auto& shape: value)
-  {
-    tempValue.push_back(shape);
-    if (shape == polygon)
+    Polygon polygon;
+    in >> polygon;
+    if (!in || polygon.points.size() < 3)
     {
-      ++polygonCount;
-      tempValue.push_back(polygon);
+        throw std::invalid_argument("<INVALID COMMAND>");
     }
-  }
-  value = tempValue;
-  out << polygonCount;
+
+    size_t count = std::count(value.begin(), value.end(), polygon);
+    value.insert(value.end(), count, polygon);
+    out << count;
 }
