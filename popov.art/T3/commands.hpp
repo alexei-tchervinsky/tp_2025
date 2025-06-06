@@ -10,7 +10,6 @@ namespace popov
 {
   using CommandFunction = std::function<void(std::istream&, std::ostream&)>;
   using CommandMap = std::map<std::string, CommandFunction>;
-  
   CommandMap createCommandMap(std::vector<Polygon>& polygons);
 }
 #endif
