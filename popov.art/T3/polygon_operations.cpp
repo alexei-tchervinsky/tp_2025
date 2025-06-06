@@ -15,6 +15,24 @@ namespace {
   bool comparatorPoints(const popov::Polygon& lhs, const popov::Polygon& rhs) { return lhs.points.size() < rhs.points.size(); }
   bool comparatorArea(const popov::Polygon& lhs, const popov::Polygon& rhs) { return getPolygonArea(lhs) < getPolygonArea(rhs); }
 }
+void popov::intersections(const std::vector<Polygon>& value, std::istream& in, std::ostream& out)
+{
+    Polygon target;
+    in >> target;
+    
+    if (!in || target.points.size() < 3) {
+        throw std::invalid_argument("<INVALID COMMAND>");
+    }
+
+    size_t count = 0;
+    for (const auto& poly : value) {
+        if (doPolygonsIntersect(poly, target)) {
+            count++;
+        }
+    }
+    
+    out << count;
+}
 void popov::lessArea(const std::vector<Polygon>& value, std::istream& in, std::ostream& out)
 {
     iofmtguard guard(out);
