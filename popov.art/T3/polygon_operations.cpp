@@ -218,14 +218,9 @@ void popov::echo(std::vector<Polygon>& value, std::istream& in, std::ostream& ou
     {
         throw std::invalid_argument("<INVALID COMMAND>");
     }
-    size_t count = 0;
-    for (const auto& p : value) {
-        if (p == polygon) {
-            count++;
-        }
-    }
-    for (size_t i = 0; i < count; ++i) {
-        value.push_back(polygon);
+    size_t count = std::count(value.begin(), value.end(), polygon);
+    if (count > 0) {
+        value.insert(value.end(), count, polygon);
     }
     out << count;
 }
