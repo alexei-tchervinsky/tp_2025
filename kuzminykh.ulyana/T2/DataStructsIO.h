@@ -6,6 +6,7 @@
 #include <cctype>
 #include <algorithm>
 #include <iterator>
+#include <limits>
 
 struct DataStruct
 {
