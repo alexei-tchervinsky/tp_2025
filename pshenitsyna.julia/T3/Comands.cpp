@@ -118,7 +118,7 @@ namespace wheatman
                                               {
                                                   return p1.points.size() < p2.points.size();
                                               });
-            double maxVertex = nVertexes->points.size();
+            size_t maxVertex = nVertexes->points.size();
             std::cout << maxVertex << std::endl;
         }
     }
