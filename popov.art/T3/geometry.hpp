@@ -24,6 +24,7 @@ namespace popov
   int findMinX(const Polygon& polygon);
   int findMinY(const Polygon& polygon);
   Polygon getBoundingBox(const std::vector<Polygon>& polygon);
+  void intersections(const std::vector<Polygon>& value, std::istream& in, std::ostream& out);
   bool doPolygonsIntersect(const Polygon& poly1, const Polygon& poly2);
   struct AreaPolygon {
     Point p1;
