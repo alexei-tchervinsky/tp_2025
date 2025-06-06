@@ -7,6 +7,7 @@
 #include <limits>
 #include "geometry.hpp"
 #include "iofmtguard.hpp"
+#include "polygon_operations.hpp"
 int main(int argc, char* argv[])
 {
     using namespace popov;
