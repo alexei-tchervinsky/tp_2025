@@ -1,9 +1,10 @@
-#ifndef FILE_IO_H
-#define FILE_IO_H
-#include "geometry.h"
+#ifndef FILE_IO_HPP
+#define FILE_IO_HPP
+#include "geometry.hpp"
 #include <vector>
-#include <string>
-bool isValidPolygon(const Polygon& p);
-std::vector<Polygon> readPolygonsFromFile(const std::string& filename);
-Polygon parsePolygon(const std::string& input);
-#endif // FILE_IO_H
+#include <fstream>
+namespace popov
+{
+  std::vector<Polygon> readPolygonsFromFile(const std::string& filename);
+}
+#endif
