@@ -217,18 +217,16 @@ void echo(std::vector<Polygon>& polygons, const Polygon& target, const std::stri
         size_t max_count = 0;
         auto it_match = matches.begin();
 
-        // Проходим по всем возможным подряд идущим элементам, чтобы найти максимальную длину
         while (it_match != matches.end())
         {
-            it_match = std::find(it_match, matches.end(), true);  // Поиск начала последовательности
-            if (it_match == matches.end()) break;  // Если не найдено, завершаем цикл
+            it_match = std::find(it_match, matches.end(), true);
+            if (it_match == matches.end()) break;
 
-            auto end_it = std::find(it_match, matches.end(), false);  // Поиск конца последовательности
-            max_count = std::max(max_count, static_cast<size_t>(std::distance(it_match, end_it)));  // Обновляем максимальную длину последовательности
-            it_match = end_it;  // Продолжаем с конца найденной последовательности
+            auto end_it = std::find(it_match, matches.end(), false);
+            max_count = std::max(max_count, static_cast<size_t>(std::distance(it_match, end_it)));
+            it_match = end_it;
         }
 
-        // Если длина последовательности 0, то выводим ошибку
         if (max_count == 0)
         {
             throw std::invalid_argument("");
