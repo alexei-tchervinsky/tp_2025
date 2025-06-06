@@ -1,6 +1,7 @@
 #ifndef IOFMTGUARD_HPP
 #define IOFMTGUARD_HPP
 #include <ios>
+#include <vector>
 namespace popov
 {
   class iofmtguard
