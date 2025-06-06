@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <functional>
 #include <numeric>
+#include <vector>
 #include <string>
 namespace {
   bool isEven(const popov::Polygon& polygon) { return (polygon.points.size() % 2 == 0); }
