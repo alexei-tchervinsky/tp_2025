@@ -1,8 +1,16 @@
-#ifndef POLYGON_OPERATIONS_H
-#define POLYGON_OPERATIONS_H
-#include "geometry.h"
+#ifndef POLYGON_OPERATIONS_HPP
+#define POLYGON_OPERATIONS_HPP
+#include "geometry.hpp"
 #include <vector>
-double calculateArea(const Polygon& poly);
-bool isPolygonInFrame(const Polygon& poly, const std::vector<Polygon>& polygons);
-bool doPolygonsIntersect(const Polygon& a, const Polygon& b);
-#endif // POLYGON_OPERATIONS_H
+#include <iostream>
+namespace popov
+{
+  void area(const std::vector< Polygon >& value, std::istream& in, std::ostream& out);
+  void max(const std::vector< Polygon >& value, std::istream& in, std::ostream& out);
+  void min(const std::vector< Polygon >& value, std::istream& in, std::ostream& out);
+  void count(const std::vector< Polygon >& value, std::istream& in, std::ostream& out);
+  void rightshapes(const std::vector< Polygon >& value, std::ostream& out);
+  void echo(std::vector< Polygon >& value, std::istream& in, std::ostream& out);
+  void inframe(const std::vector< Polygon >& value, std::istream& in, std::ostream& out);
+}
+#endif
