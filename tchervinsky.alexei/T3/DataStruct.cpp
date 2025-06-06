@@ -118,10 +118,10 @@ namespace nspace
         // Временный вектор для точек
         std::vector<Point> temp_points;
 #ifdef ALEXEIT
-        // temp_points.reserve(numPoints);
-        // auto it_start = std::istream_iterator<Point>(in);
-        // auto it_start = temp_points.begin();
-        // auto it_end = std::copy_n(std::istream_iterator<Point>(in), numPoints, temp_points.begin());
+// temp_points.reserve(numPoints);
+// auto it_start = std::istream_iterator<Point>(in);
+// auto it_start = temp_points.begin();
+// auto it_end = std::copy_n(std::istream_iterator<Point>(in), numPoints, temp_points.begin());
         std::copy_n(std::istream_iterator<Point>(in), numPoints, std::back_inserter(temp_points));
         auto it_start = temp_points.begin();
         auto it_end = temp_points.end();
@@ -140,7 +140,7 @@ namespace nspace
             // LOG("** ошибка std::copy_n **\n")
 #ifdef ALEXEIT
             std::cin.clear();  // Очищаем состояние ошибки
-            // std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // Игнорируем оставшийся ввод
+// std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');// Игнорируем оставшийся ввод
 #endif // ALEXEIT
             return in;
         }
@@ -160,7 +160,7 @@ namespace nspace
 #endif // ALEXEIT
 
 
-        // Если фактическое количество считанных точек не соответствует заявленному, выбрасываем ошибку
+// Если фактическое количество считанных точек не соответствует заявленному, выбрасываем ошибку
         if (temp_points.size() != numPoints)
         {
             in.setstate(std::ios::failbit);
