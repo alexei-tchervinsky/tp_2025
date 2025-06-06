@@ -8,7 +8,6 @@
 #include "geometry.hpp"
 #include "iofmtguard.hpp"
 #include "commands.hpp"
-#include <vector>
 #include "file_io.hpp"
 int main(int argc, char* argv[])
 {
