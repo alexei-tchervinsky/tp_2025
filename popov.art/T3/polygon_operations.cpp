@@ -19,18 +19,15 @@ void popov::intersections(const std::vector<Polygon>& value, std::istream& in, s
 {
     Polygon target;
     in >> target;
-    
     if (!in || target.points.size() < 3) {
         throw std::invalid_argument("<INVALID COMMAND>");
     }
-
     size_t count = 0;
     for (const auto& poly : value) {
         if (doPolygonsIntersect(poly, target)) {
             count++;
         }
     }
-    
     out << count;
 }
 void popov::lessArea(const std::vector<Polygon>& value, std::istream& in, std::ostream& out)
