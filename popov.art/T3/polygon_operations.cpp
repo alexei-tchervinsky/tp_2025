@@ -1,58 +1,182 @@
-#include "polygon_operations.h"
-#include <cmath>
+#include "polygon_operations.hpp"
+#include "geometry.hpp"
+#include "iofmtguard.hpp"
 #include <algorithm>
-#include <limits>
-using namespace std;
-double calculateArea(const Polygon& poly) {
-    if (poly.points.size() < 3) return 0.0;
-    double area = 0.0;
-    size_t n = poly.points.size();
-    for (size_t i = 0; i < n; ++i) {
-        size_t j = (i + 1) % n;
-        area += (poly.points[i].x * poly.points[j].y) - (poly.points[j].x * poly.points[i].y);
-    }
-    return abs(area) / 2.0;
+#include <functional>
+#include <numeric>
+#include <string>
+namespace {
+  bool isEven(const popov::Polygon& polygon) { return (polygon.points.size() % 2 == 0); }
+  bool isOdd(const popov::Polygon& polygon) { return !(polygon.points.size() % 2 == 0); }
+  bool isSize(const popov::Polygon& polygon, size_t numPoints) { return (polygon.points.size() == numPoints); }
+  bool comparatorPoints(const popov::Polygon& lhs, const popov::Polygon& rhs) { return lhs.points.size() < rhs.points.size(); }
+  bool comparatorArea(const popov::Polygon& lhs, const popov::Polygon& rhs) { return getPolygonArea(lhs) < getPolygonArea(rhs); }
 }
-bool isPolygonInFrame(const Polygon& poly, const vector<Polygon>& polygons) {
-    if (polygons.empty() || poly.points.empty()) return false;
-    int min_x = numeric_limits<int>::max();
-    int max_x = numeric_limits<int>::min();
-    int min_y = numeric_limits<int>::max();
-    int max_y = numeric_limits<int>::min();
-    for (const auto& p : polygons) {
-        if (p.points.size() < 3) continue;
-        for (const auto& point : p.points) {
-            min_x = min(min_x, point.x);
-            max_x = max(max_x, point.x);
-            min_y = min(min_y, point.y);
-            max_y = max(max_y, point.y);
-        }
+void popov::area(const std::vector<Polygon>& value, std::istream& in, std::ostream& out)
+{
+  iofmtguard guard(out);
+  out << std::setprecision(1) << std::fixed;
+  std::string argument = "";
+  in >> argument;
+  std::vector< Polygon > polygons;
+  using namespace std::placeholders;
+  if (argument == "EVEN")
+  {
+    std::copy_if(value.cbegin(), value.cend(), std::back_inserter(polygons), isEven);
+  }
+  else if (argument == "ODD")
+  {
+    std::copy_if(value.cbegin(), value.cend(), std::back_inserter(polygons), isOdd);
+  }
+  else if (argument == "MEAN")
+  {
+    if (value.empty())
+    {
+      throw std::logic_error("No polygons");
     }
-    for (const auto& point : poly.points) {
-        if (point.x < min_x || point.x > max_x || point.y < min_y || point.y > max_y) {
-            return false;
-        }
+    std::copy_if(value.cbegin(), value.cend(), std::back_inserter(polygons), isOdd);
+  }
+  else
+  {
+    size_t countPoints = std::stoull(argument);
+    if (countPoints < 3)
+    {
+      throw std::logic_error("Wrong number");
     }
-    return true;
+    std::function< bool(const Polygon&) > isCorrectCount = std::bind(isSize, _1, countPoints);
+    std::copy_if(value.cbegin(), value.cend(), std::back_inserter(polygons), isCorrectCount);
+  }
+  std::vector< double > area;
+  std::transform(polygons.cbegin(), polygons.cend(), std::back_inserter(area), getPolygonArea);
+  double res = std::accumulate(area.cbegin(), area.cend(), 0.0);
+  if (argument == "MEAN")
+  {
+    out << res / value.size();
+  }
+  else
+  {
+    out << res;
+  }
 }
-bool doPolygonsIntersect(const Polygon& a, const Polygon& b) {
-    if (a.points.size() < 3 || b.points.size() < 3) return false;
-    auto a_min_x = min_element(a.points.begin(), a.points.end(),
-        [](const Point& p1, const Point& p2) { return p1.x < p2.x; });
-    auto a_max_x = max_element(a.points.begin(), a.points.end(),
-        [](const Point& p1, const Point& p2) { return p1.x < p2.x; });
-    auto a_min_y = min_element(a.points.begin(), a.points.end(),
-        [](const Point& p1, const Point& p2) { return p1.y < p2.y; });
-    auto a_max_y = max_element(a.points.begin(), a.points.end(),
-        [](const Point& p1, const Point& p2) { return p1.y < p2.y; });
-    auto b_min_x = min_element(b.points.begin(), b.points.end(),
-        [](const Point& p1, const Point& p2) { return p1.x < p2.x; });
-    auto b_max_x = max_element(b.points.begin(), b.points.end(),
-        [](const Point& p1, const Point& p2) { return p1.x < p2.x; });
-    auto b_min_y = min_element(b.points.begin(), b.points.end(),
-        [](const Point& p1, const Point& p2) { return p1.y < p2.y; });
-    auto b_max_y = max_element(b.points.begin(), b.points.end(),
-        [](const Point& p1, const Point& p2) { return p1.y < p2.y; });
-    return !(a_max_x->x < b_min_x->x || a_min_x->x > b_max_x->x ||
-             a_max_y->y < b_min_y->y || a_min_y->y > b_max_y->y);
+void popov::max(const std::vector<Polygon>& value, std::istream& in, std::ostream& out)
+{
+  std::string argument = "";
+  in >> argument;
+  if (value.empty())
+  {
+    throw std::logic_error("No polygons");
+  }
+  else
+  {
+    if (argument == "AREA")
+    {
+      iofmtguard guard(out);
+      out << std::setprecision(1) << std::fixed;
+      out << getPolygonArea(*std::max_element(value.begin(), value.end(), comparatorArea));
+    }
+    else if (argument == "VERTEXES")
+    {
+      out << std::max_element(value.begin(), value.end(), comparatorPoints)->points.size();
+    }
+    else
+    {
+      throw std::logic_error("Wrong argument");
+    }
+  }
+}
+void popov::min(const std::vector<Polygon>& value, std::istream& in, std::ostream& out)
+{
+  std::string argument = "";
+  in >> argument;
+  if (value.empty())
+  {
+    throw std::logic_error("Wrong number");
+  }
+  else
+  {
+    if (argument == "AREA")
+    {
+      iofmtguard guard(out);
+      out << std::setprecision(1) << std::fixed;
+      out << getPolygonArea(*std::min_element(value.begin(), value.end(), comparatorArea));
+    }
+    else if (argument == "VERTEXES")
+    {
+      out << std::min_element(value.begin(), value.end(), comparatorPoints)->points.size();
+    }
+    else
+    {
+      throw std::logic_error("Wrong argument");
+    }
+  }
+}
+void popov::count(const std::vector<Polygon>& value, std::istream& in, std::ostream& out)
+{
+  std::string argument = "";
+  in >> argument;
+  if (argument == "EVEN")
+  {
+    out << std::count_if(value.begin(), value.end(), isEven);
+  }
+  else if (argument == "ODD")
+  {
+    out << std::count_if(value.begin(), value.end(), isOdd);
+  }
+  else
+  {
+    size_t countPoints = std::stoull(argument);
+    if (countPoints < 3)
+    {
+      throw std::logic_error("Wrong number");
+    }
+    using namespace std::placeholders;
+    std::function< bool(const Polygon&) > isCorrectCount = std::bind(isSize, _1, countPoints);
+    out << std::count_if(value.begin(), value.end(), isCorrectCount);
+  }
+}
+void popov::rightshapes(const std::vector<Polygon>& value, std::ostream& out)
+{
+  using namespace std::placeholders;
+  out << std::count_if(value.cbegin(), value.cend(), isRightAngle);
+}
+void popov::inframe(const std::vector<Polygon>& value, std::istream& in, std::ostream& out)
+{
+  Polygon argument;
+  in >> argument;
+  if (!in)
+  {
+    throw std::invalid_argument("Wrong argument");
+  }
+  Polygon frameRectangle = getBoundingBox(value);
+  if (argument <= frameRectangle)
+  {
+    out << "<TRUE>";
+  }
+  else
+  {
+    out << "<FALSE>";
+  }
+}
+void popov::echo(std::vector<Polygon>& value, std::istream& in, std::ostream& out)
+{
+  Polygon polygon;
+  in >> polygon;
+  if (!in)
+  {
+    throw std::logic_error("Wrong argument");
+  }
+  size_t duplicateCount = std::count(value.begin(), value.end(), polygon);
+  std::vector< Polygon > tempValue(value.size() + duplicateCount);
+  size_t polygonCount = 0;
+  for (const auto& shape: value)
+  {
+    tempValue.push_back(shape);
+    if (shape == polygon)
+    {
+      ++polygonCount;
+      tempValue.push_back(polygon);
+    }
+  }
+  value = tempValue;
+  out << polygonCount;
 }
