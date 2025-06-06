@@ -34,7 +34,7 @@ namespace wheatman {
     std::vector<Polygon> readFile(const std::string &filename) {
         std::ifstream file(filename);
         if (!file.is_open()) {
-            std::cerr << "Open file error!\n";
+            throw std::runtime_error("Error! Can't open file!");
             exit(1);
         }
 
@@ -51,7 +51,10 @@ namespace wheatman {
                 Polygon polygon = wheatman::splitPolygon(line);
                 polygons.push_back(polygon);
             }
-            catch (const std::runtime_error& e){}
+            catch (const std::runtime_error& e)
+            {
+                continue;
+            }
         }
         file.close();
         return polygons;
