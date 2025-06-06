@@ -1,13 +1,15 @@
-#ifndef COMMANDS_HPP
-#define COMMANDS_HPP
-#include <map>
-#include <functional>
-#include <istream>
-#include <string>
+#ifndef GEOMETRY_HPP
+#define GEOMETRY_HPP
+#include <iostream>
 #include <vector>
-#include "geometry.hpp"
+#include <functional>
 namespace popov
 {
+  struct Polygon;
+  struct DelimiterChar
+  {
+    char expected;
+  };
   using CommandFunction = std::function<void(std::istream&, std::ostream&)>;
   using CommandMap = std::map<std::string, CommandFunction>;
   CommandMap createCommandMap(std::vector<Polygon>& polygons);
