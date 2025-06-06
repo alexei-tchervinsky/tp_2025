@@ -20,7 +20,6 @@ int main(int argc, char* argv[])
   try {
     std::vector<Polygon> polygons = readPolygonsFromFile(argv[1]);
     CommandMap commands = createCommandMap(polygons);
-    
     std::string cmd = "";
     while (std::cin >> cmd)
     {
