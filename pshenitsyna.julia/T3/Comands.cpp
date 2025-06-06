@@ -200,20 +200,14 @@ namespace wheatman
             );
         };
         size_t countFigure = 0;
-        auto it = polygon.begin();
 
-        while (it != polygon.end())
+        for (size_t i = 0; i < polygon.size(); ++i)
         {
-            it = std::find_if(it, polygon.end(),
-                               [&figure, &isEqual](const Polygon& p)
-                               {
-                                   return isEqual(p, figure);
-                               });
-            if (it != polygon.end())
+            if (isEqual(polygon[i], figure))
             {
-                it = polygon.insert(it + 1, *it);
-                countFigure++;
-                it += 2; // чтобы пропустить копию
+                polygon.insert(polygon.begin() + i + 1, polygon[i]);
+                ++countFigure;
+                ++i;
             }
         }
         std::cout << countFigure << "\n";
