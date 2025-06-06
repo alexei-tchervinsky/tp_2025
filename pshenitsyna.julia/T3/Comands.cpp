@@ -116,7 +116,7 @@ namespace wheatman
             auto nVertexes = std::max_element(polygon.begin(), polygon.end(),
                                               [](Polygon& p1, Polygon& p2)
                                               {
-                                                  return p1.points.size() > p2.points.size();
+                                                  return p1.points.size() < p2.points.size();
                                               });
             double maxVertex = nVertexes->points.size();
             std::cout << maxVertex << std::endl;
