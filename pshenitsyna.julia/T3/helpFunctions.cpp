@@ -13,14 +13,15 @@ namespace wheatman {
         {
             throw std::runtime_error("Incorrect input!");
         }
-        polygon.points.resize(number);
+//        polygon.points.resize(number);
         for (size_t i = 0; i < number; ++i)
         {
-            if(!(in>>polygon.points[i]))
+            Point point;
+            if(!(in>>point))
             {
                 throw std::runtime_error("Error. Wrong coordinates!");
             }
-            in >> polygon.points[i];
+            polygon.points.push_back(point);
         }
 
         std::string remaining;
