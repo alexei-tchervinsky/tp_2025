@@ -2,6 +2,7 @@
 
 #include <cctype>
 #include <sstream>
+#include <iomanip>
 
 namespace prokopenko {
 
@@ -18,9 +19,7 @@ namespace prokopenko {
     std::string result;
     char ch;
     while (in.get(ch)) {
-      if (ch == ' ') {
-        break;
-      }
+      if (ch == ' ') break;
       result += ch;
     }
     if (in) {
@@ -44,7 +43,7 @@ namespace prokopenko {
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, ULLIO&& u) {
+  std::istream& operator>>(std::istream& in, UllIO&& u) {
     unsigned long long value;
     in >> value;
     if (in) {
@@ -70,4 +69,4 @@ namespace prokopenko {
     return in;
   }
 
-}
+} // namespace prokopenko

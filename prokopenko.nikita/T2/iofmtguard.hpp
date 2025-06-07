@@ -7,7 +7,7 @@ namespace prokopenko {
 
   class iofmtguard {
   public:
-    iofmtguard(std::basic_ios<char>& stream);
+    explicit iofmtguard(std::basic_ios<char>& stream);
     ~iofmtguard();
   private:
     std::basic_ios<char>& stream_;
@@ -16,6 +16,6 @@ namespace prokopenko {
     std::basic_ios<char>::fmtflags flags_;
   };
 
-}
+} // namespace prokopenko
 
 #endif
