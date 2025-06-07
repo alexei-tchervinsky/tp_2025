@@ -36,5 +36,27 @@ int main()
         return 1;
     }
 
+    try 
+    {
+        while (std::cin) 
+        {
+            DataStruct tmp;
+            if (std::cin >> tmp) 
+            {
+                data.push_back(tmp);
+            }
+            else 
+            {
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            }
+        }
+    }
+    catch (const std::exception& e) 
+    {
+        std::cerr << "Error: " << e.what() << '\n';
+        return 1;
+    }
+
     return 0;
 }

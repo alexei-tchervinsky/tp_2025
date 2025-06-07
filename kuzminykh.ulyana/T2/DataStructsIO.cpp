@@ -90,7 +90,7 @@ std::istream& operator>>(std::istream& in, StringIO&& d)
     return std::getline(in >> DelimiterIO{ '"' }, d.ref, '"');
 }
 
-std::istream& operator>>(std::istream& in, DataStruct& d)
+std::istream& operator>>(std::istream& in, DataStruct& d) 
 {
     std::istream::sentry sentry(in);
     if (!sentry) return in;
@@ -102,43 +102,62 @@ std::istream& operator>>(std::istream& in, DataStruct& d)
     while (in && in.peek() != ')')
     {
         std::string key;
-        if (!(in >> key)) break;
-
-        if (key == "key1" && !hasKey1)
-        {
-            in >> LongLongIO{ tmp.key1 } >> DelimiterIO{ ':' };
-            hasKey1 = true;
-        }
-        else if (key == "key2" && !hasKey2)
-        {
-            in >> ULongLongOctIO{ tmp.key2 } >> DelimiterIO{ ':' };
-            hasKey2 = true;
-        }
-        else if (key == "key3" && !hasKey3)
-        {
-            in >> StringIO{ tmp.key3 } >> DelimiterIO{ ':' };
-            hasKey3 = true;
-        }
-        else
+        if (!(in >> key))
         {
             in.setstate(std::ios::failbit);
             break;
         }
+
+        if (key == "key1" && !hasKey1)
+        {
+            if (!(in >> LongLongIO{ tmp.key1 } >> DelimiterIO{ ':' }))
+            {
+                break;
+            }
+            hasKey1 = true;
+        }
+        else if (key == "key2" && !hasKey2)
+        {
+            if (!(in >> ULongLongOctIO{ tmp.key2 } >> DelimiterIO{ ':' }))
+            {
+                break;
+            }
+            hasKey2 = true;
+        }
+        else if (key == "key3" && !hasKey3)
+        {
+            if (!(in >> StringIO{ tmp.key3 } >> DelimiterIO{ ':' }))
+            {
+                break;
+            }
+            hasKey3 = true;
+        }
+        else 
+        {
+            std::string dummy;
+            while (in && in.peek() != ':' && in.peek() != ')') 
+            {
+                in >> dummy;
+            }
+            if (in.peek() == ':') in.get();
+        }
     }
 
-    if (hasKey1 && hasKey2 && hasKey3)
+    if (hasKey1 && hasKey2 && hasKey3) 
     {
         in >> DelimiterIO{ ')' };
         d = tmp;
     }
-    else {
+    else 
+    {
         in.setstate(std::ios::failbit);
     }
 
     return in;
 }
 
-std::ostream& operator<<(std::ostream& out, const DataStruct& d) {
+std::ostream& operator<<(std::ostream& out, const DataStruct& d) 
+{
     std::ostream::sentry sentry(out);
     if (!sentry) return out;
 
