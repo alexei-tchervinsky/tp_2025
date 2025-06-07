@@ -16,9 +16,16 @@ int main() {
       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
   }
+
+  if (data.empty()) {
+    std::cout << "Looks like there is no supported record. Cannot determine input. Test skipped\n";
+    return 2;
+  }
+
   std::sort(data.begin(), data.end());
   for (const auto& el : data) {
     std::cout << el << "\n";
   }
+
   return 0;
 }
