@@ -143,7 +143,7 @@ int main() {
     });
 
     std::cout << "\nОтсортированные элементы:\n";
-    std::copy(items.begin(), items.end(), std::ostream_iterator<DataStruct>(std::cout, "\n0"));
+    std::copy(items.begin(), items.end(), std::ostream_iterator<DataStruct>(std::cout, "\n"));
     std::cout << std::endl;
 
     return 0;
