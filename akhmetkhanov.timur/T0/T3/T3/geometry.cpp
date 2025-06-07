@@ -228,7 +228,7 @@ geom_lab::Polygon geom_lab::getBoundingBox(const std::vector<Polygon>& polygon)
 {
     int pointMaxX = findMaxX(*std::max_element(polygon.cbegin(),
                                     polygon.cend(), comparePolygonsByMaxX));
-    int pointMaxY = findMaxY(*std::max_element(polygon.cbegin()
+    int pointMaxY = findMaxY(*std::max_element(polygon.cbegin(),
                                     polygon.cend(), comparePolygonsByMaxY));
     int pointMinX = findMinX(*std::min_element(polygon.cbegin(),
                                     polygon.cend(), comparePolygonsByMinX));
@@ -497,4 +497,4 @@ void geom_lab::maxseq(const std::vector<Polygon>& value,
     }
 
     out << maxSequence;
-}:
+}

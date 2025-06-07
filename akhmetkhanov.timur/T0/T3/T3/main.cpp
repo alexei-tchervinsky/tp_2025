@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
         geom_lab::count(const_polygons, in, out);
     };
 
-    commands["RIGHTSHAPES"] = [](std::vector<geom_lab::Polygon>& polygons, std::istream& in, std::ostream& out) {
+    commands["RIGHTSHAPES"] = [](std::vector<geom_lab::Polygon>& polygons, std::istream&, std::ostream& out) {
         const std::vector<geom_lab::Polygon>& const_polygons = polygons;
         geom_lab::rightshapes(const_polygons, out);
     };
