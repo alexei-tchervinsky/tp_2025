@@ -2,39 +2,31 @@
 #include <algorithm>
 #include <iterator>
 #include <numeric>
-#include <utility>
 namespace popov {
 bool doPolygonsIntersect(const Polygon& poly1, const Polygon& poly2) {
-    auto getProjections = [](const Polygon& poly, double nx, double ny) -> std::pair<double, double> {
-        if (poly.points.empty()) return {0.0, 0.0};
+    auto getProjections = [](const Polygon& poly, double nx, double ny) {
         double minProj = std::numeric_limits<double>::max();
-        double maxProj = std::numeric_limits<double>::lowest();
-        auto getProjections = [](const Polygon& poly, double nx, double ny) -> std::pair<double, double> {
-    if (poly.points.empty()) return {0.0, 0.0};
-    auto projections = poly.points | std::views::transform([nx, ny](const Point& point) {
-        return point.x * nx + point.y * ny;
-    });
-    auto [minIt, maxIt] = std::minmax_element(projections.begin(), projections.end());
-    return {*minIt, *maxIt};
+        double maxProj = -std::numeric_limits<double>::max();
+        for (const auto& p : poly.points) {
+            double proj = p.x * nx + p.y * ny;
+            minProj = std::min(minProj, proj);
+            maxProj = std::max(maxProj, proj);
+        }
+        return std::make_pair(minProj, maxProj);
+    };
+    auto check_edges = [&](const Polygon& poly, const Polygon& other_poly) {
+    return std::all_of(poly.points.begin(), poly.points.end(),
+        [&](const Point& p1) {
+            size_t next = (&p1 - &poly.points[0] + 1) % poly.points.size();
+            const Point& p2 = poly.points[next];
+            double nx = -(p2.y - p1.y);
+            double ny = p2.x - p1.x;
+            auto proj1 = getProjections(poly, nx, ny);
+            auto proj2 = getProjections(other_poly, nx, ny);
+            return !(proj1.second < proj2.first || proj2.second < proj1.first);
+        });
 };
-        return {minProj, maxProj};
-    };
-    auto checkProjections = [&getProjections](const Polygon& poly1, const Polygon& poly2) {
-        auto processPolygon = [&getProjections](const Polygon& sourcePoly, const Polygon& otherPoly) {
-            return std::all_of(sourcePoly.points.begin(), sourcePoly.points.end(),
-                [&sourcePoly, &otherPoly, &getProjections](const Point& p1) {
-                    const Point& p2 = sourcePoly.points[(&p1 - &sourcePoly.points[0] + 1) % sourcePoly.points.size()];
-                    double nx = -(p2.y - p1.y);
-                    double ny = p2.x - p1.x;
-                    auto proj1 = getProjections(sourcePoly, nx, ny);
-                    auto proj2 = getProjections(otherPoly, nx, ny);
-                    return !(proj1.second < proj2.first || proj2.second < proj1.first);
-                });
-        };
-        return processPolygon(poly1, poly2) && processPolygon(poly2, poly1);
-    };
-    return checkProjections(poly1, poly2);
-}
+return check_edges(poly1, poly2) && check_edges(poly2, poly1);
 std::istream& operator>>(std::istream& in, DelimiterChar&& exp) {
     std::istream::sentry guard(in);
     if (!guard) return in;
