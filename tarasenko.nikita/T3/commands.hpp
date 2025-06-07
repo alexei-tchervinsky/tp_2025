@@ -27,6 +27,8 @@ namespace tarasenko {
     void sameCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out);
     void intersectionsCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out);
     void rmechoCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out);
+    bool segmentsIntersect(const Point& p1, const Point& p2, const Point& q1, const Point& q2);
+    bool isPointInsidePolygon(const Point& point, const Polygon& poly);
 }
 
 #endif
