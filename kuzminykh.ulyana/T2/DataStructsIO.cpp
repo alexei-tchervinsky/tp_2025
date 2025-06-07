@@ -38,45 +38,56 @@ std::istream& operator>>(std::istream& in, LongLongIO&& d)
 
     in >> d.ref;
 
+    char c;
+    char k;
+
     if (in.peek() == 'l' || in.peek() == 'L')
     {
-        std::string suffix;
-        in >> suffix;
-        if (suffix != "ll" && suffix != "LL")
+
+        in >> c;
+        in >> k;
+
+        std::string lab = std::string(1,  c) + std::string(1, k);
+        if (lab != "ll" &&  lab != "LL")
         {
+            std::cout << lab;
             in.setstate(std::ios::failbit);
         }
     }
+
     return in;
 }
 
 std::istream& operator>>(std::istream& in, ULongLongOctIO&& d)
 {
     std::istream::sentry sentry(in);
-    if (!sentry)
-    {
-        return in;
-    }
+    if (!sentry) return in;
 
     if (in.peek() == '0')
     {
         in >> std::oct >> d.ref;
-        in >> std::dec;
     }
     else
     {
         in >> d.ref;
     }
 
+
     if (in.peek() == 'u' || in.peek() == 'U')
     {
-        std::string suffix;
-        in >> suffix;
-        if (suffix != "ull" && suffix != "ULL")
+        char c;
+        char k;
+        char k2;
+        in >> c;
+        in >> k;
+        in >> k2;
+        std::string lab = std::string(1, c) + std::string(1, k) + std::string(1, k2);
+        if (lab != "ull" && lab != "ULL")
         {
             in.setstate(std::ios::failbit);
         }
     }
+
     return in;
 }
 
@@ -93,65 +104,83 @@ std::istream& operator>>(std::istream& in, StringIO&& d)
 std::istream& operator>>(std::istream& in, DataStruct& d)
 {
     std::istream::sentry sentry(in);
-    if (!sentry) return in;
+    if (!sentry) {
+
+        return in;
+    }
 
     DataStruct tmp;
-    in >> DelimiterIO{ '(' };
+
+    if (!(in >> DelimiterIO{ '(' })) {
+        std::cerr << "Error: Missing opening '('\n";
+        return in;
+    }
 
     bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
     while (in && in.peek() != ')')
     {
-        in >> DelimiterIO{ ':' };
+
+        if (!(in >> DelimiterIO{ ':' })) {
+
+            break;
+        }
 
         std::string key;
-        if (!(in >> key))
-        {
+        if (!(in >> key)) {
+
             in.setstate(std::ios::failbit);
             break;
         }
 
+
         if (key == "key1" && !hasKey1)
         {
-            if (!(in >> LongLongIO{ tmp.key1 } >> DelimiterIO{ ':' }))
-            {
+            if (!(in >> LongLongIO{ tmp.key1 })) {
+
                 break;
             }
             hasKey1 = true;
+
         }
         else if (key == "key2" && !hasKey2)
         {
-            if (!(in >> ULongLongOctIO{ tmp.key2 } >> DelimiterIO{ ':' }))
-            {
+            if (!(in >> ULongLongOctIO{ tmp.key2 })) {
+
                 break;
             }
             hasKey2 = true;
+
         }
         else if (key == "key3" && !hasKey3)
         {
-            if (!(in >> StringIO{ tmp.key3 } >> DelimiterIO{ ':' }))
-            {
+            if (!(in >> StringIO{ tmp.key3 })) {
+
                 break;
             }
             hasKey3 = true;
+
+
+        }
+        else if (key==")")
+        {
+            break;
         }
         else
         {
+
             std::string dummy;
-            while (in && in.peek() != ':' && in.peek() != ')')
-            {
+            while (in && in.peek() != ':' && in.peek() != ')') {
                 in >> dummy;
             }
         }
     }
 
-    if (hasKey1 && hasKey2 && hasKey3)
-    {
-        in >> DelimiterIO{ ')' };
-        d = tmp;
-    }
-    else
-    {
+    if (!(hasKey1 && hasKey2 && hasKey3)) {
+
         in.setstate(std::ios::failbit);
+    }
+    else {
+        d = tmp;
     }
 
     return in;
