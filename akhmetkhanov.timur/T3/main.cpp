@@ -25,13 +25,11 @@ int main(int argc, char* argv[])
     std::vector<geom_lab::Polygon> polygons;
     geom_lab::Polygon polygon;
 
-    // Читаем все корректные полигоны из файла, игнорируя некорректные
     while (file >> polygon)
     {
         polygons.push_back(polygon);
     }
 
-    // Очищаем состояние потока и закрываем файл
     file.clear();
     file.close();
 
@@ -67,18 +65,18 @@ int main(int argc, char* argv[])
         geom_lab::inframe(const_polygons, in, out);
     };
 
-    commands["LESSAREA"] = [](std::vector<geom_lab::Polygon>& polygons, std::istream& in, std::ostream& out) {
+    commands["ECHO"] = [](std::vector<geom_lab::Polygon>& polygons, std::istream& in, std::ostream& out) {
+        geom_lab::echo(polygons, in, out);
+    };
+
+    commands["PERMS"] = [](std::vector<geom_lab::Polygon>& polygons, std::istream& in, std::ostream& out) {
         const std::vector<geom_lab::Polygon>& const_polygons = polygons;
-        geom_lab::lessarea(const_polygons, in, out);
+        geom_lab::perms(const_polygons, in, out);
     };
 
     commands["MAXSEQ"] = [](std::vector<geom_lab::Polygon>& polygons, std::istream& in, std::ostream& out) {
         const std::vector<geom_lab::Polygon>& const_polygons = polygons;
         geom_lab::maxseq(const_polygons, in, out);
-    };
-
-    commands["ECHO"] = [](std::vector<geom_lab::Polygon>& polygons, std::istream& in, std::ostream& out) {
-        geom_lab::echo(polygons, in, out);
     };
 
     std::string line;
@@ -102,6 +100,14 @@ int main(int argc, char* argv[])
             {
                 std::cout << "<INVALID COMMAND>" << std::endl;
             }
+        }
+        catch (const std::invalid_argument&)
+        {
+            std::cout << "<INVALID COMMAND>" << std::endl;
+        }
+        catch (const std::logic_error&)
+        {
+            std::cout << "<INVALID COMMAND>" << std::endl;
         }
         catch (const std::exception&)
         {

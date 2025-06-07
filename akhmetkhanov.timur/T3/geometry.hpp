@@ -62,7 +62,7 @@ namespace geom_lab
   void echo(std::vector< Polygon >& value, std::istream& in, std::ostream& out);
   void inframe(const std::vector< Polygon >& value, std::istream& in, std::ostream& out);
 
-  void lessarea(const std::vector< Polygon >& value, std::istream& in, std::ostream& out);
+  void perms(const std::vector< Polygon >& value, std::istream& in, std::ostream& out);
   void maxseq(const std::vector< Polygon >& value, std::istream& in, std::ostream& out);
 }
 

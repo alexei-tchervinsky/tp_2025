@@ -106,7 +106,6 @@ std::istream& geom_lab::operator>>(std::istream& in, Polygon& polygon)
     std::vector< Point > temp;
     temp.reserve(countPoints);
 
-    // Читаем точки по одной, проверяя каждую
     for (size_t i = 0; i < countPoints; ++i)
     {
         Point p;
@@ -266,6 +265,16 @@ bool comparatorPoints(const geom_lab::Polygon& lhs,
 bool comparatorArea(const geom_lab::Polygon& lhs,
                     const geom_lab::Polygon& rhs)
 { return geom_lab::getPolygonArea(lhs) < geom_lab::getPolygonArea(rhs); }
+
+bool isPermutation(const geom_lab::Polygon& lhs, const geom_lab::Polygon& rhs)
+{
+    if (lhs.points.size() != rhs.points.size())
+    {
+        return false;
+    }
+    return std::is_permutation(lhs.points.begin(), lhs.points.end(),
+                               rhs.points.begin());
+}
 }
 
 void geom_lab::area(const std::vector<Polygon>& value,
@@ -438,43 +447,45 @@ void geom_lab::echo(std::vector<Polygon>& value, std::istream& in,
     in >> polygon;
     if (!in)
     {
-        throw std::logic_error("Wrong argument");
+        throw std::invalid_argument("Wrong argument");
     }
+
     size_t polygonCount = 0;
-    std::vector< Polygon > tempValue;
+    std::vector<Polygon> tempValue;
     tempValue.reserve(value.size() * 2);
 
     for (const auto& shape : value)
     {
-        tempValue.push_back(shape);
         if (shape == polygon)
         {
             ++polygonCount;
-            tempValue.push_back(polygon);
+            tempValue.push_back(shape);
+            tempValue.push_back(shape);
+        }
+        else
+        {
+            tempValue.push_back(shape);
         }
     }
     value = std::move(tempValue);
     out << polygonCount;
 }
 
-// Variant 2 commands implementation
 
-void geom_lab::lessarea(const std::vector<Polygon>& value,
-                        std::istream& in, std::ostream& out)
+void geom_lab::perms(const std::vector<Polygon>& value,
+                     std::istream& in, std::ostream& out)
 {
     Polygon polygon;
     in >> polygon;
     if (!in)
     {
-        throw std::logic_error("Wrong argument");
+        throw std::invalid_argument("Wrong argument");
     }
 
-    double targetArea = getPolygonArea(polygon);
-    auto hasLessArea = [targetArea](const Polygon& p) {
-        return getPolygonArea(p) < targetArea;
-    };
+    using namespace std::placeholders;
+    auto isPermutationOfTarget = std::bind(isPermutation, _1, polygon);
 
-    out << std::count_if(value.cbegin(), value.cend(), hasLessArea);
+    out << std::count_if(value.cbegin(), value.cend(), isPermutationOfTarget);
 }
 
 void geom_lab::maxseq(const std::vector<Polygon>& value,
@@ -484,7 +495,7 @@ void geom_lab::maxseq(const std::vector<Polygon>& value,
     in >> polygon;
     if (!in)
     {
-        throw std::logic_error("Wrong argument");
+        throw std::invalid_argument("Wrong argument");
     }
 
     if (value.empty())
