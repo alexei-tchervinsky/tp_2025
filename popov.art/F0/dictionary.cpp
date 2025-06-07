@@ -49,9 +49,7 @@ size_t DictionaryHashTable::size() const {
     return tableSize;
 }
 size_t DictionaryHashTable::hash(const std::string& key) const {
-    size_t hash = 5381;
-    for (char c : key) {
-        hash = ((hash << 5) + hash) + c;
-    }
+    std::hash<std::string> hasher;
+    size_t hash = hasher(key);
     return hash;
 }
