@@ -13,12 +13,6 @@ void Rects(const std::vector<Polygon>& polygons)
     std::cout << count << "\n";
 }
 
-#include "geometry.hpp"
-#include <iomanip>
-#include <cmath>
-#include <string>
-#include <vector>
-
 double computeArea(const Polygon& poly) {
     double area = 0.0;
     const auto& points = poly.points;
@@ -36,25 +30,24 @@ void areaCommand(const std::vector<Polygon>& polygons, const std::string& arg)
 {
     if (arg == "EVEN")
     {
-        double sum = 0.0;
-        for (const auto& poly : polygons)
-        {
-            if (poly.points.size() % 2 == 0)
-            {
-                sum += computeArea(poly);
-            }
-        }
+        double sum = std::accumulate(polygons.begin(), polygons.end(), 0.0,
+            [](double current_sum, const Polygon& poly) {
+                if (poly.points.size() % 2 == 0) {
+                    return current_sum + computeArea(poly);
+                }
+                return current_sum;
+            });
         std::cout << std::fixed << std::setprecision(1) << sum << "\n";
     }
     else if (arg == "ODD")
     {
-        double sum = 0.0;
-        for (const auto& poly : polygons) {
-            if (poly.points.size() % 2 == 1)
-            {
-                sum += computeArea(poly);
-            }
-        }
+        double sum = std::accumulate(polygons.begin(), polygons.end(), 0.0,
+            [](double current_sum, const Polygon& poly) {
+                if (poly.points.size() % 2 == 1) {
+                    return current_sum + computeArea(poly);
+                }
+                return current_sum;
+            });
         std::cout << std::fixed << std::setprecision(1) << sum << "\n";
     }
     else if (arg == "MEAN")
@@ -64,11 +57,13 @@ void areaCommand(const std::vector<Polygon>& polygons, const std::string& arg)
             std::cout << "<INVALID COMMAND>\n";
             return;
         }
-        double total = 0.0;
-        for (const auto& poly : polygons)
-        {
-            total += computeArea(poly);
-        }
+        double total = std::accumulate(polygons.begin(), polygons.end(), 0.0,
+            [](double current_sum, const Polygon& poly) {
+                if (poly.points.size() % 2 == 1) {
+                    return current_sum + computeArea(poly);
+                }
+                return current_sum;
+            });
         std::cout << std::fixed << std::setprecision(1) << total / polygons.size() << "\n";
     }
     else {
@@ -80,14 +75,13 @@ void areaCommand(const std::vector<Polygon>& polygons, const std::string& arg)
                 std::cout << "<INVALID COMMAND>\n";
                 return;
             }
-            double sum = 0.0;
-            for (const auto& poly : polygons)
-            {
-                if (poly.points.size() == num)
-                {
-                    sum += computeArea(poly);
-                }
-            }
+            double sum = std::accumulate(polygons.begin(), polygons.end(), 0.0,
+                [num](double current_sum, const Polygon& poly) {
+                    if (poly.points.size() == num){
+                        return current_sum + computeArea(poly);
+                    }
+                    return current_sum;
+            });
             std::cout << std::fixed << std::setprecision(1) << sum << "\n";
         } catch (...) {
             std::cout << "<INVALID COMMAND>\n";
@@ -104,21 +98,19 @@ void maxCommand(const std::vector<Polygon>& polygons, const std::string& arg)
     }
     if (arg == "AREA")
     {
-        double maxArea = computeArea(polygons[0]);
-        for (const auto& poly : polygons) {
-            double area = computeArea(poly);
-            if (area > maxArea) maxArea = area;
-        }
-        std::cout << std::fixed << std::setprecision(1) << maxArea << "\n";
+        auto max_it = std::max_element(polygons.begin(), polygons.end(),
+            [](const Polygon& a, const Polygon& b) {
+                return computeArea(a) < computeArea(b);
+            });
+        std::cout << std::fixed << std::setprecision(1) << computeArea(*max_it) << "\n";
     }
     else if (arg == "VERTEXES")
     {
-        size_t maxVert = polygons[0].points.size();
-        for (const auto& poly : polygons) {
-            size_t numVert = poly.points.size();
-            if (numVert > maxVert) maxVert = numVert;
-        }
-        std::cout << maxVert << "\n";
+        auto max_it = std::max_element(polygons.begin(), polygons.end(),
+            [](const Polygon& a, const Polygon& b) {
+                return a.points.size() < b.points.size();
+            });
+        std::cout << max_it->points.size() << "\n";
     }
     else
     {
@@ -135,23 +127,19 @@ void minCommand(const std::vector<Polygon>& polygons, const std::string& arg)
     }
     if (arg == "AREA")
     {
-        double minArea = computeArea(polygons[0]);
-        for (const auto& poly : polygons)
-        {
-            double area = computeArea(poly);
-            if (area < minArea) minArea = area;
-        }
-        std::cout << std::fixed << std::setprecision(1) << minArea << "\n";
+        auto min_it = std::min_element(polygons.begin(), polygons.end(),
+            [](const Polygon& a, const Polygon& b) {
+                return computeArea(a) < computeArea(b);
+            });
+        std::cout << std::fixed << std::setprecision(1) << computeArea(*min_it) << "\n";
     }
     else if (arg == "VERTEXES")
     {
-        size_t minVert = polygons[0].points.size();
-        for (const auto& poly : polygons)
-        {
-            size_t numVert = poly.points.size();
-            if (numVert < minVert) minVert = numVert;
-        }
-        std::cout << minVert << "\n";
+        auto min_it = std::min_element(polygons.begin(), polygons.end(),
+            [](const Polygon& a, const Polygon& b) {
+                return a.points.size() < b.points.size();
+            });
+        std::cout << min_it->points.size() << "\n";
     }
     else {
         std::cout << "<INVALID COMMAND>\n";
@@ -184,10 +172,8 @@ void countNum(const std::vector<Polygon>& polygons, int num) {
     {
         return;
     }
-    for (const auto& poly : polygons) {
-        if (static_cast<int>(poly.points.size()) == num) {
-            count++;
-        }
-    }
+    count = std::count_if(polygons.begin(), polygons.end(), [num](const Polygon& poly) {
+        return static_cast<int>(poly.points.size()) == num;
+    });
     std::cout << count << "\n";
 }

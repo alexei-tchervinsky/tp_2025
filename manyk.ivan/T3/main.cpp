@@ -2,6 +2,13 @@
 #include <map>
 #include <functional>
 
+void rectsCommand(const std::vector<Polygon>& polygons, std::istream&, std::ostream&);
+void intersectionsCommand(const std::vector<Polygon>& polygons, std::istream&, std::ostream&);
+void areaCommand(const std::vector<Polygon>& polygons, std::istream&, std::ostream&);
+void maxCommand(const std::vector<Polygon>& polygons, std::istream&, std::ostream&);
+void minCommand(const std::vector<Polygon>& polygons, std::istream&, std::ostream&);
+void countCommand(const std::vector<Polygon>& polygons, std::istream&, std::ostream&);
+
 int main(int argc, char **argv)
 {
     if (argc != 2)
