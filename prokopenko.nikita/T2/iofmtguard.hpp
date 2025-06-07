@@ -3,9 +3,7 @@
 
 #include <iostream>
 
-namespace prokopenko {
-
-    // Класс сохраняет формат потока и восстанавливает при выходе из области
+namespace ponomarenko {
     class iofmtguard {
     public:
         iofmtguard(std::basic_ios<char>& stream);
@@ -16,7 +14,6 @@ namespace prokopenko {
         std::streamsize precision_;
         std::basic_ios<char>::fmtflags flags_;
     };
-
 }
 
 #endif

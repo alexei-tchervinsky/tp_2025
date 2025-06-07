@@ -2,41 +2,27 @@
 #include "IO_Objects.hpp"
 #include "iofmtguard.hpp"
 
-#include <cmath>
 #include <iomanip>
 
-namespace prokopenko {
-
-    // Сравнение двух структур для сортировки
+namespace ponomarenko {
     bool DataStruct::operator<(const DataStruct& other) const {
-        double firstAbs = std::abs(key1);
-        double secondAbs = std::abs(other.key1);
-        if (firstAbs != secondAbs) {
-            return firstAbs < secondAbs;
-        }
-        if (key2 != other.key2) {
-            return key2 < other.key2;
-        }
+        if (key1 != other.key1) return key1 < other.key1;
+        if (key2 != other.key2) return key2 < other.key2;
         return key3.size() < other.key3.size();
     }
 
-    // Ввод структуры из потока
     std::istream& operator>>(std::istream& in, DataStruct& data) {
         std::istream::sentry guard(in);
-        if (!guard) {
-            return in;
-        }
+        if (!guard) return in;
 
         DataStruct temp;
         bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
-
         in >> DelimiterIO{'('} >> DelimiterIO{':'};
         for (int i = 0; i < 3 && in; ++i) {
             std::string label;
             in >> LabelIO{label};
-
             if (label == "key1") {
-                in >> ComplexIO{temp.key1} >> DelimiterIO{':'};
+                in >> ULLLitIO{temp.key1} >> DelimiterIO{':'};
                 hasKey1 = in.good();
             } else if (label == "key2") {
                 in >> CharIO{temp.key2} >> DelimiterIO{':'};
@@ -49,10 +35,7 @@ namespace prokopenko {
                 std::getline(in, skip, ':');
             }
         }
-
         in >> DelimiterIO{')'};
-
-        // Проверка, что все поля успешно считаны
         if (hasKey1 && hasKey2 && hasKey3) {
             data = temp;
         } else {
@@ -61,20 +44,13 @@ namespace prokopenko {
         return in;
     }
 
-    // Вывод структуры в поток
     std::ostream& operator<<(std::ostream& out, const DataStruct& data) {
         std::ostream::sentry guard(out);
-        if (!guard) {
-            return out;
-        }
-
-        iofmtguard fmtguard(out); // Сохраняет форматирование потока
-
-        out << "(:";
-        out << "key1 #c(" << std::fixed << std::setprecision(1)
-            << data.key1.real() << " " << data.key1.imag() << "):";
-        out << "key2 '" << data.key2 << "':";
-        out << "key3 " << std::quoted(data.key3) << ":)";
+        if (!guard) return out;
+        iofmtguard fmtguard(out);
+        out << "(:key1 " << data.key1 << "ull:"
+            << "key2 '" << data.key2 << "':"
+            << "key3 " << std::quoted(data.key3) << ":)";
         return out;
     }
 }
