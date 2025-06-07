@@ -2,6 +2,7 @@
 #define DATASTRUCT_HPP
 
 #include <string>
+#include <iostream>
 
 namespace orlov
 {
@@ -22,5 +23,5 @@ namespace orlov
     bool compareDataStruct(const DataStruct& first, const DataStruct& second);
 }
 
-#endif // !__DATASTRUCT_HPP
+#endif // DATASTRUCT_HPP
 

@@ -13,9 +13,11 @@ namespace orlov
         if (!sentry) return os;
 
         iofmtguard guard(os);
+
         os << "(:key1 " << src.key1 << "ull";
         os << ":key2 " << std::scientific << std::setprecision(6) << src.key2;
         os << ":key3 \"" << src.key3 << "\":)";
+
         return os;
     }
 
@@ -27,34 +29,69 @@ namespace orlov
         DataStruct tmp;
 
         if (!(is >> checkSymbol{'('} >> checkSymbol{':'})) {
-            is.setstate(std::ios::failbit);
             return is;
         }
 
+        bool key1_read = false;
+        bool key2_read = false;
+        bool key3_read = false;
+
         for (int i = 0; i < 3; ++i) {
+            std::string label_str;
             std::size_t num = 0;
-            if (!(is >> checkLabel{"key"} >> num >> checkSymbol{' '})) {
+
+            if (!(is >> checkLabel{"key"})) {
+                is.setstate(std::ios::failbit);
+                return is;
+            }
+
+            char digit_char;
+            if (!(is >> digit_char) || !std::isdigit(digit_char)) {
+                is.setstate(std::ios::failbit);
+                return is;
+            }
+            num = digit_char - '0';
+
+            if (!(is >> checkSymbol{' '}))
+            {
                 is.setstate(std::ios::failbit);
                 return is;
             }
 
             if (num == 1) {
-                if (!(is >> checkUnsLongLong{tmp.key1})) return is;
+                if (key1_read || !(is >> checkUnsLongLong{tmp.key1})) return is;
+                key1_read = true;
             }
             else if (num == 2) {
-                if (!(is >> checkDoubleScientific{tmp.key2})) return is;
+                if (key2_read || !(is >> checkDoubleScientific{tmp.key2})) return is;
+                key2_read = true;
             }
-            else if (num == 3) {
-                if (!(is >> checkString{tmp.key3})) return is;
+            else if (num == 3)
+            {
+                if (key3_read || !(is >> checkString{tmp.key3})) return is;
+                key3_read = true;
             }
-
-            if (i < 2 && !(is >> checkSymbol{':'})) {
+            else
+            {
                 is.setstate(std::ios::failbit);
                 return is;
             }
+
+            if (i < 2)
+            {
+                if (!(is >> checkSymbol{':'}))
+                {
+                    is.setstate(std::ios::failbit);
+                    return is;
+                }
+            }
         }
 
-        if (!(is >> checkSymbol{':'} >> checkSymbol{')'})) {
+        if (!(is >> checkSymbol{':'} >> checkSymbol{')'}))
+            return is;
+
+        if (!key1_read || !key2_read || !key3_read)
+        {
             is.setstate(std::ios::failbit);
             return is;
         }

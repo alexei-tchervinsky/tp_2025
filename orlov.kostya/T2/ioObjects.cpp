@@ -11,11 +11,15 @@ namespace orlov
         if (!sentry) return is;
 
         char c;
-        is >> c;
 
-        if (is && (c != cSymb.symbol))
+        if (is.get(c) && (c != cSymb.symbol))
+        {
             is.setstate(std::ios::failbit);
-
+        }
+        else if (!is.good())
+        {
+            is.setstate(std::ios::failbit);
+        }
         return is;
     }
 
@@ -25,11 +29,11 @@ namespace orlov
         if (!sentry) return is;
 
         std::string tmp;
-        is >> tmp;
 
-        if (is && (tmp != cL.label))
+        if (!(is >> tmp) || (tmp != cL.label))
+        {
             is.setstate(std::ios::failbit);
-
+        }
         return is;
     }
 
@@ -41,35 +45,29 @@ namespace orlov
         std::string numbStr;
         is >> numbStr;
 
-        if
-        (
-            numbStr.size() > 2 &&
-            (
-                numbStr.substr(numbStr.size() - 3) == "ull" ||
-                numbStr.substr(numbStr.size() - 3) == "uLL"
-            )
-        )
+        if (!is) return is;
+
+        if (numbStr.size() >= 3 && (numbStr.substr(numbStr.size() - 3) == "ull" || numbStr.substr(numbStr.size() - 3) == "uLL"))
         {
             numbStr = numbStr.substr(0, numbStr.size() - 3);
         }
-        else if
-        (
-            numbStr.size() > 1 &&
-            (
-                numbStr.back() == 'u' ||
-                numbStr.back() == 'U'
-            )
-        )
+        else if (numbStr.size() >= 1 && (numbStr.back() == 'u' || numbStr.back() == 'U'))
         {
             numbStr = numbStr.substr(0, numbStr.size() - 1);
         }
 
         std::istringstream iss(numbStr);
-        iss >> cULL.src;
+        unsigned long long val;
+        iss >> val;
 
         if (iss.fail() || !iss.eof())
+        {
             is.setstate(std::ios::failbit);
-
+        }
+        else
+        {
+            cULL.src = val;
+        }
         return is;
     }
 
@@ -81,24 +79,25 @@ namespace orlov
         std::string numbStr;
         is >> numbStr;
 
-        if
-        (
-            !numbStr.empty() &&
-            (
-                numbStr.back() == 'd' ||
-                numbStr.back() == 'D'
-            )
-        )
+        if (!is) return is;
+
+        if (!numbStr.empty() && (numbStr.back() == 'd' || numbStr.back() == 'D'))
         {
             numbStr = numbStr.substr(0, numbStr.size() - 1);
         }
 
         std::istringstream iss(numbStr);
-        iss >> cD.src;
+        double val;
+        iss >> val;
 
         if (iss.fail() || !iss.eof())
+        {
             is.setstate(std::ios::failbit);
-
+        }
+        else
+        {
+            cD.src = val;
+        }
         return is;
     }
 
@@ -107,7 +106,17 @@ namespace orlov
         std::istream::sentry sentry(is);
         if (!sentry) return is;
 
-        return std::getline(is >> checkSymbol{ '\"' }, cStr.src, '\"');
+        if (!(is >> checkSymbol{ '\"' })) {
+            return is;
+        }
+
+        std::getline(is, cStr.src, '\"');
+
+        if (!is)
+        {
+            is.setstate(std::ios::failbit);
+        }
+
+        return is;
     }
 }
-
