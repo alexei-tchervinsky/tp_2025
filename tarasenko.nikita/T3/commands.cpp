@@ -42,7 +42,6 @@ namespace tarasenko {
                     return false;
                 };
 
-            // Проверка пересечения сегментов
             auto hasSegmentIntersection = [&]() {
                 return std::any_of(poly1.points.begin(), poly1.points.end(),
                     [&](const Point& p1) {
@@ -59,7 +58,6 @@ namespace tarasenko {
                 return true;
             }
 
-            // Проверка нахождения точек одного полигона внутри другого
             auto isPointInsidePolygon = [](const Point& point, const Polygon& poly) -> bool {
                 bool inside = false;
                 std::accumulate(poly.points.begin(), poly.points.end(), poly.points.back(),
