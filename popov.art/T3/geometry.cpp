@@ -15,7 +15,7 @@ bool doPolygonsIntersect(const Polygon& poly1, const Polygon& poly2) {
         return std::make_pair(minProj, maxProj);
     };
     const auto check_edges = [&](const Polygon& poly1, const Polygon& poly2) {
-        return std::all_of(poly1.points.begin(), poly1.points.end(), 
+        return std::all_of(poly1.points.begin(), poly1.points.end(),
             [&, i = 0](const Point& p1) mutable {
                 const Point& p2 = poly1.points[(i + 1) % poly1.points.size()];
                 double nx = -(p2.y - p1.y);
@@ -26,7 +26,6 @@ bool doPolygonsIntersect(const Polygon& poly1, const Polygon& poly2) {
                 return !(proj1.second < proj2.first || proj2.second < proj1.first);
             });
     };
-
     return check_edges(poly1, poly2) && check_edges(poly2, poly1);
     }
     for (size_t i = 0; i < poly2.points.size(); i++) {
