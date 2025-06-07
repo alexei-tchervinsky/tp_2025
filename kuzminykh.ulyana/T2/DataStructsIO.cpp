@@ -24,7 +24,6 @@ std::istream& operator>>(std::istream& in, DelimiterIO&& d)
         return in;
     }
     char c = 0;
-    in >> c;
     if (in >> c && c != d.exp)
     {
         in.setstate(std::ios::failbit);
@@ -62,6 +61,7 @@ std::istream& operator>>(std::istream& in, ULongLongOctIO&& d)
     if (in.peek() == '0')
     {
         in >> std::oct >> d.ref;
+        in >> std::dec;
     }
     else
     {
@@ -96,11 +96,13 @@ std::istream& operator>>(std::istream& in, DataStruct& d)
     if (!sentry) return in;
 
     DataStruct tmp;
-    in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' };
+    in >> DelimiterIO{ '(' };
 
     bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
     while (in && in.peek() != ')')
     {
+        in >> DelimiterIO{ ':' };
+
         std::string key;
         if (!(in >> key))
         {
@@ -139,7 +141,6 @@ std::istream& operator>>(std::istream& in, DataStruct& d)
             {
                 in >> dummy;
             }
-            if (in.peek() == ':') in.get();
         }
     }
 
@@ -163,7 +164,7 @@ std::ostream& operator<<(std::ostream& out, const DataStruct& d)
 
     iofmtguard fmt(out);
     out << "(:key1 " << d.key1 << "ll";
-    out << ":key2 0" << std::oct << d.key2;
+    out << ":key2 " << std::showbase << std::oct << d.key2;
     out << ":key3 \"" << d.key3 << "\":)";
     return out;
 }
