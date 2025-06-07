@@ -14,77 +14,47 @@ namespace tarasenko {
         }
 
         bool doPolygonsIntersect(const Polygon& poly1, const Polygon& poly2) {
-            auto segmentsIntersect = [](const Point& p1, const Point& p2,
-                const Point& q1, const Point& q2) -> bool {
-                    auto orientation = [](const Point& a, const Point& b, const Point& c) -> int {
-                        int val = (b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y);
-                        if (val == 0) return 0;
-                        return (val > 0) ? 1 : 2;
-                        };
+            auto checkEdgeIntersection = [](const Polygon& p1, const Polygon& p2) {
+                return std::any_of(
+                    p1.points.begin(), p1.points.end(),
+                    [&p1, &p2](const Point& point1) {
+                        size_t i = &point1 - &p1.points[0];
+                        size_t next_i = (i + 1) % p1.points.size();
 
-                    auto onSegment = [](const Point& p, const Point& q, const Point& r) -> bool {
-                        if (q.x <= std::max(p.x, r.x) && q.x >= std::min(p.x, r.x) &&
-                            q.y <= std::max(p.y, r.y) && q.y >= std::min(p.y, r.y))
-                            return true;
-                        return false;
-                        };
+                        return std::any_of(
+                            p2.points.begin(), p2.points.end(),
+                            [&p1, &p2, i, next_i](const Point& point2) {
+                                size_t j = &point2 - &p2.points[0];
+                                size_t next_j = (j + 1) % p2.points.size();
 
-                    int o1 = orientation(p1, p2, q1);
-                    int o2 = orientation(p1, p2, q2);
-                    int o3 = orientation(q1, q2, p1);
-                    int o4 = orientation(q1, q2, p2);
-
-                    if (o1 != o2 && o3 != o4)
-                        return true;
-
-                    if (o1 == 0 && onSegment(p1, q1, p2)) return true;
-                    if (o2 == 0 && onSegment(p1, q2, p2)) return true;
-                    if (o3 == 0 && onSegment(q1, p1, q2)) return true;
-                    if (o4 == 0 && onSegment(q1, p2, q2)) return true;
-
-                    return false;
+                                return segmentsIntersect(
+                                    p1.points[i], p1.points[next_i],
+                                    p2.points[j], p2.points[next_j]
+                                );
+                            }
+                        );
+                    }
+                );
                 };
 
-            for (size_t i = 0; i < poly1.points.size(); ++i) {
-                size_t next_i = (i + 1) % poly1.points.size();
-                for (size_t j = 0; j < poly2.points.size(); ++j) {
-                    size_t next_j = (j + 1) % poly2.points.size();
-                    if (segmentsIntersect(poly1.points[i], poly1.points[next_i],
-                        poly2.points[j], poly2.points[next_j])) {
-                        return true;
-                    }
-                }
+            if (checkEdgeIntersection(poly1, poly2)) {
+                return true;
             }
 
-            auto isPointInsidePolygon = [](const Point& point, const Polygon& poly) -> bool {
-                bool inside = false;
-                for (size_t i = 0, j = poly.points.size() - 1; i < poly.points.size(); j = i++) {
-                    const Point& p1 = poly.points[i];
-                    const Point& p2 = poly.points[j];
-
-                    if (((p1.y > point.y) != (p2.y > point.y))) {
-                        double intersectX = (p2.x - p1.x) * (point.y - p1.y) / (p2.y - p1.y) + p1.x;
-                        if (point.x <= intersectX) {
-                            inside = !inside;
-                        }
+            auto isAnyPointInside = [](const Polygon& inner, const Polygon& outer) {
+                return std::any_of(
+                    inner.points.begin(), inner.points.end(),
+                    [&outer](const Point& point) {
+                        return isPointInsidePolygon(point, outer);
                     }
-                }
-                return inside;
-                        };
+                );
+                };
 
-                        for (const auto& point : poly1.points) {
-                            if (isPointInsidePolygon(point, poly2)) {
-                                return true;
-                            }
-                        }
+            if (isAnyPointInside(poly1, poly2) || isAnyPointInside(poly2, poly1)) {
+                return true;
+            }
 
-                for (const auto& point : poly2.points) {
-                    if (isPointInsidePolygon(point, poly1)) {
-                        return true;
-                    }
-                }
-
-                return false;
+            return false;
         }
     }
 
