@@ -115,6 +115,7 @@ namespace wheatman {
         };
     }
     void CommandsHandler(const std::string& command, std::vector<Polygon>& p) {
+        (void)p;
         std::stringstream in(command);
         std::string cmd;
         in >> cmd;
