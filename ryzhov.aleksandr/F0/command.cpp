@@ -14,13 +14,6 @@
 
 namespace ryzhov {
 
-    namespace {
-        void checkEmpty(const ERDictionary &dictionary) {
-            if (dictionary.empty())
-                throw std::invalid_argument("Invalid command. Check -h for list of commands.");
-        }
-    }
-
     CommandMap createCommandMap() {
         using namespace std::placeholders;
         return {{"-i", std::bind(insertCommand, _1, _2, _3)},
@@ -44,7 +37,7 @@ namespace ryzhov {
         it->second(dictionary, is, os);
     }
 
-    void insertCommand(ERDictionary &dictionary, std::istream &is, std::ostream &os) {
+    void insertCommand(ERDictionary &dictionary, std::istream &is, std::ostream &) {
         is >> dictionary;
     }
 
@@ -59,7 +52,7 @@ namespace ryzhov {
         // Достаем английское слово
         iss >> enWord;
         // Выходим, если слова нет
-        if (!dictionary.contains(enWord)){
+        if (dictionary.find(enWord) == dictionary.end()){
             os << "Word not found.\n";
             return;
         }
@@ -90,7 +83,8 @@ namespace ryzhov {
         iofmtguard guard(os);
         std::string word;
         is >> word;
-        if (is && dictionary.contains(word)) {
+
+        if (is && dictionary.find(word) != dictionary.end()) {
             std::copy(dictionary[word].begin(), dictionary[word].end(),
                       std::ostream_iterator<std::string>(os, ", "));
             std::cout << "\n";
@@ -100,7 +94,7 @@ namespace ryzhov {
         }
     }
 
-    void countCommand(ERDictionary &dictionary, std::istream &is, std::ostream &os) {
+    void countCommand(ERDictionary &dictionary, std::istream &, std::ostream &os) {
         iofmtguard guard(os);
         os << "Words in dictionary: " << dictionary.size() << ".\n";
     }
