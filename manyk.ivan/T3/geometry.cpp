@@ -8,6 +8,7 @@ std::istream& operator>>(std::istream& in, Point& point)
         return in;
     }
     Point temp = { 0, 0 };
+
     in >> DelimiterChar{ '(' } >> temp.x >> DelimiterChar{ ';' } >> temp.y >> DelimiterChar{ ')' };
     if (in)
     {
@@ -36,6 +37,7 @@ std::istream& operator>>(std::istream& in, Polygon& polygon)
     if (in.peek() != '\n')
     {
         in.setstate(std::ios::failbit);
+        return in;
     }
     if (in && (temp.size() == countPoints))
     {
@@ -44,6 +46,7 @@ std::istream& operator>>(std::istream& in, Polygon& polygon)
     else
     {
         in.setstate(std::ios::failbit);
+        return in;
     }
     return in;
 }
@@ -57,9 +60,10 @@ std::istream& operator>>(std::istream& in, DelimiterChar&& exp)
     }
     char c = 0;
     in >> c;
-    if (c != exp.expected)
+    if (in && c != exp.expected)
     {
         in.setstate(std::ios::failbit);
+        return in;
     }
     return in;
 }

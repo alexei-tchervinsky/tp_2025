@@ -17,7 +17,11 @@ int main(int argc, char **argv)
         {
             in.clear();
             in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+           // std::cout << 1;
         }
+        // for(auto &i : polygons) {
+        //     std::cout << i << std::endl;
+        // }
     }
     std::string a;
     while (std::cin >> a)
@@ -39,6 +43,54 @@ int main(int argc, char **argv)
             }
             std::size_t count = countIntersections(polygons, target);
             std::cout << count << "\n";
+        }
+        else if (a == "AREA")
+        {
+            std::string arg;
+            if (std::cin >> arg)
+                areaCommand(polygons, arg);
+            else
+            {
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                std::cout << "<INVALID COMMAND>\n";
+                continue;
+            }
+        }
+        else if (a == "MAX") {
+            std::string arg;
+            if (std::cin >> arg)
+                maxCommand(polygons, arg);
+            else {
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                std::cout << "<INVALID COMMAND>\n";
+                continue;
+            }
+        }
+        else if (a == "MIN") {
+            std::string arg;
+            if (std::cin >> arg)
+                minCommand(polygons, arg);
+            else
+            {
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                std::cout << "<INVALID COMMAND>\n";
+                continue;
+            }
+        }
+        else if (a == "COUNT") {
+            std::string arg;
+            if (std::cin >> arg)
+                countCommand(polygons, arg);
+            else
+            {
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                std::cout << "<INVALID COMMAND>\n";
+                continue;
+            }
         }
         else
         {
