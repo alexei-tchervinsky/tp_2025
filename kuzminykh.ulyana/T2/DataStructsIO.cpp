@@ -27,6 +27,9 @@ namespace kuzminykh
         {
             return in;
         }
+        bool key1 = false;
+        bool key2 = false;
+        bool key3 = false;
         DataStruct tmp;
         in >> DelimiterIO{ '(' };
         for (std::size_t i = 0; i < 3; i++)
@@ -40,22 +43,27 @@ namespace kuzminykh
             case LongLong:
             {
                 in >> LongLongIO{ tmp.key1_ };
+                key1 = true;
                 break;
             }
             case OCT:
             {
                 in >> OctUnsignedLongLongIO{ tmp.key2_ };
+                key2 = true;
                 break;
             }
             case STRING:
             {
                 in >> StringIO{ tmp.key3_ };
+                key3 = true;
                 break;
             }
+            default:
+                break;
             }
         }
         in >> DelimiterIO{ ':' } >> DelimiterIO{ ')' };
-        if (in) {
+        if (in && key1 && key2 && key3) {
             ds = tmp;
         }
         return in;
@@ -138,25 +146,14 @@ namespace kuzminykh
             return in;
         }
 
-        unsigned long long value;
-        in >> value;
 
-        if (in.peek() == 'l' || in.peek() == 'L')
-        {
-            in.ignore(1);
-            if (in.peek() == 'l' || in.peek() == 'L')
-            {
-                in.ignore(1);
-            }
-            else
-            {
-                in.setstate(std::ios::failbit);
-            }
-        }
+        in >> dest.ref;
 
-        if (in)
+        std::string suffix;
+        std::copy_n(std::istream_iterator<char>(in), 2, std::back_inserter(suffix));
+        if (in && (suffix != "ll" && suffix != "LL"))
         {
-            dest.ref = value;
+            in.setstate(std::ios::failbit);
         }
         return in;
     }
