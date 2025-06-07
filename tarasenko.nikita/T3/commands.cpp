@@ -14,6 +14,7 @@ namespace tarasenko {
         }
 
         bool doPolygonsIntersect(const Polygon& poly1, const Polygon& poly2) {
+            // Проверка пересечения ребер с помощью алгоритмов STL
             bool edgesIntersect = std::any_of(poly1.points.begin(), poly1.points.end(),
                 [&poly1, &poly2](const Point& p1) {
                     size_t i = &p1 - &poly1.points[0];
@@ -23,6 +24,8 @@ namespace tarasenko {
                         [&p1, &p2, &poly2](const Point& p3) {
                             size_t j = &p3 - &poly2.points[0];
                             const Point& p4 = poly2.points[(j + 1) % poly2.points.size()];
+
+                            // Вычисление ориентаций
                             int orient1 = (p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x);
                             int orient2 = (p2.x - p1.x) * (p4.y - p1.y) - (p2.y - p1.y) * (p4.x - p1.x);
 
@@ -36,26 +39,45 @@ namespace tarasenko {
                 });
 
             if (edgesIntersect) return true;
+
+            // Проверка содержания одного полигона внутри другого
             auto isPointInside = [](const Point& p, const Polygon& poly) {
                 bool inside = false;
-                for (size_t i = 0, j = poly.points.size() - 1; i < poly.points.size(); j = i++) {
-                    const Point& pi = poly.points[i];
-                    const Point& pj = poly.points[j];
+                std::vector<bool> results(poly.points.size());
 
-                    if (((pi.y > p.y) != (pj.y > p.y)) {
-                        int intersectX = (pj.x - pi.x) * (p.y - pi.y) / (pj.y - pi.y) + pi.x;
-                        if (p.x < intersectX) {
-                            inside = !inside;
+                std::transform(poly.points.begin(), poly.points.end() - 1,
+                    poly.points.begin() + 1,
+                    results.begin(),
+                    [&p, &inside](const Point& pi, const Point& pj) {
+                        if (((pi.y > p.y) != (pj.y > p.y)) {
+                            int intersectX = (pj.x - pi.x) * (p.y - pi.y) / (pj.y - pi.y) + pi.x;
+                            if (p.x < intersectX) {
+                                inside = !inside;
+                            }
                         }
+                        return inside;
+                            });
+
+                // Обработка последнего ребра (от последней точки к первой)
+                const Point& pi = poly.points.back();
+                const Point& pj = poly.points.front();
+                if (((pi.y > p.y) != (pj.y > p.y)) {
+                    int intersectX = (pj.x - pi.x) * (p.y - pi.y) / (pj.y - pi.y) + pi.x;
+                    if (p.x < intersectX) {
+                        inside = !inside;
                     }
                 }
+
                 return inside;
-                        };
+                    };
+
+                    // Проверка всех точек poly1 внутри poly2
                     bool allInside1 = std::all_of(poly1.points.begin(), poly1.points.end(),
                         [&poly2, &isPointInside](const Point& p) {
                             return isPointInside(p, poly2);
                         });
 
+                // Проверка всех точек poly2 внутри poly1
                 bool allInside2 = std::all_of(poly2.points.begin(), poly2.points.end(),
                     [&poly1, &isPointInside](const Point& p) {
                         return isPointInside(p, poly1);

@@ -19,12 +19,18 @@ namespace tarasenko {
             return 0.0;
         }
 
-        double sum = std::accumulate(
+        double sum = 0.0;
+        auto next_point = [this](const Point& p) {
+            auto it = std::find(points.begin(), points.end(), p);
+            return (it + 1 == points.end()) ? points.front() : *(it + 1);
+            };
+
+        sum = std::accumulate(
             points.begin(),
             points.end(),
             0.0,
-            [this](double acc, const Point& p1) {
-                const Point& p2 = points[(&p1 - &points[0] + 1) % points.size()];
+            [&next_point](double acc, const Point& p1) {
+                const Point& p2 = next_point(p1);
                 return acc + (p1.x * p2.y) - (p1.y * p2.x);
             }
         );
