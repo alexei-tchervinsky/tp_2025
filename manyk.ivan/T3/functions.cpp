@@ -75,6 +75,11 @@ void areaCommand(const std::vector<Polygon>& polygons, const std::string& arg)
         try
         {
             size_t num = std::stoul(arg);
+            if (num <= 2)
+            {
+                std::cout << "<INVALID COMMAND>\n";
+                return;
+            }
             double sum = 0.0;
             for (const auto& poly : polygons)
             {
