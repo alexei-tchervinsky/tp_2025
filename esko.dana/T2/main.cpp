@@ -5,8 +5,8 @@
 #include <iomanip>
 
 struct DataStruct {
-    double      key1;
-    long long   key2;
+    double key1;
+    long long key2;
     std::string key3;
 };
 
@@ -17,14 +17,14 @@ bool parse(std::string const & str, DataStruct & o) {
     size_t m = 0;
     for (size_t i = 1; i < str.size(); ++i) {
         if (str[i] == ':') {
-            std::string key = ""; 
+            std::string key = "";
             for (i = i + 1; i < str.size() && (str[i] != ' ' && str[i] != ')'); ++i)
                 key += str[i];
 
             if (str[i] == ')' && key.empty()) {
                 if (i == str.size() - 1 && m == 7)
                     return true;
-                
+
                 return false;
             }
 
@@ -73,7 +73,7 @@ bool parse(std::string const & str, DataStruct & o) {
 
                 if (++i == str.size())
                     return false;
-                
+
                 if (str[i] != 'L' && str[i] != 'l')
                     return false;
 
@@ -87,10 +87,10 @@ bool parse(std::string const & str, DataStruct & o) {
 
                 if (++i == str.size())
                     return false;
-                
+
                 if (str[i] != '"')
                     return false;
-                
+
                 std::string value = "";
                 for (i = i + 1; i < str.size(); ++i) {
                     if (str[i] == '"' && str[i - 1] != '\\')
