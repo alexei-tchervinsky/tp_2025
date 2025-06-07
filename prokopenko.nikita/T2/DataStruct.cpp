@@ -52,14 +52,15 @@ namespace prokopenko {
         std::getline(in, skip, ':');
       }
     }
-    in >> DelimiterIO{ ')' };
 
+    in >> DelimiterIO{ ')' };
     if (hasKey1 && hasKey2 && hasKey3) {
       data = temp;
     }
     else {
       in.setstate(std::ios::failbit);
     }
+
     return in;
   }
 
@@ -79,7 +80,8 @@ namespace prokopenko {
       << real << " " << imag << "):";
     out << "key2 '" << data.key2 << "':";
     out << "key3 " << std::quoted(data.key3) << ":)";
+
     return out;
   }
 
-}
+}  // namespace prokopenko
