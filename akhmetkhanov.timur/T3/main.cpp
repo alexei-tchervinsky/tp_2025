@@ -23,14 +23,29 @@ int main(int argc, char* argv[])
     }
 
     std::vector<geom_lab::Polygon> polygons;
-    geom_lab::Polygon polygon;
+    std::string line;
 
-    while (file >> polygon)
+    while (std::getline(file, line))
     {
-        polygons.push_back(polygon);
+        if (line.empty()) continue;
+
+        std::istringstream iss(line);
+        geom_lab::Polygon polygon;
+
+        if (iss >> polygon)
+        {
+            std::string remaining;
+            std::getline(iss, remaining);
+            remaining.erase(0, remaining.find_first_not_of(" \t"));
+            remaining.erase(remaining.find_last_not_of(" \t") + 1);
+
+            if (remaining.empty())
+            {
+                polygons.push_back(polygon);
+            }
+        }
     }
 
-    file.clear();
     file.close();
 
     std::map<std::string, std::function<void(std::vector<geom_lab::Polygon>&, std::istream&, std::ostream&)>> commands;
@@ -79,12 +94,12 @@ int main(int argc, char* argv[])
         geom_lab::maxseq(const_polygons, in, out);
     };
 
-    std::string line;
-    while (std::getline(std::cin, line))
+    std::string command_line;
+    while (std::getline(std::cin, command_line))
     {
-        if (line.empty()) continue;
+        if (command_line.empty()) continue;
 
-        std::istringstream iss(line);
+        std::istringstream iss(command_line);
         std::string command;
         iss >> command;
 
