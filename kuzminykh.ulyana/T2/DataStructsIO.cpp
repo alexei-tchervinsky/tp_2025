@@ -23,8 +23,9 @@ std::istream& operator>>(std::istream& in, DelimiterIO&& d)
     {
         return in;
     }
-    char c = 0;
-    if (in >> c && c != d.exp)
+    char c;
+    in >> c;
+    if (in && (c != d.exp))
     {
         in.setstate(std::ios::failbit);
     }
@@ -38,53 +39,41 @@ std::istream& operator>>(std::istream& in, LongLongIO&& d)
 
     in >> d.ref;
 
-    char c;
-    char k;
 
-    if (in.peek() == 'l' || in.peek() == 'L')
-    {
 
-        in >> c;
-        in >> k;
-
-        std::string lab = std::string(1,  c) + std::string(1, k);
-        if (lab != "ll" &&  lab != "LL")
-        {
+    if (in.peek() == 'l' || in.peek() == 'L') {
+        char first = in.get();
+        if (in.peek() == first) {
+            in.get();
+        }
+        else {
+            in.unget();
             in.setstate(std::ios::failbit);
         }
+    }
+    else {
+        in.setstate(std::ios::failbit);
     }
 
     return in;
 }
 
-std::istream& operator>>(std::istream& in, ULongLongOctIO&& d)
-{
+std::istream& operator>>(std::istream& in, ULongLongOctIO&& dest) {
     std::istream::sentry sentry(in);
-    if (!sentry) return in;
-
-    if (in.peek() == '0')
-    {
-        in >> std::oct >> d.ref;
+    if (!sentry) {
+        return in;
     }
-    else
-    {
-        in >> d.ref;
+    char c;
+    if (!(in >> c) || c != '0') {
+        in.setstate(std::ios::failbit);
+        return in;
     }
 
-
-    if (in.peek() == 'u' || in.peek() == 'U')
-    {
-        char c;
-        char k;
-        char k2;
-        in >> c;
-        in >> k;
-        in >> k2;
-        std::string lab = std::string(1, c) + std::string(1, k) + std::string(1, k2);
-        if (lab != "ull" && lab != "ULL")
-        {
-            in.setstate(std::ios::failbit);
-        }
+    if (isdigit(in.peek())) {
+        in >> dest.ref;
+    }
+    else {
+        dest.ref = 0;
     }
 
     return in;
@@ -119,14 +108,17 @@ std::istream& operator>>(std::istream& in, DataStruct& dest) {
         }
         if (keyLabel == "key1" && !isKey1) {
             in >> ll{ input.key1 } >> sep{ ':' };
+            if (!in) return in;
             isKey1 = true;
         }
         else if (keyLabel == "key2" && !isKey2) {
             in >> oct{ input.key2 } >> sep{ ':' };
+            if (!in) return in;
             isKey2 = true;
         }
         else if (keyLabel == "key3" && !isKey3) {
             in >> str{ input.key3 } >> sep{ ':' };
+            if (!in) return in;
             isKey3 = true;
         }
         else {
@@ -136,6 +128,7 @@ std::istream& operator>>(std::istream& in, DataStruct& dest) {
     }
     if (in && isKey1 && isKey2 && isKey3) {
         in >> sep{ ')' };
+        if (!in) return in;
         dest = input;
     }
     else {
