@@ -445,7 +445,8 @@ void geom_lab::echo(std::vector<Polygon>& value, std::istream& in,
 {
     Polygon polygon;
     in >> polygon;
-    if (!in)
+
+    if (!in || polygon.points.size() < 3)
     {
         throw std::invalid_argument("Wrong argument");
     }
