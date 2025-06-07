@@ -241,21 +241,20 @@ namespace tarasenko {
     }
 
     void intersectionsCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
-        Polygon inputPolygon;
-        in >> inputPolygon;
+    Polygon inputPolygon;
+    in >> inputPolygon;
 
-        if (inputPolygon.points.size() < 3) {
-            throw std::invalid_argument("INVALID COMMAND");
-        }
-
-        size_t count = std::count_if(polygons.begin(), polygons.end(),
-            [&inputPolygon](const Polygon& poly) {
-                return doPolygonsIntersect(inputPolygon, poly);
-            });
-
-        out << count << '\n';
+    if (inputPolygon.points.size() < 3) {
+        throw std::invalid_argument("INVALID COMMAND");
     }
 
+    size_t count = std::count_if(polygons.begin(), polygons.end(),
+        [&inputPolygon](const Polygon& poly) {
+            return doPolygonsIntersect(inputPolygon, poly);
+        });
+
+    out << count << '\n';
+}
     void rmechoCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
         Polygon target;
         in >> target;
