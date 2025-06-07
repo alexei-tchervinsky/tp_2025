@@ -69,7 +69,7 @@ namespace kuzminykh
         }
         if (a.key2_ != b.key2_)
         {
-            return a.key1_ < a.key2_;
+            return a.key2_ < b.key2_;
         }
         return a.key3_.length() < b.key3_.length();
     }
