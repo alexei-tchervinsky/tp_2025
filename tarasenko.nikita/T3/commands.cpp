@@ -1,4 +1,4 @@
-#include "iofmtguard.hpp"More actions
+#include "iofmtguard.hpp"
 #include "commands.hpp"
 #include "DataStruct.hpp"
 #include <algorithm>
@@ -59,19 +59,27 @@ namespace tarasenko {
             }
 
             auto isPointInsidePolygon = [](const Point& point, const Polygon& poly) -> bool {
-                bool inside = false;
-                std::accumulate(poly.points.begin(), poly.points.end(), poly.points.back(),
-                    [&](const Point& prev, const Point& curr) {
-                        if (((prev.y > point.y) != (curr.y > point.y)) {
-                            double intersectX = (curr.x - prev.x) * (point.y - prev.y) / (curr.y - prev.y) + prev.x;
+                struct Accumulator {
+                    bool inside = false;
+                    Point prev;
+                };
+
+                Accumulator acc{ false, poly.points.back() };
+
+                acc = std::accumulate(poly.points.begin(), poly.points.end(), acc,
+                    [&point](Accumulator a, const Point& curr) {
+                        if ((a.prev.y > point.y) != (curr.y > point.y)) {
+                            double intersectX = (curr.x - a.prev.x) * (point.y - a.prev.y) / (curr.y - a.prev.y) + a.prev.x;
                             if (point.x <= intersectX) {
-                                inside = !inside;
+                                a.inside = !a.inside;
                             }
                         }
-                        return curr;
-                            });
-                return inside;
-                    };
+                        a.prev = curr;
+                        return a;
+                    });
+
+                return acc.inside;
+                };
 
             auto hasPointInside = [&](const Polygon& outer, const Polygon& inner) {
                 return std::any_of(inner.points.begin(), inner.points.end(),
