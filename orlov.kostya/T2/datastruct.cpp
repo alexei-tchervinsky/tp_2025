@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <cmath>
 #include <sstream>
+#include <map> // Добавлено для использования std::map
 
 #include "datastruct.hpp"
 #include "iofmtguard.hpp"
@@ -16,8 +17,10 @@ namespace orlov
         std::string str = oss.str();
 
         size_t e_pos = str.find('e');
-        if (e_pos != std::string::npos) {
-            if (str[e_pos + 2] == '0') {
+        if (e_pos != std::string::npos)
+        {
+            if (str[e_pos + 2] == '0' && str.length() > e_pos + 3)
+            {
                 str.erase(e_pos + 2, 1);
             }
         }
@@ -44,24 +47,64 @@ namespace orlov
         if (!sentry) return is;
 
         DataStruct tmp;
+        std::map<std::string, bool> keys_read;
+        keys_read["key1"] = false;
+        keys_read["key2"] = false;
+        keys_read["key3"] = false;
 
         is >> checkSymbol{ '(' };
+        if (!is) return is;
 
         for (std::size_t i = 0; i < 3; ++i)
         {
-            if (i == 0)
+            is >> checkSymbol{ ':' };
+            if (!is) return is;
+
+            std::string label_str;
+            is >> checkLabelAnyOrder{ label_str };
+            if (!is) return is;
+
+            if (label_str == "key1")
             {
-                is >> checkSymbol{ ':' };
-                is >> checkLabel{ "key1" }  >> checkUnsLongLong{ tmp.key1 };
+                if (keys_read["key1"]) {
+                    is.setstate(std::ios::failbit);
+                    return is;
+                }
+                is >> checkUnsLongLong{ tmp.key1 };
+                if (!is) return is;
+                keys_read["key1"] = true;
             }
-            else if (i == 1)
+            else if (label_str == "key2")
             {
-                is >> checkLabel{ "key2" } >> checkDoubleScientific{ tmp.key2 };
+                if (keys_read["key2"]) {
+                    is.setstate(std::ios::failbit);
+                    return is;
+                }
+                is >> checkDoubleScientific{ tmp.key2 };
+                if (!is) return is;
+                keys_read["key2"] = true;
             }
-            else if (i == 2)
+            else if (label_str == "key3")
             {
-                is >> checkLabel{ ":key3" } >> checkString{ tmp.key3 };
+                if (keys_read["key3"]) {
+                    is.setstate(std::ios::failbit);
+                    return is;
+                }
+                is >> checkString{ tmp.key3 };
+                if (!is) return is;
+                keys_read["key3"] = true;
             }
+            else
+            {
+                is.setstate(std::ios::failbit);
+                return is;
+            }
+        }
+
+        if (is && (!keys_read["key1"] || !keys_read["key2"] || !keys_read["key3"]))
+        {
+            is.setstate(std::ios::failbit);
+            return is;
         }
 
         is >> checkSymbol{ ':' } >> checkSymbol{ ')' };

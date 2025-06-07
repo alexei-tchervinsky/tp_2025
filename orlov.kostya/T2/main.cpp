@@ -13,18 +13,20 @@ int main()
 
     while (!std::cin.eof())
     {
-        std::copy
-        (
-            std::istream_iterator<DataStruct>(std::cin),
-            std::istream_iterator<DataStruct>(),
-            std::back_inserter(ds)
-        );
+        std::istream_iterator<DataStruct> it(std::cin);
+        std::istream_iterator<DataStruct> end;
 
-        if (!std::cin.fail())
-            continue;
+        if (it != end)
+        {
+            std::copy(it, end, std::back_inserter(ds));
+        }
 
-        std::cin.clear();
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        if (std::cin.fail() && !std::cin.eof())
+        {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        } else if (std::cin.eof())
+            break;
     }
 
     std::sort(ds.begin(), ds.end(), orlov::compareDataStruct);

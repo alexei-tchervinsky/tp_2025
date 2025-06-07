@@ -16,6 +16,11 @@ namespace orlov
         std::string label;
     };
 
+    struct checkLabelAnyOrder
+    {
+        std::string& label;
+    };
+
     struct checkUnsLongLong
     {
         unsigned long long& src;
@@ -33,6 +38,7 @@ namespace orlov
 
     std::istream& operator>>(std::istream& is, checkSymbol&& cSymb);
     std::istream& operator>>(std::istream& is, checkLabel&& cL);
+    std::istream& operator>>(std::istream& is, checkLabelAnyOrder&& cLAO);
     std::istream& operator>>(std::istream& is, checkUnsLongLong&& cULL);
     std::istream& operator>>(std::istream& is, checkDoubleScientific&& cD);
     std::istream& operator>>(std::istream& is, checkString&& cStr);
