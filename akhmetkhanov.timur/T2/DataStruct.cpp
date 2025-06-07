@@ -3,6 +3,9 @@
 #include "iofmtguard.hpp"
 #include <iostream>
 #include <iomanip>
+#include <sstream>
+#include <cctype>
+#include <algorithm>
 
 namespace nspace {
     std::istream& operator>>(std::istream& is, DataStruct& ds) {
@@ -45,8 +48,16 @@ namespace nspace {
         if (!sentry) return os;
 
         iofmtguard fmtguard(os);
+
+        // Форматируем key2 в строку и приводим к нижнему регистру
+        std::ostringstream oss;
+        oss << std::scientific << ds.key2;
+        std::string key2_str = oss.str();
+        std::transform(key2_str.begin(), key2_str.end(), key2_str.begin(),
+                      [](unsigned char c) { return std::tolower(c); });
+
         os << "(:key1 0x" << std::hex << std::uppercase << ds.key1 << std::dec
-           << ":key2 " << std::scientific << ds.key2
+           << ":key2 " << key2_str
            << ":key3 \"" << ds.key3 << "\":)";
         return os;
     }
