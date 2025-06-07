@@ -3,13 +3,12 @@
 #include <algorithm>
 #include <sstream>
 #include <string>
-#include <iomanip>
 #include <cctype>
-#include <iterator>
+#include <iomanip>
 
 struct DataStruct {
-    unsigned long long key1;
-    char key2;
+    unsigned long long key1;  // ULL OCT
+    char key2;                // CHR LIT
     std::string key3;
 };
 
@@ -21,7 +20,7 @@ std::istream& operator>>(std::istream& in, DataStruct& ds) {
 
     size_t start = line.find('(');
     size_t end = line.rfind(')');
-    if (start == std::string::npos || end == std::string::npos || start >= end) {
+    if (start == std::string::npos || end == std::string::npos) {
         in.setstate(std::ios::failbit);
         return in;
     }
@@ -30,23 +29,18 @@ std::istream& operator>>(std::istream& in, DataStruct& ds) {
     std::istringstream iss(content);
     std::string token;
 
-    ds.key1 = 0;
-    ds.key2 = '\0';
-    ds.key3.clear();
-
-    bool key1_found = false, key2_found = false, key3_found = false;
+    bool has_key1 = false, has_key2 = false, has_key3 = false;
+    unsigned long long key1_val = 0;
+    char key2_val = '\0';
+    std::string key3_val;
 
     while (iss >> token) {
         if (token == ":key1") {
-            std::string value;
-            iss >> value;
+            std::string oct_val;
+            iss >> oct_val;
             try {
-                size_t pos = 0;
-                ds.key1 = std::stoull(value, &pos, 8);
-                if (pos != value.size()) {
-                    throw std::invalid_argument("Invalid octal number");
-                }
-                key1_found = true;
+                key1_val = std::stoull(oct_val, nullptr, 8);
+                has_key1 = true;
             }
             catch (...) {
                 in.setstate(std::ios::failbit);
@@ -54,11 +48,11 @@ std::istream& operator>>(std::istream& in, DataStruct& ds) {
             }
         }
         else if (token == ":key2") {
-            std::string value;
-            iss >> value;
-            if (value.size() >= 3 && value.front() == '\'' && value.back() == '\'') {
-                ds.key2 = value[1];
-                key2_found = true;
+            std::string char_lit;
+            iss >> char_lit;
+            if (char_lit.size() == 3 && char_lit[0] == '\'' && char_lit[2] == '\'') {
+                key2_val = char_lit[1];
+                has_key2 = true;
             }
             else {
                 in.setstate(std::ios::failbit);
@@ -66,11 +60,13 @@ std::istream& operator>>(std::istream& in, DataStruct& ds) {
             }
         }
         else if (token == ":key3") {
-            std::string value;
-            iss >> value;
-            if (value.size() >= 2 && value.front() == '"' && value.back() == '"') {
-                ds.key3 = value.substr(1, value.size() - 2);
-                key3_found = true;
+            std::string str_lit;
+            iss >> std::ws;
+            if (iss.peek() == '"') {
+                iss.get();
+                std::getline(iss, str_lit, '"');
+                key3_val = str_lit;
+                has_key3 = true;
             }
             else {
                 in.setstate(std::ios::failbit);
@@ -79,38 +75,42 @@ std::istream& operator>>(std::istream& in, DataStruct& ds) {
         }
     }
 
-    if (!key1_found || !key2_found || !key3_found) {
+    if (!has_key1 || !has_key2 || !has_key3) {
         in.setstate(std::ios::failbit);
+        return in;
     }
+
+    ds.key1 = key1_val;
+    ds.key2 = key2_val;
+    ds.key3 = key3_val;
     return in;
 }
 
 std::ostream& operator<<(std::ostream& out, const DataStruct& ds) {
-    out << "(:key1 " << std::oct << ds.key1 << std::dec << ":key2 '" << ds.key2 << "':key3 \"" << ds.key3 << "\":)";
+    out << "(:key1 " << std::oct << ds.key1 << ":key2 '" << ds.key2 << "':key3 \"" << ds.key3 << "\":)";
     return out;
 }
 
 bool compareDataStructs(const DataStruct& a, const DataStruct& b) {
-    if (a.key1 != b.key1) {
-        return a.key1 < b.key1;
-    }
-    if (a.key2 != b.key2) {
-        return a.key2 < b.key2;
-    }
+    if (a.key1 != b.key1) return a.key1 < b.key1;
+    if (a.key2 != b.key2) return a.key2 < b.key2;
     return a.key3.length() < b.key3.length();
 }
 
 int main() {
     std::vector<DataStruct> data;
 
+    // Чтение данных
     std::copy(
         std::istream_iterator<DataStruct>(std::cin),
         std::istream_iterator<DataStruct>(),
         std::back_inserter(data)
     );
 
+    // Сортировка данных
     std::sort(data.begin(), data.end(), compareDataStructs);
 
+    // Вывод данных
     std::copy(
         data.begin(),
         data.end(),
