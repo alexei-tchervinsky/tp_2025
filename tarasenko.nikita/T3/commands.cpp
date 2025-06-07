@@ -40,32 +40,37 @@ namespace tarasenko {
 
             auto isPointInside = [](const Point& p, const Polygon& poly) -> bool {
                 bool inside = false;
-                size_t n = poly.points.size();
-                for (size_t i = 0, j = n - 1; i < n; j = i++) {
-                    const Point& pi = poly.points[i];
-                    const Point& pj = poly.points[j];
+                std::vector<Point> points = poly.points;
+                size_t n = points.size();
 
-                    if (((pi.y > p.y) != (pj.y > p.y)) {
-                        int intersectX = (pj.x - pi.x) * (p.y - pi.y) / (pj.y - pi.y) + pi.x;
-                        if (p.x < intersectX) {
-                            inside = !inside;
+                std::accumulate(points.begin(), points.end(), points.back(),
+                    [&p, &inside, &n](const Point& pj, const Point& pi) {
+                        size_t i = &pi - &points[0];
+                        size_t j = (i == 0) ? n - 1 : i - 1;
+
+                        if (((pi.y > p.y) != (pj.y > p.y))) {
+                            int intersectX = (pj.x - pi.x) * (p.y - pi.y) / (pj.y - pi.y) + pi.x;
+                            if (p.x < intersectX) {
+                                inside = !inside;
+                            }
                         }
-                    }
-                }
-                return inside;
-                        };
-
-                    bool allInside1 = std::all_of(poly1.points.begin(), poly1.points.end(),
-                        [&poly2, &isPointInside](const Point& p) {
-                            return isPointInside(p, poly2);
-                        });
-
-                bool allInside2 = std::all_of(poly2.points.begin(), poly2.points.end(),
-                    [&poly1, &isPointInside](const Point& p) {
-                        return isPointInside(p, poly1);
+                        return pi;
                     });
 
-                return allInside1 || allInside2;
+                return inside;
+                };
+
+            bool allInside1 = std::all_of(poly1.points.begin(), poly1.points.end(),
+                [&poly2, &isPointInside](const Point& p) {
+                    return isPointInside(p, poly2);
+                });
+
+            bool allInside2 = std::all_of(poly2.points.begin(), poly2.points.end(),
+                [&poly1, &isPointInside](const Point& p) {
+                    return isPointInside(p, poly1);
+                });
+
+            return allInside1 || allInside2;
         }
     }
 
