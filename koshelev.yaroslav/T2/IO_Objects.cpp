@@ -1,5 +1,6 @@
 #include "IO_Objects.h"
 #include "DataStruct.h"
+#include "iofmtguard.h"
 #include <sstream>
 #include <iomanip>
 #include <string>
@@ -11,6 +12,10 @@ std::istream& operator>>(std::istream& in, DataStruct& data) {
     if (!std::getline(in, line)) {
         return in;
     }
+
+    // Trim whitespace
+    line.erase(0, line.find_first_not_of(" \t"));
+    line.erase(line.find_last_not_of(" \t") + 1);
 
     if (line.empty() || line.front() != '(' || line.back() != ')') {
         in.setstate(std::ios::failbit);
@@ -25,27 +30,32 @@ std::istream& operator>>(std::istream& in, DataStruct& data) {
     while (iss >> token) {
         if (token == ":key1") {
             std::string value;
-            iss >> value;
-            if (!parseScientificDouble(value, temp.key1)) {
-                in.setstate(std::ios::failbit);
-                return in;
+            if (iss >> value) {
+                if (!parseScientificDouble(value, temp.key1)) {
+                    in.setstate(std::ios::failbit);
+                    return in;
+                }
+                hasKey1 = true;
             }
-            hasKey1 = true;
-        } else if (token == ":key2") {
+        } 
+        else if (token == ":key2") {
             std::string value;
-            iss >> value;
-            if (!parseHexULL(value, temp.key2)) {
-                in.setstate(std::ios::failbit);
-                return in;
+            if (iss >> value) {
+                if (!parseHexULL(value, temp.key2)) {
+                    in.setstate(std::ios::failbit);
+                    return in;
+                }
+                hasKey2 = true;
             }
-            hasKey2 = true;
-        } else if (token == ":key3") {
-            iss >> std::quoted(temp.key3);
-            hasKey3 = true;
+        } 
+        else if (token == ":key3") {
+            if (iss >> std::quoted(temp.key3)) {
+                hasKey3 = true;
+            }
         }
     }
 
-    if (!hasKey1 || !hasKey2 || !hasKey3) {
+    if (!(hasKey1 && hasKey2 && hasKey3)) {
         in.setstate(std::ios::failbit);
         return in;
     }
@@ -55,9 +65,10 @@ std::istream& operator>>(std::istream& in, DataStruct& data) {
 }
 
 std::ostream& operator<<(std::ostream& out, const DataStruct& data) {
-    out << "(:key1 " << std::scientific << std::setprecision(6) << data.key1
-        << ":key2 " << std::hex << std::uppercase << data.key2
-        << ":key3 " << std::quoted(data.key3) << ":)";
+    iofmtguard guard(out);
+    out << "(:key1 " << std::scientific << std::uppercase << std::setprecision(1) << data.key1
+        << " :key2 0x" << std::hex << data.key2
+        << " :key3 " << std::quoted(data.key3) << ":)";
     return out;
 }
 
