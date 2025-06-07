@@ -425,6 +425,14 @@ void geom_lab::inframe(const std::vector<Polygon>& value, std::istream& in,
     {
         throw std::invalid_argument("Wrong argument");
     }
+
+    char c;
+    if (in >> c)
+    {
+        throw std::invalid_argument("Wrong argument");
+    }
+    in.clear();
+
     if (value.empty())
     {
         throw std::logic_error("No polygons");
