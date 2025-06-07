@@ -31,16 +31,16 @@ namespace prokopenko {
     bool hasKey3 = false;
 
     in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' };
-
     for (int i = 0; i < 3 && in; ++i) {
       std::string label;
       in >> LabelIO{ label };
+
       if (label == "key1") {
-        in >> CharIO{ temp.key1 } >> DelimiterIO{ ':' };
+        in >> ComplexIO{ temp.key1 } >> DelimiterIO{ ':' };
         hasKey1 = in.good();
       }
       else if (label == "key2") {
-        in >> UllIO{ temp.key2 } >> DelimiterIO{ ':' };
+        in >> CharIO{ temp.key2 } >> DelimiterIO{ ':' };
         hasKey2 = in.good();
       }
       else if (label == "key3") {
@@ -52,7 +52,6 @@ namespace prokopenko {
         std::getline(in, skip, ':');
       }
     }
-
     in >> DelimiterIO{ ')' };
 
     if (hasKey1 && hasKey2 && hasKey3) {
@@ -61,7 +60,6 @@ namespace prokopenko {
     else {
       in.setstate(std::ios::failbit);
     }
-
     return in;
   }
 
@@ -72,12 +70,16 @@ namespace prokopenko {
     }
 
     iofmtguard fmtguard(out);
+    double real = data.key1.real();
+    double imag = data.key1.imag();
 
     out << "(:";
-    out << "key1 '" << data.key1 << "':";
-    out << "key2 " << data.key2 << ":";
+    out << "key1 #c(";
+    out << std::fixed << std::setprecision(1)
+      << real << " " << imag << "):";
+    out << "key2 '" << data.key2 << "':";
     out << "key3 " << std::quoted(data.key3) << ":)";
     return out;
   }
 
-} // namespace prokopenko
+}
