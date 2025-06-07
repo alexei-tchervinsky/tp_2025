@@ -1,4 +1,3 @@
-// DataStruct.h
 #ifndef DATASTRUCT_H
 #define DATASTRUCT_H
 
@@ -11,6 +10,7 @@ struct DataStruct {
     std::string key3;
 };
 
+// ѕерегрузки операторов объ€вл€ем, но не определ€аем
 std::istream& operator>>(std::istream& in, DataStruct& data);
 std::ostream& operator<<(std::ostream& out, const DataStruct& data);
 
