@@ -1,5 +1,4 @@
 #include <iostream>
-#include <Windows.h>
 #include <fstream>
 #include <sstream>
 #include <vector>
@@ -9,7 +8,6 @@
 
 int main() {
 
-    SetConsoleOutputCP(65001);
     std::unordered_map<std::string, std::set<size_t>> index;
     std::ifstream in ("input.txt");
 
