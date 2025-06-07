@@ -15,4 +15,4 @@ namespace prokopenko {
     stream_.flags(flags_);
   }
 
-} // namespace prokopenko
+}

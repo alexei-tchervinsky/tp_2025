@@ -1,7 +1,7 @@
 #include "IO_Objects.hpp"
 
+#include <cctype>
 #include <sstream>
-#include <iomanip>
 
 namespace prokopenko {
 
@@ -44,8 +44,8 @@ namespace prokopenko {
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, UllIO&& u) {
-    unsigned long long value;
+  std::istream& operator>>(std::istream& in, ULLIO&& u) {
+    unsigned long long value = 0;
     in >> value;
     if (in) {
       u.ref = value;
@@ -70,4 +70,4 @@ namespace prokopenko {
     return in;
   }
 
-} // namespace prokopenko
+}
