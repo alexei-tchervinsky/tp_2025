@@ -8,51 +8,75 @@
 #include <iterator>
 #include <limits>
 
-struct DataStruct
+namespace kuzminykh
 {
-    long long key1 = 0;
-    unsigned long long key2 = 0;
-    std::string key3;
-};
+    enum key_number { LongLong = 1, OCT = 2, STRING = 3 };
 
-struct DelimiterIO
-{
-    char exp;
-};
+    struct DataStruct
+    {
+        long long key1_;
+        unsigned long long key2_;
 
-struct LongLongIO
-{
-    long long& ref;
-};
+        std::string key3_;
 
-struct ULongLongOctIO
-{
-    unsigned long long& ref;
-};
+        friend std::ostream& operator<<(std::ostream& out, const DataStruct& src);
 
-struct StringIO
-{
-    std::string& ref;
-};
+        friend std::istream& operator>>(std::istream& in, DataStruct& dest);
+    };
 
-class iofmtguard
-{
-public:
-    iofmtguard(std::basic_ios<char>& s);
-    ~iofmtguard();
-private:
-    std::basic_ios<char>& s_;
-    std::streamsize width_;
-    char fill_;
-    std::streamsize precision_;
-    std::basic_ios<char>::fmtflags fmt_;
-};
+    bool compare(const DataStruct& a, const DataStruct& b);
 
-std::istream& operator>>(std::istream& in, DelimiterIO&& d);
-std::istream& operator>>(std::istream& in, LongLongIO&& d);
-std::istream& operator>>(std::istream& in, ULongLongOctIO&& d);
-std::istream& operator>>(std::istream& in, StringIO&& d);
-std::istream& operator>>(std::istream& in, DataStruct& d);
+    struct DelimiterIO
+    {
+        char delimiter;
+    };
 
-std::ostream& operator<<(std::ostream& out, const DataStruct& d);
-bool DataStructSort(const DataStruct& a, const DataStruct& d);
+    struct LongLongIO
+    {
+        long long& ref;
+    };
+
+    struct StringIO
+    {
+        std::string& ref;
+    };
+
+    struct OctUnsignedLongLongIO
+    {
+        unsigned long long& ref;
+    };
+
+
+    struct LabelIO
+    {
+        std::string label;
+    };
+
+    std::istream& operator>>(std::istream&, LabelIO&&);
+    std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
+    std::istream& operator>>(std::istream& in, LongLongIO&& dest);
+    std::istream& operator>>(std::istream& in, OctUnsignedLongLongIO&& dest);
+    std::istream& operator>>(std::istream& in, StringIO&& dest);
+
+    class iofmtguard {
+    public:
+        explicit iofmtguard(std::basic_ios<char>& s);
+
+        iofmtguard(const iofmtguard& other) = delete;
+
+        iofmtguard(iofmtguard&& other) noexcept = delete;
+
+        iofmtguard& operator=(const iofmtguard& other) = delete;
+
+        iofmtguard& operator=(iofmtguard&& other) noexcept = delete;
+
+        ~iofmtguard();
+
+    private:
+        std::basic_ios<char>& s_;
+        std::streamsize width_;
+        char fill_;
+        std::streamsize precision_;
+        std::basic_ios<char>::fmtflags fmt_;
+    };
+}
