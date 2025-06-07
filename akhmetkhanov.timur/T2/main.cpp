@@ -6,7 +6,6 @@
 #include <numeric>
 #include <sstream>
 
-// Итератор для чтения строк вместо слов
 class line_iterator {
 public:
     using iterator_category = std::input_iterator_tag;

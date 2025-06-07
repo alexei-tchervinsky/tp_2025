@@ -6,6 +6,7 @@
 #include <sstream>
 #include <cctype>
 #include <algorithm>
+#include <regex>
 
 namespace nspace {
     std::istream& operator>>(std::istream& is, DataStruct& ds) {
@@ -55,6 +56,10 @@ namespace nspace {
         std::string key2_str = oss.str();
         std::transform(key2_str.begin(), key2_str.end(), key2_str.begin(),
                       [](unsigned char c) { return std::tolower(c); });
+
+        // Убираем ведущий ноль в экспоненте
+        std::regex exp_regex(R"(e([+-])0(\d))");
+        key2_str = std::regex_replace(key2_str, exp_regex, "e$1$2");
 
         os << "(:key1 0x" << std::hex << std::uppercase << ds.key1 << std::dec
            << ":key2 " << key2_str
