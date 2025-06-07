@@ -23,99 +23,124 @@ int main(int argc, char **argv)
     // for(auto &i : polygons) {
     //         std::cout << i << std::endl;
     //     }
-    std::string a;
-    while (std::cin >> a)
+    // std::string a;
+    // while (std::cin >> a)
+    // {
+    //     if (a == "RECTS")
+    //     {
+    //         Rects(polygons);
+    //     }
+    //     else if(a == "INTERSECTIONS")
+    //     {
+    //         Polygon target;
+    //         std::cin >> target;
+    //         if (std::cin.fail())
+    //         {
+    //             std::cin.clear();
+    //             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    //             std::cout << "<INVALID COMMAND>\n";
+    //             continue;
+    //         }
+    //         std::size_t count = countIntersections(polygons, target);
+    //         std::cout << count << "\n";
+    //     }
+    //     else if (a == "AREA")
+    //     {
+    //         std::string arg;
+    //         if (std::cin >> arg)
+    //             areaCommand(polygons, arg);
+    //         else
+    //         {
+    //             std::cin.clear();
+    //             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    //             std::cout << "<INVALID COMMAND>\n";
+    //             continue;
+    //         }
+    //     }
+    //     else if (a == "MAX") {
+    //         std::string arg;
+    //         if (std::cin >> arg)
+    //             maxCommand(polygons, arg);
+    //         else {
+    //             std::cin.clear();
+    //             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    //             std::cout << "<INVALID COMMAND>\n";
+    //             continue;
+    //         }
+    //     }
+    //     else if (a == "MIN") {
+    //         std::string arg;
+    //         if (std::cin >> arg)
+    //             minCommand(polygons, arg);
+    //         else
+    //         {
+    //             std::cin.clear();
+    //             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    //             std::cout << "<INVALID COMMAND>\n";
+    //             continue;
+    //         }
+    //     }
+    //      else if (a == "COUNT") {
+    //         std::string arg;
+    //         if (std::cin >> arg) {
+    //             if (arg == "ODD") {
+    //                 countOdd(polygons);
+    //             }
+    //             else if (arg == "EVEN") {
+    //                 countEven(polygons);
+    //             }
+    //             else {
+    //                 try {
+    //                     int num = std::stoi(arg);
+    //                     if (num < 3) {
+    //                         std::cout << "<INVALID COMMAND>\n";
+    //                     }
+    //                     countNum(polygons, num);
+    //                 }
+    //                 catch (...) {
+    //                     std::cin.clear();
+    //                     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    //                     std::cout << "<INVALID COMMAND>\n";
+    //                 }
+    //             }
+    //         }
+    //         else {
+    //             std::cin.clear();
+    //             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    //             std::cout << "<INVALID COMMAND>\n";
+    //         }
+    //     }
+    //     else
+    //     {
+    //         std::cin.clear();
+    //         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    //         std::cout << "<INVALID COMMAND>\n";
+    //     }
+    // }
+    std::map< std::string, std::function< void(std::istream&, std::ostream&) > > commands;
     {
-        if (a == "RECTS")
+        using CommandFunc = void (*)(const std::vector<Polygon>&, std::istream&, std::ostream&);
+        using namespace std::placeholders;
+        commands["RECTS"] = std::bind(rectsCommand, std::cref(polygons), _1, _2);
+        commands["INTERSECTIONS"] = std::bind(intersectionsCommand, std::cref(polygons), _1, _2);
+        commands["AREA"] = std::bind(static_cast<CommandFunc>(areaCommand), std::cref(polygons), _1, _2);
+        commands["MAX"] = std::bind(static_cast<CommandFunc>(maxCommand), std::cref(polygons), _1, _2);
+        commands["MIN"] = std::bind(static_cast<CommandFunc>(minCommand), std::cref(polygons), _1, _2);
+        commands["COUNT"] = std::bind(countCommand, std::cref(polygons), _1, _2);
+    }
+    std::string cmd = "";
+    while (std::cin >> cmd)
+    {
+        try
         {
-            Rects(polygons);
+            commands.at(cmd)(std::cin, std::cout);
         }
-        else if(a == "INTERSECTIONS")
+        catch (...)
         {
-            Polygon target;
-            std::cin >> target;
-            if (std::cin.fail())
-            {
-                std::cin.clear();
-                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                std::cout << "<INVALID COMMAND>\n";
-                continue;
-            }
-            std::size_t count = countIntersections(polygons, target);
-            std::cout << count << "\n";
-        }
-        else if (a == "AREA")
-        {
-            std::string arg;
-            if (std::cin >> arg)
-                areaCommand(polygons, arg);
-            else
-            {
-                std::cin.clear();
-                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                std::cout << "<INVALID COMMAND>\n";
-                continue;
-            }
-        }
-        else if (a == "MAX") {
-            std::string arg;
-            if (std::cin >> arg)
-                maxCommand(polygons, arg);
-            else {
-                std::cin.clear();
-                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                std::cout << "<INVALID COMMAND>\n";
-                continue;
-            }
-        }
-        else if (a == "MIN") {
-            std::string arg;
-            if (std::cin >> arg)
-                minCommand(polygons, arg);
-            else
-            {
-                std::cin.clear();
-                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                std::cout << "<INVALID COMMAND>\n";
-                continue;
-            }
-        }
-         else if (a == "COUNT") {
-            std::string arg;
-            if (std::cin >> arg) {
-                if (arg == "ODD") {
-                    countOdd(polygons);
-                }
-                else if (arg == "EVEN") {
-                    countEven(polygons);
-                }
-                else {
-                    try {
-                        int num = std::stoi(arg);
-                        if (num < 3) {
-                            std::cout << "<INVALID COMMAND>\n";
-                        }
-                        countNum(polygons, num);
-                    }
-                    catch (...) {
-                        std::cin.clear();
-                        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                        std::cout << "<INVALID COMMAND>\n";
-                    }
-                }
-            }
-            else {
-                std::cin.clear();
-                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                std::cout << "<INVALID COMMAND>\n";
-            }
-        }
-        else
-        {
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             std::cout << "<INVALID COMMAND>\n";
         }
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
     return 0;
 }
