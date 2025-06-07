@@ -512,6 +512,13 @@ void geom_lab::maxseq(const std::vector<Polygon>& value,
         throw std::invalid_argument("Wrong argument");
     }
 
+    char c;
+    if (in >> c)
+    {
+        throw std::invalid_argument("Wrong argument");
+    }
+    in.clear();
+
     if (value.empty())
     {
         out << 0;
