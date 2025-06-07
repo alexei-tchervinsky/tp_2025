@@ -41,7 +41,6 @@ namespace tarasenko {
             auto isPointInside = [](const Point& p, const Polygon& poly) -> bool {
                 bool inside = false;
                 const std::vector<Point>& points = poly.points;
-                size_t n = points.size();
 
                 std::accumulate(points.begin(), points.end(), points.back(),
                     [&p, &inside, &points](const Point& pj, const Point& pi) {
