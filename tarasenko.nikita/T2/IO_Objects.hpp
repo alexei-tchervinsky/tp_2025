@@ -2,6 +2,7 @@
 #define IO_OBJECTS_HPP
 
 #include <iostream>
+#include <string>
 
 namespace tarasenko {
     struct DelimiterIO {

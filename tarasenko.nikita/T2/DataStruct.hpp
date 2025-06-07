@@ -1,6 +1,9 @@
 #ifndef DATASTRUCT_HPP
 #define DATASTRUCT_HPP
 
+#include <string>
+#include <iosfwd>
+
 namespace tarasenko {
     enum key_number { OCT = 1, CHAR = 2, STRING = 3 };
 

@@ -5,8 +5,7 @@
 #include <iomanip>
 
 namespace tarasenko {
-    std::ostream& operator<<(std::ostream& out, const DataStruct& src)
-    {
+    std::ostream& operator<<(std::ostream& out, const DataStruct& src) {
         std::ostream::sentry sentry(out);
         if (!sentry) {
             return out;
@@ -18,8 +17,7 @@ namespace tarasenko {
         return out;
     }
 
-    std::istream& operator>>(std::istream& in, DataStruct& dest)
-    {
+    std::istream& operator>>(std::istream& in, DataStruct& dest) {
         std::istream::sentry sentry(in);
         if (!sentry) {
             return in;
@@ -63,8 +61,7 @@ namespace tarasenko {
         return in;
     }
 
-    bool DataStructSort(const DataStruct& dest1, const DataStruct& dest2)
-    {
+    bool DataStructSort(const DataStruct& dest1, const DataStruct& dest2) {
         if (dest1.key1 != dest2.key1) {
             return dest1.key1 < dest2.key1;
         }
