@@ -161,6 +161,16 @@ namespace kuzminykh
         return in;
     }
 
+    std::istream& operator>>(std::istream& in, StringIO&& dest)
+    {
+        std::istream::sentry sentry(in);
+        if (!sentry)
+        {
+            return in;
+        }
+        return std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
+    }
+
     iofmtguard::iofmtguard(std::basic_ios<char>& s) :
         s_(s),
         width_(s.width()),
