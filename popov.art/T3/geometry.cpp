@@ -6,7 +6,6 @@ namespace popov {
 bool doPolygonsIntersect(const Polygon& poly1, const Polygon& poly2) {
     auto getProjections = [](const Polygon& poly, double nx, double ny) {
     };
-
     auto checkProjections = [&getProjections](const Polygon& poly1, const Polygon& poly2) {
         auto processPolygon = [&getProjections](const Polygon& sourcePoly, const Polygon& otherPoly) {
             return std::all_of(sourcePoly.points.begin(), sourcePoly.points.end(),
@@ -19,10 +18,8 @@ bool doPolygonsIntersect(const Polygon& poly1, const Polygon& poly2) {
                     return !(proj1.second < proj2.first || proj2.second < proj1.first);
                 });
         };
-
         return processPolygon(poly1, poly2) && processPolygon(poly2, poly1);
     };
-
     return checkProjections(poly1, poly2);
 }
 std::istream& operator>>(std::istream& in, DelimiterChar&& exp) {
