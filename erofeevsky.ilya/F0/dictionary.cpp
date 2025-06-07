@@ -177,3 +177,4 @@ void Dictionary::printStats() const {
     std::cout << "Load factor: " << static_cast<double>(nonEmptyBuckets) / TABLE_SIZE << "\n";
     std::cout << "Longest chain: " << maxChainLength << "\n";
 }
+
