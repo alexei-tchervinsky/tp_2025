@@ -50,3 +50,17 @@ namespace prokopenko {
         }
         return in;
     }
+
+    std::ostream& operator<<(std::ostream& out, const DataStruct& data) {
+        std::ostream::sentry guard(out);
+        if (!guard) {
+            return out;
+        }
+        iofmtguard fmtguard(out);
+        out << "(:";
+        out << "key1 '" << data.key1 << "':";
+        out << "key2 " << data.key2 << ":";
+        out << "key3 " << std::quoted(data.key3) << ":)";
+        return out;
+    }
+}
