@@ -18,16 +18,38 @@ void skipSpaces(const std::string& str, size_t& i) {
     while (i < str.size() && std::isspace(str[i])) ++i;
 }
 
-bool parse(const std::string& str, DataStruct& o);
-
-std::istream& operator>>(std::istream& in, DataStruct& o) {
-    std::string line;
-    std::getline(in, line);
-    if (!parse(line, o)) {
-        throw std::logic_error("Parse error: invalid input format");
+bool parseNumber(const std::string& str, double& result) {
+    try {
+        size_t pos = 0;
+        result = std::stod(str, &pos);
+        return pos == str.length();
+    } catch (...) {
+        return false;
     }
-    return in;
 }
+
+bool parseNumber(const std::string& str, long long& result) {
+    try {
+        size_t pos = 0;
+
+        if (str.size() > 2 && str[0] == '0') {
+            if (str[1] == 'x' || str[1] == 'X') {
+                result = std::stoll(str, &pos, 16);
+            } else if (str[1] == 'b' || str[1] == 'B') {
+                result = std::stoll(str.substr(2), &pos, 2);
+            } else {
+                result = std::stoll(str, &pos, 8);
+            }
+        } else {
+            result = std::stoll(str, &pos);
+        }
+
+        return pos == str.length();
+    } catch (...) {
+        return false;
+    }
+}
+
 
 std::ostream& operator<<(std::ostream& out, const DataStruct& o) {
     out << "(:key1 " << std::fixed << std::setprecision(1) << o.key1 << "D"
@@ -73,8 +95,8 @@ bool parse(const std::string& str, DataStruct& o) {
     int flags = 0;
 
     while (i < str.size()) {
-
-        if (str[i] != ':') break;
+        skipSpaces(str, i);
+        if (i >= str.size() || str[i] != ':') break;
         ++i;
 
         std::string key;
@@ -83,21 +105,23 @@ bool parse(const std::string& str, DataStruct& o) {
 
         if (key.empty()) return false;
 
+        skipSpaces(str, i);
+        if (i >= str.size()) return false;
+
         if (key == "key1") {
             if (flags & 1) return false;
             flags |= 1;
 
             std::string val;
-            while (i < str.size() && str[i] != ':' && str[i] != ')')
+            while (i < str.size() && str[i] != ':' && str[i] != ')') {
                 val += str[i++];
+            }
 
-            if (val.empty() || (val.back() != 'D' && val.back() != 'd'))
-                return false;
+            if (!val.empty() && (val.back() == 'd' || val.back() == 'D')) {
+                val.pop_back();
+            }
 
-            val.pop_back();
-            try {
-                o.key1 = std::stod(val);
-            } catch (...) {
+            if (!parseNumber(val, o.key1)) {
                 return false;
             }
         }
@@ -106,20 +130,20 @@ bool parse(const std::string& str, DataStruct& o) {
             flags |= 2;
 
             std::string val;
-            while (i < str.size() && str[i] != ':' && str[i] != ')')
+            while (i < str.size() && str[i] != ':' && str[i] != ')') {
                 val += str[i++];
+            }
 
-            if (val.size() < 2) return false;
+            if (val.size() >= 2) {
+                std::string suffix = val.substr(val.size() - 2);
+                for (auto& c : suffix) c = std::tolower(c);
 
-            std::string suffix = val.substr(val.size() - 2);
-            for (auto& c : suffix) c = std::toupper(c);
-            if (suffix != "LL") return false;
+                if (suffix == "ll" || suffix == "ul") {
+                    val.erase(val.size() - 2);
+                }
+            }
 
-            val.erase(val.size() - 2);
-
-            try {
-                o.key2 = std::stoll(val);
-            } catch (...) {
+            if (!parseNumber(val, o.key2)) {
                 return false;
             }
         }
@@ -143,7 +167,6 @@ bool parse(const std::string& str, DataStruct& o) {
             o.key3 = val;
         }
         else {
-
             return false;
         }
     }
