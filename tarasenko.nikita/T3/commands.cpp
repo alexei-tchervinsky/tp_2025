@@ -14,7 +14,6 @@ namespace tarasenko {
         }
 
         bool doPolygonsIntersect(const Polygon& poly1, const Polygon& poly2) {
-            // Check if any edges intersect
             bool edgesIntersect = std::any_of(poly1.points.begin(), poly1.points.end(),
                 [&poly1, &poly2](const Point& p1) {
                     size_t i = &p1 - &poly1.points[0];
@@ -39,14 +38,18 @@ namespace tarasenko {
 
             if (edgesIntersect) return true;
 
-            // Check if one polygon is completely inside another
             auto isPointInside = [](const Point& p, const Polygon& poly) -> bool {
                 struct State {
                     bool inside = false;
-                    Point prev = poly.points.back();
+                    Point prev;
                 };
 
-                State result = std::accumulate(poly.points.begin(), poly.points.end(), State{},
+                if (poly.points.empty()) return false;
+
+                State initial;
+                initial.prev = poly.points.back();
+
+                State result = std::accumulate(poly.points.begin(), poly.points.end(), initial,
                     [&p](State state, const Point& curr) {
                         if (((curr.y > p.y) != (state.prev.y > p.y))) {
                             int intersectX = (state.prev.x - curr.x) * (p.y - curr.y) / (state.prev.y - curr.y) + curr.x;
