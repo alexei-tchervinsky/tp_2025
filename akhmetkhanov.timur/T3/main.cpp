@@ -5,6 +5,7 @@
 #include <string>
 #include <map>
 #include <functional>
+#include <sstream>
 
 int main(int argc, char* argv[])
 {
@@ -28,6 +29,9 @@ int main(int argc, char* argv[])
     {
         polygons.push_back(polygon);
     }
+
+    // Очищаем состояние потока после чтения файла
+    file.clear();
     file.close();
 
     std::map<std::string, std::function<void(std::vector<geom_lab::Polygon>&, std::istream&, std::ostream&)>> commands;
@@ -76,29 +80,31 @@ int main(int argc, char* argv[])
         geom_lab::echo(polygons, in, out);
     };
 
-    std::string command;
-    while (std::cin >> command)
+    std::string line;
+    while (std::getline(std::cin, line))
     {
+        if (line.empty()) continue;
+
+        std::istringstream iss(line);
+        std::string command;
+        iss >> command;
+
         try
         {
             auto it = commands.find(command);
             if (it != commands.end())
             {
-                it->second(polygons, std::cin, std::cout);
+                it->second(polygons, iss, std::cout);
                 std::cout << std::endl;
             }
             else
             {
                 std::cout << "<INVALID COMMAND>" << std::endl;
-                std::string line;
-                std::getline(std::cin, line);
             }
         }
         catch (const std::exception& e)
         {
             std::cout << "<INVALID COMMAND>" << std::endl;
-            std::string line;
-            std::getline(std::cin, line);
         }
     }
 
