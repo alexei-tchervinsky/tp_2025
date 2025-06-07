@@ -100,62 +100,47 @@ std::istream& operator>>(std::istream& in, StringIO&& d)
     return std::getline(in >> DelimiterIO{ '"' }, d.ref, '"');
 }
 
-std::istream& operator>>(std::istream& in, DataStruct& d)
-{
+std::istream& operator>>(std::istream& in, DataStruct& dest) {
     std::istream::sentry sentry(in);
     if (!sentry) {
-
         return in;
     }
-    DataStruct temp;
-    bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
-
-
-    in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' };
-    while (in && in.peek() != ')') {
-        std::string label;
-        if (!(in >> label)) {
+    DataStruct input;
+    using sep = DelimiterIO;
+    using oct = ULongLongOctIO;
+    using ll = LongLongIO;
+    using str = StringIO;
+    in >> sep{ '(' } >> sep{ ':' };
+    bool isKey1 = false, isKey2 = false, isKey3 = false;
+    while (in.peek() != ')') {
+        std::string keyLabel;
+        if (!(in >> keyLabel)) {
             break;
         }
-
-        if (label == "key1" && !hasKey1) {
-            if (in >> LongLongIO{ temp.key1 } >> DelimiterIO{ ':' }) {
-                hasKey1 = true;
-            }
-            else {
-                break;
-            }
+        if (keyLabel == "key1" && !isKey1) {
+            in >> ll{ input.key1 } >> sep{ ':' };
+            isKey1 = true;
         }
-        else if (label == "key2" && !hasKey2) {
-            if (in >> ULongLongOctIO{ temp.key2 } >> DelimiterIO{ ':' }) {
-                hasKey2 = true;
-            }
-            else {
-                break;
-            }
+        else if (keyLabel == "key2" && !isKey2) {
+            in >> oct{ input.key2 } >> sep{ ':' };
+            isKey2 = true;
         }
-        else if (label == "key3" && !hasKey3) {
-            if (in >> StringIO{ temp.key3 } >> DelimiterIO{ ':' }) {
-                hasKey3 = true;
-            }
-            else {
-                break;
-            }
+        else if (keyLabel == "key3" && !isKey3) {
+            in >> str{ input.key3 } >> sep{ ':' };
+            isKey3 = true;
         }
         else {
             in.setstate(std::ios::failbit);
             break;
         }
     }
-
-    if (in && hasKey1 && hasKey2 && hasKey3) {
-        in >> DelimiterIO{ ')' };
-        d = temp;
+    if (in && isKey1 && isKey2 && isKey3) {
+        in >> sep{ ')' };
+        dest = input;
     }
     else {
         in.setstate(std::ios::failbit);
     }
-
     return in;
 }
 
