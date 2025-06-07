@@ -40,14 +40,11 @@ namespace tarasenko {
 
             auto isPointInside = [](const Point& p, const Polygon& poly) -> bool {
                 bool inside = false;
-                std::vector<Point> points = poly.points;
+                const std::vector<Point>& points = poly.points;
                 size_t n = points.size();
 
                 std::accumulate(points.begin(), points.end(), points.back(),
-                    [&p, &inside, &n](const Point& pj, const Point& pi) {
-                        size_t i = &pi - &points[0];
-                        size_t j = (i == 0) ? n - 1 : i - 1;
-
+                    [&p, &inside, &points](const Point& pj, const Point& pi) {
                         if (((pi.y > p.y) != (pj.y > p.y))) {
                             int intersectX = (pj.x - pi.x) * (p.y - pi.y) / (pj.y - pi.y) + pi.x;
                             if (p.x < intersectX) {
