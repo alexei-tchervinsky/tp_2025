@@ -1,6 +1,6 @@
-// DataStruct.cpp
 #include "DataStruct.h"
 #include <string>
+#include <iostream>
 
 std::istream& operator>>(std::istream& in, DataStruct& data) {
     char openBrace = '\0';
@@ -42,7 +42,8 @@ std::istream& operator>>(std::istream& in, DataStruct& data) {
                 in.setstate(std::ios_base::failbit);
                 return in;
             }
-            if (ch != 'u' && ch != 'U' || colon2 != ':') {
+            // Исправленная строка: добавлены скобки вокруг условия
+            if ((ch != 'u' && ch != 'U') || colon2 != ':') {
                 in.setstate(std::ios_base::failbit);
                 return in;
             }
@@ -82,5 +83,3 @@ std::ostream& operator<<(std::ostream& out, const DataStruct& data) {
         << ":key3 \"" << data.key3 << "\":)";
     return out;
 }
-
-
