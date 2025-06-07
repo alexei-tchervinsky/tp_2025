@@ -14,6 +14,7 @@ bool doPolygonsIntersect(const Polygon& poly1, const Polygon& poly2) {
         }
         return std::make_pair(minProj, maxProj);
     };
+};
     auto check_edges = [&](const Polygon& poly, const Polygon& other_poly) {
     return std::all_of(poly.points.begin(), poly.points.end(),
         [&](const Point& p1) {
