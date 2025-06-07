@@ -180,6 +180,10 @@ void countEven(const std::vector<Polygon>& polygons) {
 
 void countNum(const std::vector<Polygon>& polygons, int num) {
     size_t count = 0;
+    if (num <= 2)
+    {
+        return;
+    }
     for (const auto& poly : polygons) {
         if (static_cast<int>(poly.points.size()) == num) {
             count++;
