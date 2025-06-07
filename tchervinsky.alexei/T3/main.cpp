@@ -4,11 +4,16 @@
 #include <string>
 #include <iterator>
 #include <limits>
+#include <map>
+#include <functional>
 #include "DataStruct.hpp"
 #include "commands.hpp"
 #include "iofmtguard.hpp"
 
+
 using namespace nspace;
+
+using CommandHandler = std::function<void(const std::vector<Polygon>&)>;
 
 int main(int argc, char* argv[])
 {
@@ -47,6 +52,73 @@ int main(int argc, char* argv[])
     }
 #endif // ALEXEIT
 
+    if (polygons.empty())
+    {
+        LOG("Warning: No polygons loaded from file\n")
+    }
+
+    std::map<std::string, CommandHandler> commands;
+
+    commands["AREA"] = [](const std::vector<Polygon>& polygons) {
+        std::string param;
+        std::cin >> param;
+        area(polygons, param);
+    };
+
+    commands["MAX"] = [](const std::vector<Polygon>& polygons) {
+        std::string param;
+        std::cin >> param;
+        max(polygons, param);
+    };
+
+    commands["MIN"] = [](const std::vector<Polygon>& polygons) {
+        std::string param;
+        std::cin >> param;
+        min(polygons, param);
+    };
+
+    commands["COUNT"] = [](const std::vector<Polygon>& polygons) {
+        std::string param;
+        std::cin >> param;
+        count(polygons, param);
+    };
+
+    commands["ECHO"] = [&polygons, argv](const std::vector<Polygon>&) {
+        Polygon target;
+        std::cin >> target;
+        echo(polygons, target, argv[1]);
+    };
+
+    commands["MAXSEQ"] = [](const std::vector<Polygon>& polygons) {
+        Polygon target;
+        std::cin >> target;
+        maxSeq(polygons, target);
+    };
+
+    std::string cmd;
+    while (std::cin >> cmd)
+    {
+        try
+        {
+            auto it = commands.find(cmd);
+            if (it != commands.end())
+            {
+                it->second(polygons);
+            }
+            else
+            {
+                throw std::invalid_argument("<INVALID COMMAND>");
+            }
+        }
+        catch (const std::invalid_argument& e)
+        {
+            std::cout << e.what() << '\n';
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+    }
+
+#if 0
     std::string cmd;
     while (std::cin >> cmd)
     {
@@ -124,6 +196,6 @@ int main(int argc, char* argv[])
             // std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // Игнорируем оставшийся ввод
         }
     }
-
+#endif
     return 0;
 }
