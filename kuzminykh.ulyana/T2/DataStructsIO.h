@@ -35,11 +35,6 @@ struct StringIO
     std::string& ref;
 };
 
-struct LabelIO
-{
-    std::string exp;
-};
-
 class iofmtguard
 {
 public:
@@ -57,7 +52,6 @@ std::istream& operator>>(std::istream& in, DelimiterIO&& d);
 std::istream& operator>>(std::istream& in, LongLongIO&& d);
 std::istream& operator>>(std::istream& in, ULongLongOctIO&& d);
 std::istream& operator>>(std::istream& in, StringIO&& d);
-std::istream& operator>>(std::istream& in, LabelIO&& d);
 std::istream& operator>>(std::istream& in, DataStruct& d);
 
 std::ostream& operator<<(std::ostream& out, const DataStruct& d);
