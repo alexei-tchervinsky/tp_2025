@@ -62,7 +62,7 @@ namespace tarasenko {
                     const Point& p1 = poly.points[i];
                     const Point& p2 = poly.points[j];
 
-                    if (((p1.y > point.y) != (p2.y > point.y)) {
+                    if (((p1.y > point.y) != (p2.y > point.y))) {
                         double intersectX = (p2.x - p1.x) * (point.y - p1.y) / (p2.y - p1.y) + p1.x;
                         if (point.x <= intersectX) {
                             inside = !inside;
