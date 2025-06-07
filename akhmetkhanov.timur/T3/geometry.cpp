@@ -51,7 +51,8 @@ std::istream& geom_lab::operator>>(std::istream& in, Point& point)
     }
     using delChar = DelimiterChar;
     Point temp = { 0, 0 };
-    in >> delChar{ '(' } >> temp.x >> delChar{ ';' } >> temp.y >> delChar{ ')' };
+    in >> delChar{ '(' } >> temp.x >> delChar{ ';' } >> temp.y >>
+    delChar{ ')' };
     if (in)
     {
         point = temp;
@@ -70,7 +71,8 @@ bool geom_lab::operator==(const Polygon& lhs, const Polygon& rhs)
     {
         return false;
     }
-    return std::equal(lhs.points.cbegin(), lhs.points.cend(), rhs.points.cbegin());
+    return std::equal(lhs.points.cbegin(), lhs.points.cend(),
+                      rhs.points.cbegin());
 }
 
 bool geom_lab::operator<=(const Polygon& lhs, const Polygon& rhs)
@@ -115,9 +117,11 @@ std::istream& geom_lab::operator>>(std::istream& in, Polygon& polygon)
     return in;
 }
 
-double geom_lab::AreaPolygon::operator()(double area, const Point& p2, const Point& p3)
+double geom_lab::AreaPolygon::operator()(double area, const Point& p2,
+                                         const Point& p3)
 {
-    area += 0.5 * std::abs((p3.y - p1.y) * (p2.x - p1.x) - (p3.x - p1.x) * (p2.y - p1.y));
+    area += 0.5 * std::abs((p3.y - p1.y) * (p2.x - p1.x) - (p3.x - p1.x)
+                           * (p2.y - p1.y));
     p1 = p2;
     return area;
 }
@@ -176,53 +180,83 @@ bool geom_lab::accumulateRightAngle::operator()(const Point& p3)
 }
 
 namespace {
-bool compareByX(const geom_lab::Point& lhs, const geom_lab::Point& rhs) { return lhs.x < rhs.x; }
-bool compareByY(const geom_lab::Point& lhs, const geom_lab::Point& rhs) { return lhs.y < rhs.y; }
-bool comparePolygonsByMaxX(const geom_lab::Polygon& lhs, const geom_lab::Polygon& rhs) { return geom_lab::findMaxX(lhs) < geom_lab::findMaxX(rhs); }
-bool comparePolygonsByMaxY(const geom_lab::Polygon& lhs, const geom_lab::Polygon& rhs) { return geom_lab::findMaxY(lhs) < geom_lab::findMaxY(rhs); }
-bool comparePolygonsByMinX(const geom_lab::Polygon& lhs, const geom_lab::Polygon& rhs) { return geom_lab::findMinX(lhs) < geom_lab::findMinX(rhs); }
-bool comparePolygonsByMinY(const geom_lab::Polygon& lhs, const geom_lab::Polygon& rhs) { return geom_lab::findMinY(lhs) < geom_lab::findMinY(rhs); }
+bool compareByX(const geom_lab::Point& lhs, const geom_lab::Point& rhs)
+{ return lhs.x < rhs.x; }
+bool compareByY(const geom_lab::Point& lhs, const geom_lab::Point& rhs)
+{ return lhs.y < rhs.y; }
+bool comparePolygonsByMaxX(const geom_lab::Polygon& lhs,
+                           const geom_lab::Polygon& rhs)
+{ return geom_lab::findMaxX(lhs)
+    < geom_lab::findMaxX(rhs); }
+bool comparePolygonsByMaxY(const geom_lab::Polygon& lhs,
+                           const geom_lab::Polygon& rhs)
+{ return geom_lab::findMaxY(lhs)
+    < geom_lab::findMaxY(rhs); }
+bool comparePolygonsByMinX(const geom_lab::Polygon& lhs,
+                           const geom_lab::Polygon& rhs)
+{ return geom_lab::findMinX(lhs) < geom_lab::findMinX(rhs); }
+bool comparePolygonsByMinY(const geom_lab::Polygon& lhs,
+                           const geom_lab::Polygon& rhs)
+{ return geom_lab::findMinY(lhs) < geom_lab::findMinY(rhs); }
 }
 
 int geom_lab::findMaxX(const Polygon& polygon)
 {
-    return std::max_element(polygon.points.cbegin(), polygon.points.cend(), compareByX)->x;
+    return std::max_element(polygon.points.cbegin(),
+                            polygon.points.cend(), compareByX)->x;
 }
 
 int geom_lab::findMaxY(const Polygon& polygon)
 {
-    return std::max_element(polygon.points.cbegin(), polygon.points.cend(), compareByY)->y;
+    return std::max_element(polygon.points.cbegin(),
+                            polygon.points.cend(), compareByY)->y;
 }
 
 int geom_lab::findMinX(const Polygon& polygon)
 {
-    return std::min_element(polygon.points.cbegin(), polygon.points.cend(), compareByX)->x;
+    return std::min_element(polygon.points.cbegin(), polygon.points.cend(),
+                            compareByX)->x;
 }
 
 int geom_lab::findMinY(const Polygon& polygon)
 {
-    return std::min_element(polygon.points.cbegin(), polygon.points.cend(), compareByY)->y;
+    return std::min_element(polygon.points.cbegin(), polygon.points.cend(),
+                            compareByY)->y;
 }
 
 geom_lab::Polygon geom_lab::getBoundingBox(const std::vector<Polygon>& polygon)
 {
-    int pointMaxX = findMaxX(*std::max_element(polygon.cbegin(), polygon.cend(), comparePolygonsByMaxX));
-    int pointMaxY = findMaxY(*std::max_element(polygon.cbegin(), polygon.cend(), comparePolygonsByMaxY));
-    int pointMinX = findMinX(*std::min_element(polygon.cbegin(), polygon.cend(), comparePolygonsByMinX));
-    int pointMinY = findMinY(*std::min_element(polygon.cbegin(), polygon.cend(), comparePolygonsByMinY));
-    std::vector< Point > res{ {pointMinX, pointMinY}, {pointMinX, pointMaxY}, {pointMaxX, pointMaxY}, {pointMaxX, pointMinY} };
+    int pointMaxX = findMaxX(*std::max_element(polygon.cbegin(),
+                                    polygon.cend(), comparePolygonsByMaxX));
+    int pointMaxY = findMaxY(*std::max_element(polygon.cbegin()
+                                    polygon.cend(), comparePolygonsByMaxY));
+    int pointMinX = findMinX(*std::min_element(polygon.cbegin(),
+                                    polygon.cend(), comparePolygonsByMinX));
+    int pointMinY = findMinY(*std::min_element(polygon.cbegin(),
+                                    polygon.cend(), comparePolygonsByMinY));
+    std::vector< Point > res{ {pointMinX, pointMinY},
+        {pointMinX, pointMaxY}, {pointMaxX, pointMaxY},
+        {pointMaxX, pointMinY} };
     return Polygon{ res };
 }
 
 namespace {
-bool isEven(const geom_lab::Polygon& polygon) { return (polygon.points.size() % 2 == 0); }
-bool isOdd(const geom_lab::Polygon& polygon) { return !(polygon.points.size() % 2 == 0); }
-bool isSize(const geom_lab::Polygon& polygon, size_t numPoints) { return (polygon.points.size() == numPoints); }
-bool comparatorPoints(const geom_lab::Polygon& lhs, const geom_lab::Polygon& rhs) { return lhs.points.size() < rhs.points.size(); }
-bool comparatorArea(const geom_lab::Polygon& lhs, const geom_lab::Polygon& rhs) { return geom_lab::getPolygonArea(lhs) < geom_lab::getPolygonArea(rhs); }
+bool isEven(const geom_lab::Polygon& polygon)
+{ return (polygon.points.size() % 2 == 0); }
+bool isOdd(const geom_lab::Polygon& polygon)
+{ return !(polygon.points.size() % 2 == 0); }
+bool isSize(const geom_lab::Polygon& polygon, size_t numPoints)
+{ return (polygon.points.size() == numPoints); }
+bool comparatorPoints(const geom_lab::Polygon& lhs,
+                      const geom_lab::Polygon& rhs)
+{ return lhs.points.size() < rhs.points.size(); }
+bool comparatorArea(const geom_lab::Polygon& lhs,
+                    const geom_lab::Polygon& rhs)
+{ return geom_lab::getPolygonArea(lhs) < geom_lab::getPolygonArea(rhs); }
 }
 
-void geom_lab::area(const std::vector<Polygon>& value, std::istream& in, std::ostream& out)
+void geom_lab::area(const std::vector<Polygon>& value,
+                    std::istream& in, std::ostream& out)
 {
     iofmtguard guard(out);
     out << std::setprecision(1) << std::fixed;
@@ -232,11 +266,13 @@ void geom_lab::area(const std::vector<Polygon>& value, std::istream& in, std::os
     using namespace std::placeholders;
     if (argument == "EVEN")
     {
-        std::copy_if(value.cbegin(), value.cend(), std::back_inserter(polygons), isEven);
+        std::copy_if(value.cbegin(), value.cend(),
+                     std::back_inserter(polygons), isEven);
     }
     else if (argument == "ODD")
     {
-        std::copy_if(value.cbegin(), value.cend(), std::back_inserter(polygons), isOdd);
+        std::copy_if(value.cbegin(), value.cend(),
+                     std::back_inserter(polygons), isOdd);
     }
     else if (argument == "MEAN")
     {
@@ -253,11 +289,14 @@ void geom_lab::area(const std::vector<Polygon>& value, std::istream& in, std::os
         {
             throw std::logic_error("Wrong number");
         }
-        std::function< bool(const Polygon&) > isCorrectCount = std::bind(isSize, _1, countPoints);
-        std::copy_if(value.cbegin(), value.cend(), std::back_inserter(polygons), isCorrectCount);
+        std::function< bool(const Polygon&)
+        > isCorrectCount = std::bind(isSize, _1, countPoints);
+        std::copy_if(value.cbegin(), value.cend(),
+                     std::back_inserter(polygons), isCorrectCount);
     }
     std::vector< double > areas;
-    std::transform(polygons.cbegin(), polygons.cend(), std::back_inserter(areas), getPolygonArea);
+    std::transform(polygons.cbegin(), polygons.cend(),
+                   std::back_inserter(areas), getPolygonArea);
     double res = std::accumulate(areas.cbegin(), areas.cend(), 0.0);
     if (argument == "MEAN")
     {
@@ -269,7 +308,8 @@ void geom_lab::area(const std::vector<Polygon>& value, std::istream& in, std::os
     }
 }
 
-void geom_lab::max(const std::vector<Polygon>& value, std::istream& in, std::ostream& out)
+void geom_lab::max(const std::vector<Polygon>& value, std::istream& in,
+                   std::ostream& out)
 {
     std::string argument = "";
     in >> argument;
@@ -281,11 +321,13 @@ void geom_lab::max(const std::vector<Polygon>& value, std::istream& in, std::ost
     {
         iofmtguard guard(out);
         out << std::setprecision(1) << std::fixed;
-        out << getPolygonArea(*std::max_element(value.begin(), value.end(), comparatorArea));
+        out << getPolygonArea(*std::max_element(value.begin(),
+                                                value.end(), comparatorArea));
     }
     else if (argument == "VERTEXES")
     {
-        out << std::max_element(value.begin(), value.end(), comparatorPoints)->points.size();
+        out << std::max_element(value.begin(), value.end(),
+                                comparatorPoints)->points.size();
     }
     else
     {
@@ -293,7 +335,8 @@ void geom_lab::max(const std::vector<Polygon>& value, std::istream& in, std::ost
     }
 }
 
-void geom_lab::min(const std::vector<Polygon>& value, std::istream& in, std::ostream& out)
+void geom_lab::min(const std::vector<Polygon>& value,
+                   std::istream& in, std::ostream& out)
 {
     std::string argument = "";
     in >> argument;
@@ -305,11 +348,13 @@ void geom_lab::min(const std::vector<Polygon>& value, std::istream& in, std::ost
     {
         iofmtguard guard(out);
         out << std::setprecision(1) << std::fixed;
-        out << getPolygonArea(*std::min_element(value.begin(), value.end(), comparatorArea));
+        out << getPolygonArea(*std::min_element(value.begin(),
+                                                value.end(), comparatorArea));
     }
     else if (argument == "VERTEXES")
     {
-        out << std::min_element(value.begin(), value.end(), comparatorPoints)->points.size();
+        out << std::min_element(value.begin(), value.end(),
+                                comparatorPoints)->points.size();
     }
     else
     {
@@ -317,7 +362,8 @@ void geom_lab::min(const std::vector<Polygon>& value, std::istream& in, std::ost
     }
 }
 
-void geom_lab::count(const std::vector<Polygon>& value, std::istream& in, std::ostream& out)
+void geom_lab::count(const std::vector<Polygon>& value,
+                     std::istream& in, std::ostream& out)
 {
     std::string argument = "";
     in >> argument;
@@ -337,7 +383,8 @@ void geom_lab::count(const std::vector<Polygon>& value, std::istream& in, std::o
             throw std::logic_error("Wrong number");
         }
         using namespace std::placeholders;
-        std::function< bool(const Polygon&) > isCorrectCount = std::bind(isSize, _1, countPoints);
+        std::function< bool(const Polygon&) >
+        isCorrectCount = std::bind(isSize, _1, countPoints);
         out << std::count_if(value.begin(), value.end(), isCorrectCount);
     }
 }
@@ -347,7 +394,8 @@ void geom_lab::rightshapes(const std::vector<Polygon>& value, std::ostream& out)
     out << std::count_if(value.cbegin(), value.cend(), isRightAngle);
 }
 
-void geom_lab::inframe(const std::vector<Polygon>& value, std::istream& in, std::ostream& out)
+void geom_lab::inframe(const std::vector<Polygon>& value, std::istream& in,
+                       std::ostream& out)
 {
     Polygon argument;
     in >> argument;
@@ -370,7 +418,8 @@ void geom_lab::inframe(const std::vector<Polygon>& value, std::istream& in, std:
     }
 }
 
-void geom_lab::echo(std::vector<Polygon>& value, std::istream& in, std::ostream& out)
+void geom_lab::echo(std::vector<Polygon>& value, std::istream& in,
+                    std::ostream& out)
 {
     Polygon polygon;
     in >> polygon;
@@ -397,7 +446,8 @@ void geom_lab::echo(std::vector<Polygon>& value, std::istream& in, std::ostream&
 
 // Variant 2 commands implementation
 
-void geom_lab::lessarea(const std::vector<Polygon>& value, std::istream& in, std::ostream& out)
+void geom_lab::lessarea(const std::vector<Polygon>& value,
+                        std::istream& in, std::ostream& out)
 {
     Polygon polygon;
     in >> polygon;
@@ -414,7 +464,8 @@ void geom_lab::lessarea(const std::vector<Polygon>& value, std::istream& in, std
     out << std::count_if(value.cbegin(), value.cend(), hasLessArea);
 }
 
-void geom_lab::maxseq(const std::vector<Polygon>& value, std::istream& in, std::ostream& out)
+void geom_lab::maxseq(const std::vector<Polygon>& value,
+                      std::istream& in, std::ostream& out)
 {
     Polygon polygon;
     in >> polygon;
