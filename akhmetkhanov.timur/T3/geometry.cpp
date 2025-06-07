@@ -445,11 +445,17 @@ void geom_lab::echo(std::vector<Polygon>& value, std::istream& in,
 {
     Polygon polygon;
     in >> polygon;
-
-    if (!in || polygon.points.size() < 3)
+    if (!in)
     {
         throw std::invalid_argument("Wrong argument");
     }
+
+    char c;
+    if (in >> c)
+    {
+        throw std::invalid_argument("Wrong argument");
+    }
+    in.clear();
 
     size_t polygonCount = 0;
     std::vector<Polygon> tempValue;
@@ -471,7 +477,6 @@ void geom_lab::echo(std::vector<Polygon>& value, std::istream& in,
     value = std::move(tempValue);
     out << polygonCount;
 }
-
 
 void geom_lab::perms(const std::vector<Polygon>& value,
                      std::istream& in, std::ostream& out)
