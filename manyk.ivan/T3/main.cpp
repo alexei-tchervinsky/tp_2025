@@ -248,7 +248,7 @@ void maxCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ost
             [](const Polygon& a, const Polygon& b) {
                 return computeArea(a) < computeArea(b);
             });
-        std::cout << std::fixed << std::setprecision(1) << computeArea(*max_it) << "\n";
+        out << std::fixed << std::setprecision(1) << computeArea(*max_it) << "\n";
     }
     else if (arg == "VERTEXES")
     {
@@ -256,11 +256,11 @@ void maxCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ost
             [](const Polygon& a, const Polygon& b) {
                 return a.points.size() < b.points.size();
             });
-        std::cout << max_it->points.size() << "\n";
+        out << max_it->points.size() << "\n";
     }
     else
     {
-        std::cout << "<INVALID COMMAND>\n";
+        out << "<INVALID COMMAND>\n";
     }
 }
 
@@ -269,7 +269,7 @@ void minCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ost
     std::string arg;
     if (polygons.empty())
     {
-        std::cout << "<INVALID COMMAND>\n";
+        out << "<INVALID COMMAND>\n";
         return;
     }
     in >> arg;
@@ -279,7 +279,7 @@ void minCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ost
             [](const Polygon& a, const Polygon& b) {
                 return computeArea(a) < computeArea(b);
             });
-        std::cout << std::fixed << std::setprecision(1) << computeArea(*min_it) << "\n";
+        out << std::fixed << std::setprecision(1) << computeArea(*min_it) << "\n";
     }
     else if (arg == "VERTEXES")
     {
@@ -287,10 +287,10 @@ void minCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ost
             [](const Polygon& a, const Polygon& b) {
                 return a.points.size() < b.points.size();
             });
-        std::cout << min_it->points.size() << "\n";
+        out << min_it->points.size() << "\n";
     }
     else {
-        std::cout << "<INVALID COMMAND>\n";
+        out << "<INVALID COMMAND>\n";
     }
 }
 
