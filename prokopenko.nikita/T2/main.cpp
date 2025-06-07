@@ -1,14 +1,25 @@
 #include <iostream>
-#include <sstream>
+#include <vector>
+#include <algorithm>
+#include <limits>
 #include "DataStruct.hpp"
-#include "IO_Objects.hpp"
-
-using namespace prokopenko;
 
 int main() {
-    DataStruct ds;
-    while (std::cin >> ds) {
-        std::cout << ds << std::endl;
+  std::vector<prokopenko::DataStruct> data;
+  prokopenko::DataStruct temp;
+  while (!std::cin.eof()) {
+    if (std::cin >> temp) {
+      data.push_back(temp);
     }
-    return 0;
+    else {
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+  }
+  std::sort(data.begin(), data.end());
+  for (const auto& el : data) {
+    std::cout << el << "\n";
+  }
+
+  return 0;
 }

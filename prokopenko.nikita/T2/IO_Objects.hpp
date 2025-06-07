@@ -1,17 +1,36 @@
-#pragma once
+#ifndef IO_OBJECTS_HPP
+#define IO_OBJECTS_HPP
+
+#include <string>
 #include <iostream>
-#include "DataStruct.hpp"
 
 namespace prokopenko {
 
-struct CharIO {
+  struct DelimiterIO {
+    char expected;
+  };
+
+  struct LabelIO {
+    std::string& ref;
+  };
+
+  struct CharIO {
     char& ref;
-};
+  };
 
-std::istream& operator>>(std::istream& in, CharIO&& c);
-std::ostream& operator<<(std::ostream& out, const CharIO& c);
+  struct ULLIO {
+    unsigned long long& ref;
+  };
 
-std::istream& operator>>(std::istream& in, DataStruct& ds);
-std::ostream& operator<<(std::ostream& out, const DataStruct& ds);
+  struct StringIO {
+    std::string& ref;
+  };
 
-} // namespace prokopenko
+  std::istream& operator>>(std::istream& in, DelimiterIO&&);
+  std::istream& operator>>(std::istream& in, LabelIO&&);
+  std::istream& operator>>(std::istream& in, CharIO&&);
+  std::istream& operator>>(std::istream& in, ULLIO&&);
+  std::istream& operator>>(std::istream& in, StringIO&&);
+}
+
+#endif
