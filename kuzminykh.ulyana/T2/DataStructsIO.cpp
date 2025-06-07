@@ -145,7 +145,7 @@ std::ostream& operator<<(std::ostream& out, const DataStruct& data) {
 
     iofmtguard guard(out);
     out << "(:key1 " << data.key1 << "ll:";
-    out << "key2 " << '0' << data.key2 << "ull:";
+    out << "key2 " << data.key2 << "ull:";
     out << "key3 \"" << data.key3 << "\":)";
     return out;
 }
