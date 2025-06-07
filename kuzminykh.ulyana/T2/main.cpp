@@ -1,61 +1,39 @@
 ﻿#include "DataStructsIO.h"
+#include <iostream>
+#include <vector>
+#include <iterator>
+#include <limits>
+#include <algorithm>
 
 int main()
 {
-    std::vector<DataStruct> data;
+    std::vector<DataStruct> v;
 
-    try
+    while (true)
     {
-        std::copy(
-            std::istream_iterator<DataStruct>(std::cin),
-            std::istream_iterator<DataStruct>(),
-            std::back_inserter(data)
-        );
-
-        if (data.empty())
+        DataStruct tmp;
+        if (std::cin >> tmp)
         {
-            return 0;
+            v.push_back(tmp);
         }
-
-        std::sort(data.begin(), data.end(), [](const DataStruct& a, const DataStruct& b)
-            {
-                if (a.key1 != b.key1) return a.key1 < b.key1;
-                if (a.key2 != b.key2) return a.key2 < b.key2;
-                return a.key3.length() < b.key3.length();
-            });
-
-        std::copy(
-            data.begin(),
-            data.end(),
-            std::ostream_iterator<DataStruct>(std::cout, "\n")
-        );
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << "Error: " << e.what() << '\n';
-        return 1;
-    }
-
-    try
-    {
-        while (std::cin)
+        else
         {
-            DataStruct tmp;
-            if (std::cin >> tmp)
-            {
-                data.push_back(tmp);
-            }
-            else
-            {
-                std::cin.clear();
-                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            }
+            if (std::cin.eof()) break;
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
     }
-    catch (const std::exception& e)
+
+    std::sort(v.begin(), v.end(), [](const DataStruct& a, const DataStruct& b)
+        {
+        if (a.key1 != b.key1) return a.key1 < b.key1;
+        if (a.key2 != b.key2) return a.key2 < b.key2;
+        return a.key3.length() < b.key3.length();
+        });
+
+    for (const auto& ds : v)
     {
-        std::cerr << "Error: " << e.what() << '\n';
-        return 1;
+        std::cout << ds << "\n";
     }
 
     return 0;
