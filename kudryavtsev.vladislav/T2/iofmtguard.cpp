@@ -1,7 +1,7 @@
 #include "iofmtguard.hpp"
 
 namespace myspace {
-    iofmtguard::iofmtguard(std::basic_ios<char>& s):
+    iofmtguard::iofmtguard(std::basic_ios<char>& s) :
         s_(s),
         width_(s.width()),
         fill_(s.fill()),
@@ -15,4 +15,3 @@ namespace myspace {
         s_.flags(fmt_);
     }
 }
-

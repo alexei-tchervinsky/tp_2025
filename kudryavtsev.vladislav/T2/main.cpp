@@ -1,25 +1,26 @@
-//CMP LSP and ULL BIN//
-
 #include "DataStruct.hpp"
-
 #include <vector>
 #include <iostream>
-#include <iterator>
+#include <sstream>
 #include <algorithm>
-#include <limits>
-
-using myspace::DataStruct;
 
 int main() {
-    std::vector<DataStruct> ds;
-    while(!std::cin.eof()) {
-        std::copy(std::istream_iterator<DataStruct>(std::cin), std::istream_iterator<DataStruct>(), std::back_inserter(ds));
-        if(!std::cin.fail()) continue;
-        std::cin.clear();
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::vector<myspace::DataStruct> ds;
+    std::string line;
+
+    while (std::getline(std::cin, line)) {
+        std::istringstream iss(line);
+        myspace::DataStruct temp;
+
+        if (iss >> temp) {
+            ds.push_back(temp);
+        }
     }
     std::sort(ds.begin(), ds.end(), myspace::compare);
-    std::copy(ds.begin(), ds.end(), std::ostream_iterator<DataStruct>(std::cout, "\n"));
+    for (const auto& item : ds) {
+        std::cout << item << "\n";
+    }
+
     return 0;
 }
 

@@ -1,37 +1,21 @@
 #ifndef IO_OBJECTS_HPP
 #define IO_OBJECTS_HPP
 
-#include <complex>
-#include <utility>
 #include <iostream>
+#include <string>
 
 namespace myspace {
-    struct LimitingSymbolIO {
-        char symbol;
-    };
+    struct DelimiterIO { char exp; };
+    struct LabelIO { std::string label; };
+    struct ULLHexIO { unsigned long long& ref; };
+    struct DoubleSciIO { double& ref; };
+    struct StringIO { std::string& ref; };
 
-    struct LabelIO {
-        std::string label;
-    };
-
-    struct ComplexIO {
-        std::complex<double>& ref;
-    };
-
-    struct BinaryIO {
-        std::string& ref;
-    };
-
-    struct StringIO {
-        std::string& ref;
-    };
-
-    std::istream& operator>>(std::istream&, LimitingSymbolIO&&);
+    std::istream& operator>>(std::istream&, DelimiterIO&&);
     std::istream& operator>>(std::istream&, LabelIO&&);
-    std::istream& operator>>(std::istream&, ComplexIO&&);
-    std::istream& operator>>(std::istream&, BinaryIO&&);
+    std::istream& operator>>(std::istream&, ULLHexIO&&);
+    std::istream& operator>>(std::istream&, DoubleSciIO&&);
     std::istream& operator>>(std::istream&, StringIO&&);
 }
 
 #endif
-
