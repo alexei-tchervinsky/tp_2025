@@ -24,23 +24,27 @@ std::istream& operator>>(std::istream& in, DataStruct& ds) {
     }
 
     line += ')';
-
     std::istringstream iss(line);
     char ch;
 
-    iss >> ch;
-    if (ch != '(') {
+    if (!(iss >> ch) || ch != '(') {
         in.setstate(std::ios::failbit);
         return in;
     }
 
     std::string key;
     while (iss >> ch && ch == ':') {
-        iss >> key;
+        if (!(iss >> key)) {
+            in.setstate(std::ios::failbit);
+            return in;
+        }
 
         if (key == "key1") {
             std::string value;
-            iss >> value;
+            if (!(iss >> value)) {
+                in.setstate(std::ios::failbit);
+                return in;
+            }
             try {
                 size_t pos = 0;
                 temp.key1 = std::stoull(value, &pos, 8);
@@ -57,30 +61,27 @@ std::istream& operator>>(std::istream& in, DataStruct& ds) {
         }
         else if (key == "key2") {
             std::string value;
-            iss >> value;
-            if (value.size() == 3 && value[0] == '\'' && value[2] == '\'') {
-                temp.key2 = value[1];
-                key2_set = true;
-            }
-            else {
+            if (!(iss >> value) || value.size() != 3 || value[0] != '\'' || value[2] != '\'') {
                 in.setstate(std::ios::failbit);
                 return in;
             }
+            temp.key2 = value[1];
+            key2_set = true;
         }
         else if (key == "key3") {
             std::string value;
             iss >> std::ws;
-            if (iss.peek() == '"') {
-                iss.get();
-                std::getline(iss, temp.key3, '"');
-                key3_set = true;
-            }
-            else {
+            if (iss.peek() != '"') {
                 in.setstate(std::ios::failbit);
                 return in;
             }
+            iss.get();
+            std::getline(iss, temp.key3, '"');
+            key3_set = true;
         }
         else {
+            in.setstate(std::ios::failbit);
+            return in;
         }
 
         while (iss.get(ch) && ch != ':') {
@@ -89,20 +90,9 @@ std::istream& operator>>(std::istream& in, DataStruct& ds) {
                 return in;
             }
         }
-        iss.putback(ch);
-    }
-
-    if (ch != ':') {
-        iss >> ch;
-    }
-    if (ch != ':') {
-        in.setstate(std::ios::failbit);
-        return in;
-    }
-    iss >> ch;
-    if (ch != ')') {
-        in.setstate(std::ios::failbit);
-        return in;
+        if (ch == ':') {
+            iss.putback(ch);
+        }
     }
 
     if (!key1_set || !key2_set || !key3_set) {
@@ -130,11 +120,16 @@ bool compareDataStructs(const DataStruct& a, const DataStruct& b) {
 int main() {
     std::vector<DataStruct> data;
 
-    std::copy(
-        std::istream_iterator<DataStruct>(std::cin),
-        std::istream_iterator<DataStruct>(),
-        std::back_inserter(data)
-    );
+    // Чтение данных с обработкой ошибок
+    std::string line;
+    while (std::getline(std::cin, line)) {
+        std::istringstream iss(line);
+        DataStruct ds;
+        if (iss >> ds) {
+            data.push_back(ds);
+        }
+        // Игнорируем некорректные строки
+    }
 
     std::sort(data.begin(), data.end(), compareDataStructs);
 
