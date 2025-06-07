@@ -1,33 +1,21 @@
 #include "DataStruct.hpp"
 #include <vector>
 #include <iostream>
-#include <sstream>
+#include <iterator>
 #include <algorithm>
 
 int main() {
     std::vector<nspace::DataStruct> ds;
-    std::string line;
 
-    // Чтение данных построчно
-    while (std::getline(std::cin, line)) {
-        std::istringstream iss(line);
-        nspace::DataStruct temp;
+    std::istream_iterator<nspace::DataStruct> input_iter(std::cin);
+    std::istream_iterator<nspace::DataStruct> end_iter;
 
-        // Пытаемся распарсить строку
-        if (iss >> temp) {
-            ds.push_back(temp);
-        }
-        // Если парсинг не удался, строка игнорируется
-    }
+    std::copy(input_iter, end_iter, std::back_inserter(ds));
 
-    // Сортировка данных
     std::sort(ds.begin(), ds.end(), nspace::compare);
 
-    // Вывод результатов
-    for (const auto& item : ds) {
-        std::cout << item << "\n";
-    }
+    std::ostream_iterator<nspace::DataStruct> output_iter(std::cout, "\n");
+    std::copy(ds.begin(), ds.end(), output_iter);
 
     return 0;
 }
-
