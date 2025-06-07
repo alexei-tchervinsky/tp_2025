@@ -14,30 +14,21 @@ bool doPolygonsIntersect(const Polygon& poly1, const Polygon& poly2) {
         }
         return std::make_pair(minProj, maxProj);
     };
-    for (size_t i = 0; i < poly1.points.size(); i++) {
-        const Point& p1 = poly1.points[i];
-        const Point& p2 = poly1.points[(i + 1) % poly1.points.size()];
-        double nx = -(p2.y - p1.y);
-        double ny = p2.x - p1.x;
-        std::pair<double, double> proj1 = getProjections(poly1, nx, ny);
-        std::pair<double, double> proj2 = getProjections(poly2, nx, ny);
-        if (proj1.second < proj2.first || proj2.second < proj1.first) {
-            return false;
-        }
-    }
-    for (size_t i = 0; i < poly2.points.size(); i++) {
-        const Point& p1 = poly2.points[i];
-        const Point& p2 = poly2.points[(i + 1) % poly2.points.size()];
-        double nx = -(p2.y - p1.y);
-        double ny = p2.x - p1.x;
-        std::pair<double, double> proj1 = getProjections(poly1, nx, ny);
-        std::pair<double, double> proj2 = getProjections(poly2, nx, ny);
-        if (proj1.second < proj2.first || proj2.second < proj1.first) {
-            return false;
-        }
-    }
-    return true;
-}
+    auto checkProjections = [](const Polygon& poly1, const Polygon& poly2) {
+    auto processPolygon = [&](const Polygon& sourcePoly, const Polygon& otherPoly) {
+        return std::all_of(sourcePoly.points.begin(), sourcePoly.points.end(),
+            [&](const Point& p1) {
+                const Point& p2 = sourcePoly.points[(&p1 - &sourcePoly.points[0] + 1) % sourcePoly.points.size()];
+                double nx = -(p2.y - p1.y);
+                double ny = p2.x - p1.x;
+                auto proj1 = getProjections(sourcePoly, nx, ny);
+                auto proj2 = getProjections(otherPoly, nx, ny);
+                return !(proj1.second < proj2.first || proj2.second < proj1.first);
+            });
+    };
+    return processPolygon(poly1, poly2) && processPolygon(poly2, poly1);
+};
+return checkProjections(poly1, poly2);
 std::istream& operator>>(std::istream& in, DelimiterChar&& exp) {
     std::istream::sentry guard(in);
     if (!guard) return in;
