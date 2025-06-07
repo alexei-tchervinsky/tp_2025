@@ -187,36 +187,30 @@ void rmechoCommand(std::vector<Polygon> &polygons, std::istream &in,
 void inframeCommand(std::vector<Polygon> &polygons, std::istream &is,
                     std::ostream &os) {
     Polygon target;
-    is >> target;
-    if (!is) {
-        return;
+    if (!(is >> target) || target.points.size() < 3) {
+        throw std::invalid_argument("INVALID COMMAND");
     }
     using Rect = std::pair<Point, Point>;
     Rect boundingBox = std::accumulate(
         polygons.begin(), polygons.end(),
-        Rect(Point{std::numeric_limits<int>::max(),
-                   std::numeric_limits<int>::max()},
-             Point{std::numeric_limits<int>::min(),
-                   std::numeric_limits<int>::min()}),
+        Rect(Point{std::numeric_limits<int>::max(),std::numeric_limits<int>::max()},
+                  Point{std::numeric_limits<int>::min(),std::numeric_limits<int>::min()}),
         [](const Rect &acc, const Polygon &poly) {
             Point bottomLeft = std::accumulate(
                 poly.points.begin(), poly.points.end(),
-                Point{std::numeric_limits<int>::max(),
-                      std::numeric_limits<int>::max()},
+                Point{std::numeric_limits<int>::max(),std::numeric_limits<int>::max()},
                 [](Point p, const Point &q) {
                     return Point{std::min(p.x, q.x), std::min(p.y, q.y)};
                 });
             Point topRight = std::accumulate(
                 poly.points.begin(), poly.points.end(),
-                Point{std::numeric_limits<int>::min(),
-                      std::numeric_limits<int>::min()},
+                Point{std::numeric_limits<int>::min(),std::numeric_limits<int>::min()},
                 [](Point p, const Point &q) {
                     return Point{std::max(p.x, q.x), std::max(p.y, q.y)};
                 });
-            return Rect{Point{std::min(acc.first.x, bottomLeft.x),
-                              std::min(acc.first.y, bottomLeft.y)},
-                        Point{std::max(acc.second.x, topRight.x),
-                              std::max(acc.second.y, topRight.y)}};
+            return Rect{
+                Point{std::min(acc.first.x, bottomLeft.x),std::min(acc.first.y, bottomLeft.y)},
+                Point{std::max(acc.second.x, topRight.x),std::max(acc.second.y, topRight.y)}};
         });
     os << (target.isInsideFrame(boundingBox.first, boundingBox.second)
                ? "<TRUE>"
