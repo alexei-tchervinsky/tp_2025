@@ -1,8 +1,6 @@
-// DataStruct.cpp
 #include "DataStruct.h"
 #include "iofmtguard.h"
 #include "IO_Objects.h"
-
 #include <algorithm>
 #include <iomanip>
 

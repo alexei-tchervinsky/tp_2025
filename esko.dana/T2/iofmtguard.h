@@ -1,4 +1,3 @@
-
 #ifndef IO_FMT_GUARD_HPP
 #define IO_FMT_GUARD_HPP
 

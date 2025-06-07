@@ -1,4 +1,3 @@
-
 #include "iofmtguard.h"
 
 namespace Data {
