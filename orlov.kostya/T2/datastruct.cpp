@@ -25,7 +25,6 @@ namespace orlov
         if (!sentry) return is;
 
         DataStruct tmp;
-        char c = 0;
 
         if (!(is >> checkSymbol{'('} >> checkSymbol{':'})) {
             is.setstate(std::ios::failbit);
