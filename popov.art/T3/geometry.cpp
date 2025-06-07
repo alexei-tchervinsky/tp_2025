@@ -14,20 +14,20 @@ bool doPolygonsIntersect(const Polygon& poly1, const Polygon& poly2) {
         }
         return std::make_pair(minProj, maxProj);
     };
-};
     auto check_edges = [&](const Polygon& poly, const Polygon& other_poly) {
-    return std::all_of(poly.points.begin(), poly.points.end(),
-        [&](const Point& p1) {
-            size_t next = (&p1 - &poly.points[0] + 1) % poly.points.size();
-            const Point& p2 = poly.points[next];
-            double nx = -(p2.y - p1.y);
-            double ny = p2.x - p1.x;
-            auto proj1 = getProjections(poly, nx, ny);
-            auto proj2 = getProjections(other_poly, nx, ny);
-            return !(proj1.second < proj2.first || proj2.second < proj1.first);
-        });
-};
-return check_edges(poly1, poly2) && check_edges(poly2, poly1);
+        return std::all_of(poly.points.begin(), poly.points.end(),
+            [&](const Point& p1) {
+                size_t next = (&p1 - &poly.points[0] + 1) % poly.points.size();
+                const Point& p2 = poly.points[next];
+                double nx = -(p2.y - p1.y);
+                double ny = p2.x - p1.x;
+                auto proj1 = getProjections(poly, nx, ny);
+                auto proj2 = getProjections(other_poly, nx, ny);
+                return !(proj1.second < proj2.first || proj2.second < proj1.first);
+            });
+    };
+    return check_edges(poly1, poly2) && check_edges(poly2, poly1);
+}
 std::istream& operator>>(std::istream& in, DelimiterChar&& exp) {
     std::istream::sentry guard(in);
     if (!guard) return in;
