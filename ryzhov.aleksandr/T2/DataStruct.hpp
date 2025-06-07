@@ -10,10 +10,8 @@ struct DataStruct {
         std::complex<double> key1_;
         signed long long key2_;
         std::string key3_;
-        friend std::ostream &operator<<(std::ostream &out,
-                                        const DataStruct &src);
+        friend std::ostream &operator<<(std::ostream &out, const DataStruct &src);
         friend std::istream &operator>>(std::istream &in, DataStruct &dest);
-
     private:
         static void printDouble(std::ostream &out, double x);
 };

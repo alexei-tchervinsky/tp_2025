@@ -45,7 +45,6 @@ std::istream &operator>>(std::istream &in, DataStruct &dest) {
     DataStruct tmp;
     in >> DelimiterIO{'('};
     for (std::size_t i = 0; i < 3; i++) {
-
         short number = 0;
         // Достаем "формальности" и ключ
         in >> DelimiterIO{':'} >> LabelIO{"key"} >> number;

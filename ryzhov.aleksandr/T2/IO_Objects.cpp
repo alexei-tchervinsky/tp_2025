@@ -12,8 +12,7 @@ std::istream &operator>>(std::istream &in, LabelIO &&dest) {
     // Проверка, что вводимый label соответствует заявленному
     std::string label;
     // Считываем вводимый
-    std::copy_n(std::istream_iterator<char>(in), dest.label.length(),
-                std::back_inserter(label));
+    std::copy_n(std::istream_iterator<char>(in), dest.label.length(), std::back_inserter(label));
     // Если поток ввода еще мертв или label не соответствует заявленному
     if (in && (label != dest.label)) {
         // Убиваем поток
