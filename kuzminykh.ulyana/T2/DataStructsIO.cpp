@@ -107,96 +107,77 @@ std::istream& operator>>(std::istream& in, DataStruct& d)
 
         return in;
     }
+    DataStruct temp;
     bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
-    DataStruct tmp;
 
-    if (!(in >> DelimiterIO{ '(' })) {
-        return in;
-    }
 
-    while (in.peek() != ')')
-    {
-
-        if (!(in >> DelimiterIO{ ':' })) {
-
+    in >> DelimiterIO{ '(' } >> DelimiterIO{ ':' };
+    while (in && in.peek() != ')') {
+        std::string label;
+        if (!(in >> label)) {
             break;
         }
 
-        std::string key;
-        if (!(in >> key)) {
-
+        if (label == "key1" && !hasKey1) {
+            if (in >> LongLongIO{ temp.key1 } >> DelimiterIO{ ':' }) {
+                hasKey1 = true;
+            }
+            else {
+                break;
+            }
+        }
+        else if (label == "key2" && !hasKey2) {
+            if (in >> ULongLongOctIO{ temp.key2 } >> DelimiterIO{ ':' }) {
+                hasKey2 = true;
+            }
+            else {
+                break;
+            }
+        }
+        else if (label == "key3" && !hasKey3) {
+            if (in >> StringIO{ temp.key3 } >> DelimiterIO{ ':' }) {
+                hasKey3 = true;
+            }
+            else {
+                break;
+            }
+        }
+        else {
             in.setstate(std::ios::failbit);
             break;
         }
-
-
-        if (key == "key1" && !hasKey1)
-        {
-            if (!(in >> LongLongIO{ tmp.key1 })) {
-
-                break;
-            }
-            hasKey1 = true;
-
-        }
-        else if (key == "key2" && !hasKey2)
-        {
-            if (!(in >> ULongLongOctIO{ tmp.key2 })) {
-
-                break;
-            }
-            hasKey2 = true;
-
-        }
-        else if (key == "key3" && !hasKey3)
-        {
-            if (!(in >> StringIO{ tmp.key3 })) {
-
-                break;
-            }
-            hasKey3 = true;
-
-
-        }
-        else if (key==")")
-        {
-            break;
-        }
-        else
-        {
-            std::string dummy;
-            while (in && in.peek() != ':' && in.peek() != ')') {
-                in >> dummy;
-            }
-        }
     }
 
-    if (!(hasKey1 && hasKey2 && hasKey3)) {
-
-        in.setstate(std::ios::failbit);
+    if (in && hasKey1 && hasKey2 && hasKey3) {
+        in >> DelimiterIO{ ')' };
+        d = temp;
     }
     else {
-        d = tmp;
+        in.setstate(std::ios::failbit);
     }
 
     return in;
 }
 
-std::ostream& operator<<(std::ostream& out, const DataStruct& d)
-{
+std::ostream& operator<<(std::ostream& out, const DataStruct& data) {
     std::ostream::sentry sentry(out);
-    if (!sentry) return out;
+    if (!sentry) {
+        return out;
+    }
 
-    iofmtguard fmt(out);
-    out << "(:key1 " << d.key1 << "ll";
-    out << ":key2 " << std::showbase << std::oct << d.key2;
-    out << ":key3 \"" << d.key3 << "\":)";
+    iofmtguard guard(out);
+    out << "(:key1 " << data.key1 << "ll:";
+    out << "key2 " << std::showbase << std::oct << data.key2 << "ull:";
+    out << "key3 \"" << data.key3 << "\":)";
     return out;
 }
 
-bool compareDataStructs(const DataStruct& a, const DataStruct& b)
-{
-    if (a.key1 != b.key1) return a.key1 < b.key1;
-    if (a.key2 != b.key2) return a.key2 < b.key2;
-    return a.key3.length() < b.key3.length();
+bool DataStructSort(const DataStruct& a, const DataStruct& d) {
+    if (a.key1 != d.key1) {
+        return a.key1 < d.key1;
+    }
+    if (a.key2 != d.key2) {
+        return d.key2 < d.key2;
+    }
+    return a.key3.length() < d.key3.length();
 }
