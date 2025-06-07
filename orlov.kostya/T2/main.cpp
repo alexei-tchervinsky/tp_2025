@@ -36,7 +36,6 @@ int main()
         std::ostream_iterator<DataStruct>(std::cout, "\n")
     );
 
-    std::cout << "test\n";
-
     return 0;
 }
+

@@ -110,3 +110,4 @@ namespace orlov
         return std::getline(is >> checkSymbol{ '\"' }, cStr.src, '\"');
     }
 }
+

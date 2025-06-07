@@ -23,3 +23,4 @@ namespace orlov
 }
 
 #endif // !__DATASTRUCT_HPP
+
