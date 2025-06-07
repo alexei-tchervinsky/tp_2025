@@ -1,37 +1,54 @@
-#include "IO_Objects.h"
-#include "DataStruct.h"
-#include <iostream>
-#include <string>
+#include "IO_Objects.hpp"
+#include <iterator>
+#include <algorithm>
+#include <cctype>
 
-std::istream& operator>>(std::istream& in, DataStruct& data) {
-    std::string value;
-    in >> value;
-    if (!parseComplex(value, data.key1)) {
-        in.setstate(std::ios::failbit);
+namespace nspace {
+    std::istream& operator>>(std::istream& is, DelimiterIO&& dlim) {
+        char c;
+        if (is >> c && c != dlim.exp) {
+            is.setstate(std::ios::failbit);
+        }
+        return is;
     }
-    in >> value;
-    if (!parseRational(value, data.key2)) {
-        in.setstate(std::ios::failbit);
-    }
-    in >> data.key3;
-    return in;
-}
 
-std::ostream& operator<<(std::ostream& out, const DataStruct& data) {
-    out << "#c(" << data.key1.real() << " " << data.key1.imag() << ")"
-        << " :key2 (:N " << data.key2.first << ":D " << data.key2.second << ":)"
-        << " " << data.key3;
-    return out;
-}
+    std::istream& operator>>(std::istream& is, LabelIO&& l) {
+        std::string temp;
+        temp.reserve(l.label.size());
 
-bool compareDataStruct(const DataStruct& a, const DataStruct& b) {
-    double ratA = static_cast<double>(a.key2.first) / a.key2.second;
-    double ratB = static_cast<double>(b.key2.first) / b.key2.second;
-    if (std::abs(ratA - ratB) > 1e-6) {
-        return ratA < ratB;
+        for (size_t i = 0; i < l.label.size(); ++i) {
+            char c = '\0';
+            if (is.get(c)) {
+                temp.push_back(c);
+            } else {
+                is.setstate(std::ios::failbit);
+                return is;
+            }
+        }
+
+        if (temp != l.label) {
+            is.setstate(std::ios::failbit);
+        }
+        return is;
     }
-    if (std::abs(a.key1.imag() - b.key1.imag()) > 1e-6) {
-        return a.key1.imag() < b.key1.imag();
+
+    std::istream& operator>>(std::istream& is, ULLHexIO&& ullhex) {
+        char c1 = '\0', c2 = '\0';
+        is >> c1 >> c2;
+        if (!is || c1 != '0' || (c2 != 'x' && c2 != 'X')) {
+            is.setstate(std::ios::failbit);
+        } else {
+            is >> std::hex >> ullhex.ref >> std::dec;
+        }
+        return is;
     }
-    return a.key3.length() < b.key3.length();
+
+    std::istream& operator>>(std::istream& is, DoubleSciIO&& dsci) {
+        is >> dsci.ref;
+        return is;
+    }
+
+    std::istream& operator>>(std::istream& is, StringIO&& s) {
+        return std::getline(is >> DelimiterIO{'\"'}, s.ref, '\"');
+    }
 }
