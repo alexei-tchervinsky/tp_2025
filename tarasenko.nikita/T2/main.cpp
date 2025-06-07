@@ -5,6 +5,7 @@
 #include <string>
 #include <cctype>
 #include <iomanip>
+#include <iterator>
 
 struct DataStruct {
     unsigned long long key1;  // ULL OCT
