@@ -5,30 +5,26 @@
 namespace popov {
 bool doPolygonsIntersect(const Polygon& poly1, const Polygon& poly2) {
     auto getProjections = [](const Polygon& poly, double nx, double ny) {
-        double minProj = std::numeric_limits<double>::max();
-        double maxProj = -std::numeric_limits<double>::max();
-        for (const auto& p : poly.points) {
-            double proj = p.x * nx + p.y * ny;
-            minProj = std::min(minProj, proj);
-            maxProj = std::max(maxProj, proj);
-        }
-        return std::make_pair(minProj, maxProj);
     };
-    auto checkProjections = [](const Polygon& poly1, const Polygon& poly2) {
-    auto processPolygon = [&](const Polygon& sourcePoly, const Polygon& otherPoly) {
-        return std::all_of(sourcePoly.points.begin(), sourcePoly.points.end(),
-            [&](const Point& p1) {
-                const Point& p2 = sourcePoly.points[(&p1 - &sourcePoly.points[0] + 1) % sourcePoly.points.size()];
-                double nx = -(p2.y - p1.y);
-                double ny = p2.x - p1.x;
-                auto proj1 = getProjections(sourcePoly, nx, ny);
-                auto proj2 = getProjections(otherPoly, nx, ny);
-                return !(proj1.second < proj2.first || proj2.second < proj1.first);
-            });
+
+    auto checkProjections = [&getProjections](const Polygon& poly1, const Polygon& poly2) {
+        auto processPolygon = [&getProjections](const Polygon& sourcePoly, const Polygon& otherPoly) {
+            return std::all_of(sourcePoly.points.begin(), sourcePoly.points.end(),
+                [&sourcePoly, &otherPoly, &getProjections](const Point& p1) {
+                    const Point& p2 = sourcePoly.points[(&p1 - &sourcePoly.points[0] + 1) % sourcePoly.points.size()];
+                    double nx = -(p2.y - p1.y);
+                    double ny = p2.x - p1.x;
+                    auto proj1 = getProjections(sourcePoly, nx, ny);
+                    auto proj2 = getProjections(otherPoly, nx, ny);
+                    return !(proj1.second < proj2.first || proj2.second < proj1.first);
+                });
+        };
+
+        return processPolygon(poly1, poly2) && processPolygon(poly2, poly1);
     };
-    return processPolygon(poly1, poly2) && processPolygon(poly2, poly1);
-};
-return checkProjections(poly1, poly2);
+
+    return checkProjections(poly1, poly2);
+}
 std::istream& operator>>(std::istream& in, DelimiterChar&& exp) {
     std::istream::sentry guard(in);
     if (!guard) return in;
