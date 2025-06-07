@@ -1,19 +1,64 @@
-#include "iofmtguard.hpp"
+#include "IO_Objects.hpp"
+
+#include <cctype>
+#include <sstream>
+#include <iomanip>
 
 namespace prokopenko {
 
-    // Сохраняем параметры потока при создании объекта
-    iofmtguard::iofmtguard(std::basic_ios<char>& stream)
-        : stream_(stream),
-        fill_(stream.fill()),
-        precision_(stream.precision()),
-        flags_(stream.flags()) {}
-
-    // Восстанавливаем параметры потока при уничтожении объекта
-    iofmtguard::~iofmtguard() {
-        stream_.fill(fill_);
-        stream_.precision(precision_);
-        stream_.flags(flags_);
+    std::istream& operator>>(std::istream& in, DelimiterIO&& d) {
+        char ch;
+        in >> std::ws >> ch;
+        if (!in || ch != d.expected) {
+            in.setstate(std::ios::failbit);
+        }
+        return in;
     }
 
+    std::istream& operator>>(std::istream& in, LabelIO&& label) {
+        std::string result;
+        char ch;
+        while (in.get(ch)) {
+            if (ch == ' ') {
+                break;
+            }
+            result += ch;
+        }
+        if (in) {
+            label.ref = result;
+        } else {
+            in.setstate(std::ios::failbit);
+        }
+        return in;
+    }
+
+    std::istream& operator>>(std::istream& in, CharIO&& c) {
+        char quote1, value, quote2;
+        in >> quote1 >> value >> quote2;
+        if (in && quote1 == '\'' && quote2 == '\'') {
+            c.ref = value;
+        } else {
+            in.setstate(std::ios::failbit);
+        }
+        return in;
+    }
+
+    std::istream& operator>>(std::istream& in, ULLIO&& u) {
+        in >> u.ref;
+        return in;
+    }
+
+    std::istream& operator>>(std::istream& in, StringIO&& s) {
+        char quote;
+        in >> std::ws >> quote;
+        if (quote != '"') {
+            in.setstate(std::ios::failbit);
+            return in;
+        }
+        std::getline(in, s.ref, '"');
+        if (!in) {
+            in.setstate(std::ios::failbit);
+        }
+        return in;
+    }
 }
