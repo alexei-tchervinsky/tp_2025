@@ -92,12 +92,29 @@ int main(int argc, char* argv[])
     commands["MAXSEQ"] = [](const std::vector<Polygon>& polygons) {
         Polygon target;
         std::cin >> target;
+#ifdef ALEXEIT
+        if (std::cin.fail())
+        {
+#if 1
+            std::cin.clear();  // Очищаем состояние ошибки
+            // std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // Игнорируем оставшийся ввод
+            std::cout << INV_CMD;
+            return;
+        }
+#endif
+            // throw std::invalid_argument(INV_CMD);
+            // throw std::invalid_argument("<INVALID COMMAND>");
+#else
+                    throw std::invalid_argument("<INVALID COMMAND>");
+        }
+#endif // ALEXEIT
         maxSeq(polygons, target);
     };
 
     std::string cmd;
     while (std::cin >> cmd)
     {
+        LOG(cmd)
         try
         {
             auto it = commands.find(cmd);
@@ -107,7 +124,7 @@ int main(int argc, char* argv[])
             }
             else
             {
-                throw std::invalid_argument("<INVALID COMMAND>");
+                throw std::invalid_argument("<INVALID COMMAND 0>");
             }
         }
         catch (const std::invalid_argument& e)
