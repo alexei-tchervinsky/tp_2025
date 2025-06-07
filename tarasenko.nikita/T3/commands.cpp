@@ -14,7 +14,8 @@ namespace tarasenko {
         }
 
         bool doPolygonsIntersect(const Polygon& poly1, const Polygon& poly2) {
-            bool edgesIntersect = std::any_of(poly1.points.begin(), poly1.points.end(),
+            // Check edge intersections
+            auto edgesIntersect = std::any_of(poly1.points.begin(), poly1.points.end(),
                 [&poly1, &poly2](const Point& p1) {
                     size_t i = &p1 - &poly1.points[0];
                     const Point& p2 = poly1.points[(i + 1) % poly1.points.size()];
@@ -24,27 +25,31 @@ namespace tarasenko {
                             size_t j = &p3 - &poly2.points[0];
                             const Point& p4 = poly2.points[(j + 1) % poly2.points.size()];
 
-                            int orient1 = (p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x);
-                            int orient2 = (p2.x - p1.x) * (p4.y - p1.y) - (p2.y - p1.y) * (p4.x - p1.x);
+                            // Segment intersection test
+                            int d1 = (p4.x - p3.x) * (p1.y - p3.y) - (p4.y - p3.y) * (p1.x - p3.x);
+                            int d2 = (p4.x - p3.x) * (p2.y - p3.y) - (p4.y - p3.y) * (p2.x - p3.x);
+                            int d3 = (p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x);
+                            int d4 = (p2.x - p1.x) * (p4.y - p1.y) - (p2.y - p1.y) * (p4.x - p1.x);
 
-                            if (orient1 * orient2 < 0) {
-                                int orient3 = (p4.x - p3.x) * (p1.y - p3.y) - (p4.y - p3.y) * (p1.x - p3.x);
-                                int orient4 = (p4.x - p3.x) * (p2.y - p3.y) - (p4.y - p3.y) * (p2.x - p3.x);
-                                return orient3 * orient4 < 0;
+                            if (((d1 < 0 && d2 > 0) || (d1 > 0 && d2 < 0)) {
+                                if (((d3 < 0 && d4 > 0) || (d3 > 0 && d4 < 0))) {
+                                    return true;
+                                }
                             }
                             return false;
+                                });
                         });
-                });
 
             if (edgesIntersect) return true;
 
+            // Check containment
             auto isPointInside = [](const Point& p, const Polygon& poly) -> bool {
+                if (poly.points.empty()) return false;
+
                 struct State {
                     bool inside = false;
                     Point prev;
                 };
-
-                if (poly.points.empty()) return false;
 
                 State initial;
                 initial.prev = poly.points.back();
@@ -52,7 +57,8 @@ namespace tarasenko {
                 State result = std::accumulate(poly.points.begin(), poly.points.end(), initial,
                     [&p](State state, const Point& curr) {
                         if (((curr.y > p.y) != (state.prev.y > p.y))) {
-                            int intersectX = (state.prev.x - curr.x) * (p.y - curr.y) / (state.prev.y - curr.y) + curr.x;
+                            double intersectX = (state.prev.x - curr.x) * (p.y - curr.y) /
+                                (double)(state.prev.y - curr.y) + curr.x;
                             if (p.x < intersectX) {
                                 state.inside = !state.inside;
                             }
@@ -64,17 +70,19 @@ namespace tarasenko {
                 return result.inside;
                 };
 
-            bool allInside1 = std::all_of(poly1.points.begin(), poly1.points.end(),
+            // Check if poly1 is inside poly2
+            bool poly1Inside = std::all_of(poly1.points.begin(), poly1.points.end(),
                 [&poly2, &isPointInside](const Point& p) {
                     return isPointInside(p, poly2);
                 });
 
-            bool allInside2 = std::all_of(poly2.points.begin(), poly2.points.end(),
+            // Check if poly2 is inside poly1
+            bool poly2Inside = std::all_of(poly2.points.begin(), poly2.points.end(),
                 [&poly1, &isPointInside](const Point& p) {
                     return isPointInside(p, poly1);
                 });
 
-            return allInside1 || allInside2;
+            return poly1Inside || poly2Inside;
         }
     }
 
