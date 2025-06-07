@@ -37,6 +37,9 @@ namespace nspace
 
     std::istream& operator>>(std::istream& in, Point& point)
     {
+#ifdef ALEXEIT
+        // std::cin >> std::noskipws;
+#endif
         char ignore;
         if (!(in >> ignore)) return in;
         if (ignore != '(')
@@ -103,6 +106,8 @@ namespace nspace
         size_t numPoints;
         if (!(in >> numPoints))
         {
+            LOG("** количество точек невалидно **\n")
+            in.setstate(std::ios::failbit);
             return in;
         }
 
@@ -123,14 +128,20 @@ namespace nspace
 // auto it_start = temp_points.begin();
 // auto it_end = std::copy_n(std::istream_iterator<Point>(in), numPoints, temp_points.begin());
         std::copy_n(std::istream_iterator<Point>(in), numPoints, std::back_inserter(temp_points));
+#if 1
         auto it_start = temp_points.begin();
         auto it_end = temp_points.end();
         if ((static_cast<size_t>(it_end - it_start)) != numPoints)
         {
-            LOG("** copy_n copy less than expected **\n")
+            LOG("** copy_n copy LESS THAN expected **\n")
             in.setstate(std::ios::failbit);
             return in;
         }
+        else
+        {
+            LOG("** copy_n copy EXACTLY AS expected **")
+        }
+#endif
 #else
         std::copy_n(std::istream_iterator<Point>(in), numPoints, std::back_inserter(temp_points));
 #endif // ALEXEIT
@@ -148,7 +159,13 @@ namespace nspace
 #ifdef ALEXEIT
         std::string tail;
         std::getline(in, tail);
+        LOG(tail.size())
+        LOG(tail.c_str())
+#if 1
+        if (tail.size() > 1)
+#else
         if (tail.size() != 0)
+#endif
         {
             in.setstate(std::ios::failbit);
             // std::cout << in.get();

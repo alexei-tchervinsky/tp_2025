@@ -24,11 +24,28 @@ int main(int argc, char* argv[])
         std::cerr << "Error: Cannot open file\n";
         return 1;
     }
+#ifdef ALEXEIT
 
     std::vector<Polygon> polygons;
-    std::copy(std::istream_iterator<Polygon>(file),
-              std::istream_iterator<Polygon>(),
-              std::back_inserter(polygons));
+
+    while(!file.eof())
+    {
+#endif // ALEXEIT
+#ifndef ALEXEIT
+        std::vector<Polygon> polygons;
+#endif // !ALEXEIT
+        std::copy(std::istream_iterator<Polygon>(file),
+                std::istream_iterator<Polygon>(),
+                std::back_inserter(polygons));
+#ifdef ALEXEIT
+        if (!file.fail())
+        {
+            continue;
+        }
+        file.clear();  // Очищаем состояние ошибки
+        file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // Игнорируем оставшийся ввод
+    }
+#endif // ALEXEIT
 
     std::string cmd;
     while (std::cin >> cmd)
