@@ -1,41 +1,31 @@
-﻿#include "DataStructsIO.h"
-#include <iostream>
+﻿#include <algorithm>
+
+#include "DataStructsIO.h"
+
 #include <vector>
+#include <iostream>
 #include <iterator>
 #include <limits>
-#include <algorithm>
-#include <fstream>
 
-int main()
-{
-    std::vector<DataStruct> v;
-
-    while (true)
-    {
-        DataStruct tmp;
-        if (std::cin >> tmp)
-        {
-            v.push_back(tmp);
+int main() {
+    std::vector<DataStruct> ds;
+    while (!std::cin.eof()) {
+        std::copy(
+            std::istream_iterator<DataStruct>(std::cin),
+            std::istream_iterator<DataStruct>(),
+            std::back_inserter(ds)
+        );
+        if (!std::cin.fail()) {
+            continue;
         }
-        else
-        {
-            if (std::cin.eof()) break;
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        }
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
-
-    std::sort(v.begin(), v.end(), [](const DataStruct& a, const DataStruct& b)
-        {
-        if (a.key1 != b.key1) return a.key1 < b.key1;
-        if (a.key2 != b.key2) return a.key2 < b.key2;
-        return a.key3.length() < b.key3.length();
-        });
-
-    for (const auto& ds : v)
-    {
-        std::cout << ds << "\n";
-    }
-
+    std::sort(ds.begin(), ds.end(), compareDataStructs);
+    std::copy(
+        ds.begin(),
+        ds.end(),
+        std::ostream_iterator<DataStruct>(std::cout, "\n")
+    );
     return 0;
 }

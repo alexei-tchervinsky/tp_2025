@@ -55,3 +55,4 @@ std::istream& operator>>(std::istream& in, StringIO&& d);
 std::istream& operator>>(std::istream& in, DataStruct& d);
 
 std::ostream& operator<<(std::ostream& out, const DataStruct& d);
+bool compareDataStructs(const DataStruct& a, const DataStruct& b);
