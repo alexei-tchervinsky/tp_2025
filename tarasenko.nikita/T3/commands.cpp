@@ -18,8 +18,8 @@ namespace tarasenko {
                 const Point& q1, const Point& q2) -> bool {
                     auto orientation = [](const Point& a, const Point& b, const Point& c) -> int {
                         int val = (b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y);
-                        if (val == 0) return 0;  
-                        return (val > 0) ? 1 : 2; 
+                        if (val == 0) return 0;
+                        return (val > 0) ? 1 : 2;
                         };
 
                     auto onSegment = [](const Point& p, const Point& q, const Point& r) -> bool {
@@ -72,11 +72,11 @@ namespace tarasenko {
                 return inside;
                         };
 
-                    for (const auto& point : poly1.points) {
-                        if (isPointInsidePolygon(point, poly2)) {
-                            return true;
+                        for (const auto& point : poly1.points) {
+                            if (isPointInsidePolygon(point, poly2)) {
+                                return true;
+                            }
                         }
-                    }
 
                 for (const auto& point : poly2.points) {
                     if (isPointInsidePolygon(point, poly1)) {
@@ -241,20 +241,21 @@ namespace tarasenko {
     }
 
     void intersectionsCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
-    Polygon inputPolygon;
-    in >> inputPolygon;
+        Polygon inputPolygon;
+        in >> inputPolygon;
 
-    if (inputPolygon.points.size() < 3) {
-        throw std::invalid_argument("INVALID COMMAND");
+        if (inputPolygon.points.size() < 3) {
+            throw std::invalid_argument("INVALID COMMAND");
+        }
+
+        size_t count = std::count_if(polygons.begin(), polygons.end(),
+            [&inputPolygon](const Polygon& poly) {
+                return doPolygonsIntersect(inputPolygon, poly);
+            });
+
+        out << count << '\n';
     }
 
-    size_t count = std::count_if(polygons.begin(), polygons.end(),
-        [&inputPolygon](const Polygon& poly) {
-            return doPolygonsIntersect(inputPolygon, poly);
-        });
-
-    out << count << '\n';
-}
     void rmechoCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
         Polygon target;
         in >> target;
