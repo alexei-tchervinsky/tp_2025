@@ -4,13 +4,11 @@
 
 #include <iomanip>
 
-namespace tarsenko {
+namespace tarasenko {
     std::ostream& operator<<(std::ostream& out, const DataStruct& src)
-
     {
         std::ostream::sentry sentry(out);
-        if (!sentry)
-        {
+        if (!sentry) {
             return out;
         }
         iofmtguard fmtguard(out);
@@ -20,12 +18,10 @@ namespace tarsenko {
         return out;
     }
 
-
     std::istream& operator>>(std::istream& in, DataStruct& dest)
     {
         std::istream::sentry sentry(in);
-        if (!sentry)
-        {
+        if (!sentry) {
             return in;
         }
         DataStruct input;
@@ -35,44 +31,33 @@ namespace tarsenko {
         using str = StringIO;
         in >> sep{ '(' } >> sep{ ':' };
         bool isKey1 = false, isKey2 = false, isKey3 = false;
-        while (in.peek() != ')')
-        {
+        while (in.peek() != ')') {
             std::string keyLabel;
-            if (!(in >> keyLabel))
-            {
+            if (!(in >> keyLabel)) {
                 break;
             }
-            if (keyLabel == "key1" && !isKey1)
-            {
+            if (keyLabel == "key1" && !isKey1) {
                 in >> oct{ input.key1 } >> sep{ ':' };
                 isKey1 = true;
-
             }
-            else if (keyLabel == "key2" && !isKey2)
-            {
+            else if (keyLabel == "key2" && !isKey2) {
                 in >> chr{ input.key2 } >> sep{ ':' };
                 isKey2 = true;
-
             }
-            else if (keyLabel == "key3" && !isKey3)
-            {
+            else if (keyLabel == "key3" && !isKey3) {
                 in >> str{ input.key3 } >> sep{ ':' };
                 isKey3 = true;
-
             }
-            else
-            {
+            else {
                 in.setstate(std::ios::failbit);
                 break;
             }
         }
-        if (in && isKey1 && isKey2 && isKey3)
-        {
+        if (in && isKey1 && isKey2 && isKey3) {
             in >> sep{ ')' };
             dest = input;
         }
-        else
-        {
+        else {
             in.setstate(std::ios::failbit);
         }
         return in;
@@ -80,12 +65,10 @@ namespace tarsenko {
 
     bool DataStructSort(const DataStruct& dest1, const DataStruct& dest2)
     {
-        if (dest1.key1 != dest2.key1)
-        {
+        if (dest1.key1 != dest2.key1) {
             return dest1.key1 < dest2.key1;
         }
-        if (dest1.key2 != dest2.key2)
-        {
+        if (dest1.key2 != dest2.key2) {
             return dest1.key2 < dest2.key2;
         }
         return dest1.key3.length() < dest2.key3.length();

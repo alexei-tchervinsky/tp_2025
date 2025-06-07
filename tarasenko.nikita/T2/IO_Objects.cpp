@@ -1,7 +1,7 @@
 #include "IO_Objects.hpp"
 
 namespace tarasenko {
-    std::istream &operator>>(std::istream &in, LabelIO &&dest) {
+    std::istream& operator>>(std::istream& in, LabelIO&& dest) {
         std::istream::sentry sentry(in);
         if (!sentry) {
             return in;
@@ -16,7 +16,7 @@ namespace tarasenko {
         return in;
     }
 
-    std::istream &operator>>(std::istream &in, DelimiterIO &&dest) {
+    std::istream& operator>>(std::istream& in, DelimiterIO&& dest) {
         std::istream::sentry sentry(in);
         if (!sentry) {
             return in;
@@ -29,16 +29,13 @@ namespace tarasenko {
         return in;
     }
 
-    std::istream& operator>>(std::istream& in, Oct_IO&& dest)
-    {
+    std::istream& operator>>(std::istream& in, OctIO&& dest) {
         std::istream::sentry sentry(in);
-        if (!sentry)
-        {
+        if (!sentry) {
             return in;
         }
         char c;
-        if (!(in >> c) || c != '0')
-        {
+        if (!(in >> c) || c != '0') {
             in.setstate(std::ios::failbit);
             return in;
         }
@@ -46,41 +43,26 @@ namespace tarasenko {
         if (isdigit(in.peek())) {
             in >> dest.ref;
         }
-        else
-        {
+        else {
             dest.ref = 0;
         }
 
         return in;
     }
 
-    std::istream& operator>>(std::istream& in, Char_IO&& dest)
-    {
+    std::istream& operator>>(std::istream& in, CharIO&& dest) {
         std::istream::sentry sentry(in);
-        if (!sentry)
-        {
+        if (!sentry) {
             return in;
         }
         return in >> DelimiterIO{ '\'' } >> dest.ref >> DelimiterIO{ '\'' };
     }
 
-    std::istream& operator>>(std::istream& in, String_IO&& dest)
-    {
+    std::istream& operator>>(std::istream& in, StringIO&& dest) {
         std::istream::sentry sentry(in);
-        if (!sentry)
-        {
+        if (!sentry) {
             return in;
         }
         return std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
-    }
-
-    std::istream& operator>>(std::istream& in, Char_IO&& dest)
-    {
-        std::istream::sentry sentry(in);
-        if (!sentry)
-        {
-            return in;
-        }
-        return in >> DelimiterIO{ '\'' } >> dest.ref >> DelimiterIO{ '\'' };
     }
 }
