@@ -42,7 +42,7 @@ namespace tarasenko {
                     const Point& pi = poly.points[i];
                     const Point& pj = poly.points[j];
 
-                    if (((pi.y > p.y) != (pj.y > p.y)) {
+                    if (((pi.y > p.y) != (pj.y > p.y))) {
                         int intersectX = (pj.x - pi.x) * (p.y - pi.y) / (pj.y - pi.y) + pi.x;
                         if (p.x < intersectX) {
                             inside = !inside;
@@ -50,7 +50,7 @@ namespace tarasenko {
                     }
                 }
                 return inside;
-                        };
+            };
                     bool allInside1 = std::all_of(poly1.points.begin(), poly1.points.end(),
                         [&poly2, &isPointInside](const Point& p) {
                             return isPointInside(p, poly2);
