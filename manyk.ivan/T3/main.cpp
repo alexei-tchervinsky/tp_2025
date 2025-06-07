@@ -297,11 +297,6 @@ void minCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ost
 void countCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out)
 {
     std::string arg;
-    if (polygons.empty())
-    {
-        std::cout << "<INVALID COMMAND>\n";
-        return;
-    }
     in >> arg;
     if (arg == "EVEN")
     {
