@@ -1,6 +1,7 @@
 #ifndef DISJOINTSET_HPP
 #define DISJOINTSET_HPP
 #include <iostream>
+#include <vector>
 
 class DisjointSet {
 private:

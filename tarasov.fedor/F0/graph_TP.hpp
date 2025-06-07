@@ -4,6 +4,10 @@
 #include <map>
 #include <list>
 #include <algorithm>
+#include <functional>
+#include <iterator>
+#include <vector>
+#include <queue>
 #include "DisjointSet_TP.hpp"
 
 using namespace std;
