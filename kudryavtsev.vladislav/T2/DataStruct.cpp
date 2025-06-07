@@ -66,3 +66,4 @@ namespace myspace {
         else return abs(ds1.key1) < abs(ds2.key1);
     }
 }
+

@@ -46,3 +46,4 @@ namespace myspace {
         return std::getline(is >> LimitingSymbolIO{'\"'}, s.ref, '\"');
     }
 }
+

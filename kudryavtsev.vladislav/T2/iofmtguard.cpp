@@ -15,3 +15,4 @@ namespace myspace {
         s_.flags(fmt_);
     }
 }
+
