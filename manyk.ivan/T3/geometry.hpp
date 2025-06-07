@@ -9,6 +9,7 @@
 #include <iterator>
 #include <iomanip>
 #include <cmath>
+#include <numeric>
 
 struct Point
 {
@@ -45,8 +46,14 @@ double computeArea(const Polygon& poly);
 void areaCommand(const std::vector<Polygon>& polygons, const std::string& arg);
 void maxCommand(const std::vector<Polygon>& polygons, const std::string& arg);
 void minCommand(const std::vector<Polygon>& polygons, const std::string& arg);
-//void countCommand(const std::vector<Polygon>& polygons, const std::string& arg);
 void countOdd(const std::vector<Polygon>& polygons);
 void countEven(const std::vector<Polygon>& polygons);
 void countNum(const std::vector<Polygon>& polygons, int num);
+
+void rectsCommand(const std::vector<Polygon>& polygons, std::istream&, std::ostream&);
+void intersectionsCommand(const std::vector<Polygon>& polygons, std::istream&, std::ostream&);
+void areaCommand(const std::vector<Polygon>& polygons, std::istream&, std::ostream&);
+void maxCommand(const std::vector<Polygon>& polygons, std::istream&, std::ostream&);
+void minCommand(const std::vector<Polygon>& polygons, std::istream&, std::ostream&);
+void countCommand(const std::vector<Polygon>& polygons, std::istream&, std::ostream&);
 #endif

@@ -1,4 +1,6 @@
 #include "geometry.hpp"
+#include <map>
+#include <functional>
 
 int main(int argc, char **argv)
 {
