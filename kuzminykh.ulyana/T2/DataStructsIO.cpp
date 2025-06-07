@@ -50,7 +50,6 @@ std::istream& operator>>(std::istream& in, LongLongIO&& d)
         std::string lab = std::string(1,  c) + std::string(1, k);
         if (lab != "ll" &&  lab != "LL")
         {
-            std::cout << lab;
             in.setstate(std::ios::failbit);
         }
     }
@@ -108,16 +107,14 @@ std::istream& operator>>(std::istream& in, DataStruct& d)
 
         return in;
     }
-
+    bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
     DataStruct tmp;
 
     if (!(in >> DelimiterIO{ '(' })) {
-        std::cerr << "Error: Missing opening '('\n";
         return in;
     }
 
-    bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
-    while (in && in.peek() != ')')
+    while (in.peek() != ')')
     {
 
         if (!(in >> DelimiterIO{ ':' })) {
@@ -167,7 +164,6 @@ std::istream& operator>>(std::istream& in, DataStruct& d)
         }
         else
         {
-
             std::string dummy;
             while (in && in.peek() != ':' && in.peek() != ')') {
                 in >> dummy;
