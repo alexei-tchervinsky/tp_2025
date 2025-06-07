@@ -5,7 +5,9 @@
 #include <cmath>
 #include <iomanip>
 
-namespace ponomarenko {
+namespace prokopenko {
+
+    // Сравнение двух структур для сортировки
     bool DataStruct::operator<(const DataStruct& other) const {
         double firstAbs = std::abs(key1);
         double secondAbs = std::abs(other.key1);
@@ -18,19 +20,21 @@ namespace ponomarenko {
         return key3.size() < other.key3.size();
     }
 
+    // Ввод структуры из потока
     std::istream& operator>>(std::istream& in, DataStruct& data) {
         std::istream::sentry guard(in);
         if (!guard) {
             return in;
         }
+
         DataStruct temp;
-        bool hasKey1 = false;
-        bool hasKey2 = false;
-        bool hasKey3 = false;
+        bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
+
         in >> DelimiterIO{'('} >> DelimiterIO{':'};
         for (int i = 0; i < 3 && in; ++i) {
             std::string label;
             in >> LabelIO{label};
+
             if (label == "key1") {
                 in >> ComplexIO{temp.key1} >> DelimiterIO{':'};
                 hasKey1 = in.good();
@@ -45,7 +49,10 @@ namespace ponomarenko {
                 std::getline(in, skip, ':');
             }
         }
+
         in >> DelimiterIO{')'};
+
+        // Проверка, что все поля успешно считаны
         if (hasKey1 && hasKey2 && hasKey3) {
             data = temp;
         } else {
@@ -54,18 +61,18 @@ namespace ponomarenko {
         return in;
     }
 
-    std::ostream& operator <<(std::ostream& out, const DataStruct& data) {
+    // Вывод структуры в поток
+    std::ostream& operator<<(std::ostream& out, const DataStruct& data) {
         std::ostream::sentry guard(out);
         if (!guard) {
             return out;
         }
-        iofmtguard fmtguard(out);
-        double real = data.key1.real();
-        double imag = data.key1.imag();
+
+        iofmtguard fmtguard(out); // Сохраняет форматирование потока
+
         out << "(:";
-        out << "key1 #c(";
-        out << std::fixed << std::setprecision(1)
-            << real << " " << imag << "):";
+        out << "key1 #c(" << std::fixed << std::setprecision(1)
+            << data.key1.real() << " " << data.key1.imag() << "):";
         out << "key2 '" << data.key2 << "':";
         out << "key3 " << std::quoted(data.key3) << ":)";
         return out;
