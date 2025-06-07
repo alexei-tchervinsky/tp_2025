@@ -152,7 +152,6 @@ namespace narumov {
         auto edges = mst.getEdges();
         std::size_t cnt = 0;
         while (edges.size()) {
-            edges.back();
             edges.pop_back();
             ++cnt;
         }
