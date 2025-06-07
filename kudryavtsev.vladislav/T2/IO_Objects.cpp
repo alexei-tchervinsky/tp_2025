@@ -6,7 +6,9 @@
 namespace myspace {
     std::istream& operator>>(std::istream& is, DelimiterIO&& dlim) {
         char c;
-        if (is >> c && c != dlim.exp) is.setstate(std::ios::failbit);
+        if (is >> c && c != dlim.exp) {
+            is.setstate(std::ios::failbit);
+        }
         return is;
     }
 
@@ -14,23 +16,26 @@ namespace myspace {
         std::string temp;
         temp.reserve(l.label.size());
 
-        std::istream_iterator<char> it(is);
-        std::istream_iterator<char> end;
-
-        for (size_t i = 0; i < l.label.size() && it != end; ++i) {
-            temp.push_back(*it++);
+        for (size_t i = 0; i < l.label.size(); ++i) {
+            char c = '\0';
+            if (is.get(c)) {
+                temp.push_back(c);
+            } else {
+                is.setstate(std::ios::failbit);
+                return is;
+            }
         }
 
-        if (temp.size() != l.label.size() || temp != l.label) {
+        if (temp != l.label) {
             is.setstate(std::ios::failbit);
         }
         return is;
     }
 
     std::istream& operator>>(std::istream& is, ULLHexIO&& ullhex) {
-        char c1, c2;
+        char c1 = '\0', c2 = '\0';
         is >> c1 >> c2;
-        if (c1 != '0' || (c2 != 'x' && c2 != 'X')) {
+        if (!is || c1 != '0' || (c2 != 'x' && c2 != 'X')) {
             is.setstate(std::ios::failbit);
         } else {
             is >> std::hex >> ullhex.ref >> std::dec;
@@ -47,3 +52,4 @@ namespace myspace {
         return std::getline(is >> DelimiterIO{'\"'}, s.ref, '\"');
     }
 }
+

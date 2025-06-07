@@ -5,8 +5,8 @@
 
 namespace myspace {
     struct DataStruct {
-        unsigned long long key1;
-        double key2;
+        unsigned long long key1; // ULL HEX
+        double key2; // DBL SCI
         std::string key3;
 
         friend std::istream& operator>>(std::istream&, DataStruct&);
@@ -16,3 +16,4 @@ namespace myspace {
 }
 
 #endif
+
