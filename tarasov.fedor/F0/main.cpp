@@ -2,168 +2,168 @@
 #include <iostream>
 
 void runKruskalTest1_Empty() {
-    std::cout << "  --- Тест Крускала 1: Пустой граф ---" << std::endl;
+    std::cout << "  --- Kruskal Test 1: Empty Graph ---" << std::endl;
     Graph g;
-    std::cout << "  Исходный граф:" << std::endl;
+    std::cout << "  Original graph:" << std::endl;
     g.printGraph();
     Graph mst = algorithmKruscala(g);
-    std::cout << "  MST (пустой граф):" << std::endl;
+    std::cout << "  MST (empty graph):" << std::endl;
     mst.printGraph();
-    std::cout << "  Ожидаемый результат: MST пуст." << std::endl << std::endl;
+    std::cout << "  Expected result: MST should be empty." << std::endl << std::endl;
 }
 
 void runKruskalTest2_SingleNode() {
-    std::cout << "  --- Тест Крускала 2: Граф из одной вершины (без рёбер) ---" << std::endl;
+    std::cout << "  --- Kruskal Test 2: Single Node Graph (no edges) ---" << std::endl;
     Graph g;
     g.addNode(1);
-    std::cout << "  Исходный граф:" << std::endl;
+    std::cout << "  Original graph:" << std::endl;
     g.printGraph();
     Graph mst = algorithmKruscala(g);
-    std::cout << "  MST (одна вершина):" << std::endl;
+    std::cout << "  MST (single node):" << std::endl;
     mst.printGraph();
-    std::cout << "  Ожидаемый результат: MST содержит узел 1, рёбер нет." << std::endl << std::endl;
+    std::cout << "  Expected result: MST should contain node 1 with no edges." << std::endl << std::endl;
 }
 
 void runKruskalTest3_SimpleConnected() {
-    std::cout << "  --- Тест Крускала 3: Простой связный граф (3 вершины) ---" << std::endl;
+    std::cout << "  --- Kruskal Test 3: Simple Connected Graph (3 nodes) ---" << std::endl;
     Graph g;
     g.addNode(0); g.addNode(1); g.addNode(2);
     g.addEdge(0, 1, 1); g.addEdge(1, 2, 2); g.addEdge(0, 2, 3);
-    std::cout << "  Исходный граф:" << std::endl;
+    std::cout << "  Original graph:" << std::endl;
     g.printGraph();
     Graph mst = algorithmKruscala(g);
-    std::cout << "  MST (простой связный граф):" << std::endl;
+    std::cout << "  MST (simple connected graph):" << std::endl;
     mst.printGraph();
-    std::cout << "  Ожидаемый результат: MST содержит рёбра (0,1,1) и (1,2,2)." << std::endl << std::endl;
+    std::cout << "  Expected result: MST should contain edges (0,1,1) and (1,2,2)." << std::endl << std::endl;
 }
 
 void runKruskalTest4_Disconnected() {
-    std::cout << "  --- Тест Крускала 4: Несвязный граф (2 компоненты) ---" << std::endl;
+    std::cout << "  --- Kruskal Test 4: Disconnected Graph (2 components) ---" << std::endl;
     Graph g;
     g.addNode(0); g.addNode(1); g.addNode(2); g.addNode(3);
     g.addEdge(0, 1, 1); g.addEdge(2, 3, 2);
-    std::cout << "  Исходный граф:" << std::endl;
+    std::cout << "  Original graph:" << std::endl;
     g.printGraph();
     Graph mst = algorithmKruscala(g);
-    std::cout << "  MST (несвязный граф, лес):" << std::endl;
+    std::cout << "  MST (disconnected graph, forest):" << std::endl;
     mst.printGraph();
-    std::cout << "  Ожидаемый результат: MST (лес) содержит рёбра (0,1,1) и (2,3,2)." << std::endl << std::endl;
+    std::cout << "  Expected result: MST (forest) should contain edges (0,1,1) and (2,3,2)." << std::endl << std::endl;
 }
 
 void runKruskalTest5_MultiplePaths() {
-    std::cout << "  --- Тест Крускала 5: Граф с несколькими путями ---" << std::endl;
+    std::cout << "  --- Kruskal Test 5: Graph with Multiple Paths ---" << std::endl;
     Graph g;
     g.addNode(0); g.addNode(1); g.addNode(2); g.addNode(3);
     g.addEdge(0, 1, 1); g.addEdge(0, 2, 2);
     g.addEdge(1, 3, 3); g.addEdge(2, 3, 1);
-    std::cout << "  Исходный граф:" << std::endl;
+    std::cout << "  Original graph:" << std::endl;
     g.printGraph();
     Graph mst = algorithmKruscala(g);
-    std::cout << "  MST (граф с несколькими путями):" << std::endl;
+    std::cout << "  MST (graph with multiple paths):" << std::endl;
     mst.printGraph();
-    std::cout << "  Ожидаемый результат: MST содержит рёбра (0,1,1), (2,3,1), (0,2,2). Общий вес = 4." << std::endl << std::endl;
+    std::cout << "  Expected result: MST should contain edges (0,1,1), (2,3,1), (0,2,2). Total weight = 4." << std::endl << std::endl;
 }
 
 void runPrimTest1_Empty() {
-    std::cout << "  --- Тест Прима 1: Пустой граф ---" << std::endl;
+    std::cout << "  --- Prim Test 1: Empty Graph ---" << std::endl;
     Graph g;
-    std::cout << "  Исходный граф:" << std::endl;
+    std::cout << "  Original graph:" << std::endl;
     g.printGraph();
     Graph mst = algorithmPrima(g);
-    std::cout << "  MST (пустой граф):" << std::endl;
+    std::cout << "  MST (empty graph):" << std::endl;
     mst.printGraph();
-    std::cout << "  Ожидаемый результат: MST пуст." << std::endl << std::endl;
+    std::cout << "  Expected result: MST should be empty." << std::endl << std::endl;
 }
 
 void runPrimTest2_SingleNode() {
-    std::cout << "  --- Тест Прима 2: Граф из одной вершины (без рёбер) ---" << std::endl;
+    std::cout << "  --- Prim Test 2: Single Node Graph (no edges) ---" << std::endl;
     Graph g;
     g.addNode(1);
-    std::cout << "  Исходный граф:" << std::endl;
+    std::cout << "  Original graph:" << std::endl;
     g.printGraph();
     Graph mst = algorithmPrima(g);
-    std::cout << "  MST (одна вершина):" << std::endl;
+    std::cout << "  MST (single node):" << std::endl;
     mst.printGraph();
-    std::cout << "  Ожидаемый результат: MST содержит узел 1, рёбер нет." << std::endl << std::endl;
+    std::cout << "  Expected result: MST should contain node 1 with no edges." << std::endl << std::endl;
 }
 
 void runPrimTest3_SimpleConnected() {
-    std::cout << "  --- Тест Прима 3: Простой связный граф (3 вершины) ---" << std::endl;
+    std::cout << "  --- Prim Test 3: Simple Connected Graph (3 nodes) ---" << std::endl;
     Graph g;
     g.addNode(0); g.addNode(1); g.addNode(2);
     g.addEdge(0, 1, 1); g.addEdge(1, 2, 2); g.addEdge(0, 2, 3);
-    std::cout << "  Исходный граф:" << std::endl;
+    std::cout << "  Original graph:" << std::endl;
     g.printGraph();
     Graph mst = algorithmPrima(g);
-    std::cout << "  MST (простой связный граф):" << std::endl;
+    std::cout << "  MST (simple connected graph):" << std::endl;
     mst.printGraph();
-    std::cout << "  Ожидаемый результат: MST содержит рёбра (0,1,1) и (1,2,2). Общий вес = 3." << std::endl << std::endl;
+    std::cout << "  Expected result: MST should contain edges (0,1,1) and (1,2,2). Total weight = 3." << std::endl << std::endl;
 }
 
 void runPrimTest4_Disconnected() {
-    std::cout << "  --- Тест Прима 4: Несвязный граф (2 компоненты) ---" << std::endl;
+    std::cout << "  --- Prim Test 4: Disconnected Graph (2 components) ---" << std::endl;
     Graph g;
     g.addNode(0); g.addNode(1); g.addNode(2); g.addNode(3);
     g.addEdge(0, 1, 1);
     g.addEdge(2, 3, 2);
-    std::cout << "  Исходный граф:" << std::endl;
+    std::cout << "  Original graph:" << std::endl;
     g.printGraph();
     Graph mst = algorithmPrima(g);
-    std::cout << "  MST ( несвязный граф, Прим):" << std::endl;
+    std::cout << "  MST (disconnected graph, Prim):" << std::endl;
     mst.printGraph();
-    std::cout << "  Ожидаемый результат: MST содержит ребро (0,1,1). Узлы 2,3 будут в MST, но без ребер к ним." << std::endl << std::endl;
+    std::cout << "  Expected result: MST should contain edge (0,1,1). Nodes 2,3 will be in MST but without connecting edges." << std::endl << std::endl;
 }
 
 void runPrimTest5_MultiplePaths() {
-    std::cout << "  --- Тест Прима 5: Граф с несколькими путями ---" << std::endl;
+    std::cout << "  --- Prim Test 5: Graph with Multiple Paths ---" << std::endl;
     Graph g;
     g.addNode(0); g.addNode(1); g.addNode(2); g.addNode(3);
     g.addEdge(0, 1, 1); g.addEdge(0, 2, 2);
     g.addEdge(1, 3, 3); g.addEdge(2, 3, 1);
-    std::cout << "  Исходный граф:" << std::endl;
+    std::cout << "  Original graph:" << std::endl;
     g.printGraph();
     Graph mst = algorithmPrima(g);
-    std::cout << "  MST (граф с несколькими путями, Прим):" << std::endl;
+    std::cout << "  MST (graph with multiple paths, Prim):" << std::endl;
     mst.printGraph();
-    std::cout << "  Ожидаемый результат: MST содержит рёбра (0,1,1), (2,3,1), (0,2,2). Общий вес = 4." << std::endl << std::endl;
+    std::cout << "  Expected result: MST should contain edges (0,1,1), (2,3,1), (0,2,2). Total weight = 4." << std::endl << std::endl;
 }
 
 void runGraphMethodsTests() {
-    std::cout << "  --- Тесты методов класса Graph ---" << std::endl;
+    std::cout << "  --- Graph Class Methods Tests ---" << std::endl;
     Graph myGraph;
 
-    std::cout << "\n  1. Исходное состояние (пустой граф):" << std::endl;
+    std::cout << "\n  1. Initial state (empty graph):" << std::endl;
     myGraph.printGraph();
-    std::cout << "  Граф пуст? " << (myGraph.isEmpty() ? "Да" : "Нет") << std::endl;
+    std::cout << "  Is graph empty? " << (myGraph.isEmpty() ? "Yes" : "No") << std::endl;
 
-    std::cout << "\n  2. Добавление узлов:" << std::endl;
+    std::cout << "\n  2. Adding nodes:" << std::endl;
     myGraph.addNode(10); myGraph.addNode(20); myGraph.addNode(5);
     myGraph.addNode(20);
     myGraph.printGraph();
-    std::cout << "  Граф пуст? " << (myGraph.isEmpty() ? "Да" : "Нет") << std::endl;
-    std::cout << "  Узел 10 существует? " << (myGraph.hasNode(10) ? "Да" : "Нет") << std::endl;
-    std::cout << "  Узел 15 существует? " << (myGraph.hasNode(15) ? "Да" : "Нет") << std::endl;
+    std::cout << "  Is graph empty? " << (myGraph.isEmpty() ? "Yes" : "No") << std::endl;
+    std::cout << "  Does node 10 exist? " << (myGraph.hasNode(10) ? "Yes" : "No") << std::endl;
+    std::cout << "  Does node 15 exist? " << (myGraph.hasNode(15) ? "Yes" : "No") << std::endl;
 
-    std::cout << "\n  3. Добавление рёбер:" << std::endl;
+    std::cout << "\n  3. Adding edges:" << std::endl;
     myGraph.addEdge(10, 20, 15);
     myGraph.addEdge(5, 10, 7);
     myGraph.addEdge(5, 20, 10);
     myGraph.addEdge(1, 2, 5);
     myGraph.addEdge(10, 20, 15);
     myGraph.printGraph();
-    std::cout << "  Ребро (10, 20) существует? " << (myGraph.hasEdge(10, 20) ? "Да" : "Нет") << std::endl;
-    std::cout << "  Ребро (20, 10) существует? " << (myGraph.hasEdge(20, 10) ? "Да" : "Нет") << " (проверка неориентированности)"<< std::endl;
-    std::cout << "  Ребро (10, 50) существует? " << (myGraph.hasEdge(10, 50) ? "Да" : "Нет") << std::endl;
+    std::cout << "  Does edge (10, 20) exist? " << (myGraph.hasEdge(10, 20) ? "Yes" : "No") << std::endl;
+    std::cout << "  Does edge (20, 10) exist? " << (myGraph.hasEdge(20, 10) ? "Yes" : "No") << " (checking undirectedness)" << std::endl;
+    std::cout << "  Does edge (10, 50) exist? " << (myGraph.hasEdge(10, 50) ? "Yes" : "No") << std::endl;
 
-    std::cout << "\n  4. Удаление узла:" << std::endl;
-    std::cout << "  Удаление узла 10:" << std::endl;
+    std::cout << "\n  4. Removing node:" << std::endl;
+    std::cout << "  Removing node 10:" << std::endl;
     myGraph.removeNode(10);
     myGraph.printGraph();
-    std::cout << "  Узел 10 существует? " << (myGraph.hasNode(10) ? "Да" : "Нет") << std::endl;
-    std::cout << "  Ребро (5, 10) существует? " << (myGraph.hasEdge(5, 10) ? "Да" : "Нет") << std::endl;
-    std::cout << "  Ребро (5, 20) существует? " << (myGraph.hasEdge(5, 20) ? "Да" : "Нет") << " (это ребро должно было остаться)"<< std::endl;
+    std::cout << "  Does node 10 exist? " << (myGraph.hasNode(10) ? "Yes" : "No") << std::endl;
+    std::cout << "  Does edge (5, 10) exist? " << (myGraph.hasEdge(5, 10) ? "Yes" : "No") << std::endl;
+    std::cout << "  Does edge (5, 20) exist? " << (myGraph.hasEdge(5, 20) ? "Yes" : "No") << " (this edge should remain)" << std::endl;
 
-    std::cout << "  Попытка удалить несуществующий узел 100:" << std::endl;
+    std::cout << "  Attempt to remove non-existent node 100:" << std::endl;
     myGraph.removeNode(100);
     myGraph.printGraph();
     std::cout << std::endl;
@@ -171,47 +171,48 @@ void runGraphMethodsTests() {
 
 void runTests(const std::string& testType) {
     std::cout << "==============================================" << std::endl;
-    std::cout << "ЗАПУСК ТЕСТОВ ДЛЯ: \"" << testType << "\"" << std::endl;
+    std::cout << "RUNNING TESTS FOR: \"" << testType << "\"" << std::endl;
     std::cout << "==============================================" << std::endl;
 
-    if (testType == "Граф") {
+    if (testType == "Graph") {
         runGraphMethodsTests();
-    } else if (testType == "Крускала") {
+    } else if (testType == "Kruskal") {
         runKruskalTest1_Empty();
         runKruskalTest2_SingleNode();
         runKruskalTest3_SimpleConnected();
         runKruskalTest4_Disconnected();
         runKruskalTest5_MultiplePaths();
-    } else if (testType == "Прима") {
+    } else if (testType == "Prim") {
         runPrimTest1_Empty();
         runPrimTest2_SingleNode();
         runPrimTest3_SimpleConnected();
         runPrimTest4_Disconnected();
         runPrimTest5_MultiplePaths();
     } else {
-        std::cout << "Неизвестный тип теста: \"" << testType << "\"" << std::endl;
-        std::cout << "Допустимые значения: \"Граф\", \"Крускала\", \"Прима\"" << std::endl;
+        std::cout << "Unknown test type: \"" << testType << "\"" << std::endl;
+        std::cout << "Valid values: \"Graph\", \"Prim\", \"Kruskal\"" << std::endl;
     }
-    std::cout << "--- Тестирование для \"" << testType << "\" завершено ---" << std::endl << std::endl;
+    std::cout << "--- Testing for \"" << testType << "\" completed ---" << std::endl << std::endl;
 }
+
 int main() {
     std::string c;
 
-    std::cout << "Введите команду ('Граф', 'Прима', 'Курскала')." << std::endl;
+    std::cout << "Enter command ('Graph', 'Prim', 'Kruskal')." << std::endl;
 
     while (std::cin >> c) {
-        if (c != "Граф" && c != "Прима" && c != "Крускала") {
-            std::cout << "Неверная команда: " << c << ". Пожалуйста, введите 'Граф', 'Прима' или 'Курскала'." << std::endl;
+        if (c != "Graph" && c != "Prim" && c != "Kruskal") {
+            std::cout << "Invalid command: " << c << ". Please enter 'Graph', 'Prim' or 'Kruskal'." << std::endl;
         } else {
             runTests(c);
         }
-        std::cout << "Введите следующую команду:" << std::endl;
+        std::cout << "Enter next command:" << std::endl;
     }
 
     if (std::cin.eof()) {
-        std::cout << "Ввод завершен (достигнут конец файла)." << std::endl;
+        std::cout << "Input completed (reached end of file)." << std::endl;
     } else if (std::cin.fail()) {
-        std::cerr << "Ошибка ввода. Возможно, был введен некорректный тип данных." << std::endl;
+        std::cerr << "Input error. Possibly entered incorrect data type." << std::endl;
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
