@@ -31,23 +31,23 @@ std::istream& operator>>(std::istream& in, DataStruct& data) {
         if (token == ":key1") {
             std::string value;
             if (iss >> value) {
-                if (!parseScientificDouble(value, temp.key1)) {
+                if (!parseComplex(value, temp.key1)) {
                     in.setstate(std::ios::failbit);
                     return in;
                 }
                 hasKey1 = true;
             }
-        } 
+        }
         else if (token == ":key2") {
             std::string value;
             if (iss >> value) {
-                if (!parseHexULL(value, temp.key2)) {
+                if (!parseRational(value, temp.key2)) {
                     in.setstate(std::ios::failbit);
                     return in;
                 }
                 hasKey2 = true;
             }
-        } 
+        }
         else if (token == ":key3") {
             if (iss >> std::quoted(temp.key3)) {
                 hasKey3 = true;
@@ -66,14 +66,24 @@ std::istream& operator>>(std::istream& in, DataStruct& data) {
 
 std::ostream& operator<<(std::ostream& out, const DataStruct& data) {
     iofmtguard guard(out);
-    out << "(:key1 " << std::scientific << std::uppercase << std::setprecision(1) << data.key1
-        << " :key2 0x" << std::hex << data.key2
+    out << "(:key1 #c(" << std::fixed << std::setprecision(1)
+        << data.key1.real() << " " << data.key1.imag() << ")"
+        << " :key2 (:N " << data.key2.first << ":D " << data.key2.second << ":)"
         << " :key3 " << std::quoted(data.key3) << ":)";
     return out;
 }
 
 bool compareDataStruct(const DataStruct& a, const DataStruct& b) {
-    if (a.key1 != b.key1) return a.key1 < b.key1;
-    if (a.key2 != b.key2) return a.key2 < b.key2;
+    // Compare by complex number magnitude
+    double magA = std::abs(a.key1);
+    double magB = std::abs(b.key1);
+    if (magA != magB) return magA < magB;
+
+    // Compare rational numbers as fractions
+    double ratA = static_cast<double>(a.key2.first) / a.key2.second;
+    double ratB = static_cast<double>(b.key2.first) / b.key2.second;
+    if (ratA != ratB) return ratA < ratB;
+
+    // Compare string lengths
     return a.key3.length() < b.key3.length();
 }
