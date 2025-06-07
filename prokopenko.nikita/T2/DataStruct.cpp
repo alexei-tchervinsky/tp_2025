@@ -7,6 +7,13 @@
 
 namespace prokopenko {
 
+  using tchervinsky::DelimiterIO;
+  using tchervinsky::LabelIO;
+  using tchervinsky::ComplexIO;
+  using tchervinsky::CharIO;
+  using tchervinsky::UllIO;
+  using tchervinsky::StringIO;
+
   bool DataStruct::operator<(const DataStruct& other) const {
     double firstAbs = std::abs(key1);
     double secondAbs = std::abs(other.key1);
