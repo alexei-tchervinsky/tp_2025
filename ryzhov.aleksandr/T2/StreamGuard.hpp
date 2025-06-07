@@ -3,9 +3,8 @@
 
 #include <iostream>
 
-
 namespace ryzhov {
-    class StreamGuard {
+class StreamGuard {
     public:
         // Конструкторы и деструктор
         explicit StreamGuard(std::basic_ios<char> &s);
@@ -21,7 +20,7 @@ namespace ryzhov {
         char fill_;
         std::streamsize precision_;
         std::basic_ios<char>::fmtflags fmt_;
-    };
 };
+}; // namespace ryzhov
 
-#endif //STREAMGUARD_HPP
+#endif // STREAMGUARD_HPP
