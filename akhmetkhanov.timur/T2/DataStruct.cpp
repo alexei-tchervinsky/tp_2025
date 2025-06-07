@@ -50,14 +50,12 @@ namespace nspace {
 
         iofmtguard fmtguard(os);
 
-        // Форматируем key2 в строку и приводим к нижнему регистру
         std::ostringstream oss;
-        oss << std::scientific << ds.key2;
+        oss << std::scientific << std::setprecision(1) << ds.key2;
         std::string key2_str = oss.str();
         std::transform(key2_str.begin(), key2_str.end(), key2_str.begin(),
                       [](unsigned char c) { return std::tolower(c); });
 
-        // Убираем ведущий ноль в экспоненте
         std::regex exp_regex(R"(e([+-])0(\d))");
         key2_str = std::regex_replace(key2_str, exp_regex, "e$1$2");
 
