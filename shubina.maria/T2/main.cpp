@@ -14,6 +14,11 @@ int main() {
         std::back_inserter(dataVector)
     );
 
+    if (dataVector.empty()) {
+        std::cout << "Looks like there is no supported record. Cannot determine input. Test skipped\n";
+        return 0;
+    }
+
 
     auto compare = [](const DataStruct& a, const DataStruct& b) {
         if (a.key1 != b.key1) return a.key1 < b.key1;
@@ -23,11 +28,9 @@ int main() {
     std::sort(dataVector.begin(), dataVector.end(), compare);
 
 
-    std::copy(
-        dataVector.begin(),
-        dataVector.end(),
-        std::ostream_iterator<DataStruct>(std::cout, "\n")
-    );
+    for (const auto& item : dataVector) {
+        std::cout << item << "\n";
+    }
 
     return 0;
 }

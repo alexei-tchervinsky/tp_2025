@@ -10,7 +10,6 @@ struct DataStruct {
     std::string key3;
 };
 
-// ѕерегрузки операторов объ€вл€ем, но не определ€аем
 std::istream& operator>>(std::istream& in, DataStruct& data);
 std::ostream& operator<<(std::ostream& out, const DataStruct& data);
 

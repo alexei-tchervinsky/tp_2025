@@ -67,7 +67,8 @@ std::istream& operator>>(std::istream& in, DataStruct& data) {
         }
     }
 
-    if (!(in >> ch) || ch != ')') {
+    char closeBrace;
+    if (!(in >> closeBrace) || closeBrace != ')') {
         in.setstate(std::ios_base::failbit);
         return in;
     }
