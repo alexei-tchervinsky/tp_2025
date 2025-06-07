@@ -2,7 +2,7 @@
 #include "iofmtguard.hpp"
 #include "IO_Objects.hpp"
 
-namespace tarasov {
+namespace myspace {
     bool DataStruct::operator<(const DataStruct& other) const {
         if (key1 != other.key1) {
             return key1 < other.key1;

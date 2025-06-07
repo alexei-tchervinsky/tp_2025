@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-namespace tarasov {
+namespace myspace {
     class iofmtguard {
     public:
         iofmtguard(std::basic_ios<char>& s);

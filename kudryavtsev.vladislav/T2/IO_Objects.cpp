@@ -1,6 +1,6 @@
 #include "IO_Objects.hpp"
 
-namespace tarasov {
+namespace myspace {
     char readChar(std::istream& in) {
         char c = 0;
         in >> c;

@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <limits>
 
-namespace tarasov {
+namespace myspace {
     struct DataStruct {
         double key1;
         char key2;

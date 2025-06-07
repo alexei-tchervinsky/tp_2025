@@ -1,6 +1,6 @@
 #include "iofmtguard.hpp"
 
-namespace tarasov {
+namespace myspace {
     iofmtguard::iofmtguard(std::basic_ios<char>& s) :
                 s_(s),
                 fill_(s.fill()),

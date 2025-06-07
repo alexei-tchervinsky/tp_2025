@@ -6,7 +6,7 @@
 
 #include "DataStruct.hpp"
 
-using namespace tarasov;
+using namespace myspace;
 
 
 int main() {

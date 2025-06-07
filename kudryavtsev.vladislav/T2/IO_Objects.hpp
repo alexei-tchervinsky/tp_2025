@@ -4,7 +4,7 @@
 #include <iostream>
 #include <iomanip>
 
-namespace tarasov {
+namespace myspace {
     struct DelimiterIO {
         char exp;
     };
