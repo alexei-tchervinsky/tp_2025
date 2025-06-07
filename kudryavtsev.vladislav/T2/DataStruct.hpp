@@ -1,18 +1,27 @@
-#ifndef DATA_STRUCT_HPP
-#define DATA_STRUCT_HPP
+#ifndef DATASTRUCT_HPP
+#define DATASTRUCT_HPP
 
-#include <complex>
+#include <iostream>
+#include <iomanip>
+#include <sstream>
+#include <string>
+#include <algorithm>
+#include <limits>
 
-namespace myspace {
+namespace tarasov {
     struct DataStruct {
-        std::complex<double> key1;
-        std::string key2;
+        double key1;
+        char key2;
         std::string key3;
 
-        friend std::ostream& operator<<(std::ostream&, const DataStruct&);
-        friend std::istream& operator>>(std::istream&, DataStruct&);
+        bool operator<(const DataStruct& other) const;
     };
-    bool compare(const DataStruct&, const DataStruct&);
+
+    std::istream& operator>>(std::istream& in, DataStruct& dest);
+
+    std::ostream& operator<<(std::ostream& out, const DataStruct& data);
+
+    std::string formatScientific(double data);
 }
 
 #endif
