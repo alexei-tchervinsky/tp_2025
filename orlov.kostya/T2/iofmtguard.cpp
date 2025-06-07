@@ -18,3 +18,4 @@ namespace orlov
         s_.flags(fmt_);
     }
 }
+
