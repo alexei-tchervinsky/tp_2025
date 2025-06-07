@@ -25,12 +25,13 @@ int main(int argc, char* argv[])
     std::vector<geom_lab::Polygon> polygons;
     geom_lab::Polygon polygon;
 
+    // Читаем все корректные полигоны из файла, игнорируя некорректные
     while (file >> polygon)
     {
         polygons.push_back(polygon);
     }
 
-    // Очищаем состояние потока после чтения файла
+    // Очищаем состояние потока и закрываем файл
     file.clear();
     file.close();
 
@@ -102,7 +103,7 @@ int main(int argc, char* argv[])
                 std::cout << "<INVALID COMMAND>" << std::endl;
             }
         }
-        catch (const std::exception& e)
+        catch (const std::exception&)
         {
             std::cout << "<INVALID COMMAND>" << std::endl;
         }

@@ -104,8 +104,21 @@ std::istream& geom_lab::operator>>(std::istream& in, Polygon& polygon)
         return in;
     }
     std::vector< Point > temp;
-    using input_iterator_t = std::istream_iterator< Point >;
-    std::copy_n(input_iterator_t{ in }, countPoints, std::back_inserter(temp));
+    temp.reserve(countPoints);
+
+    // Читаем точки по одной, проверяя каждую
+    for (size_t i = 0; i < countPoints; ++i)
+    {
+        Point p;
+        in >> p;
+        if (!in)
+        {
+            in.setstate(std::ios::failbit);
+            return in;
+        }
+        temp.push_back(p);
+    }
+
     if (in && (temp.size() == countPoints))
     {
         polygon.points = temp;
