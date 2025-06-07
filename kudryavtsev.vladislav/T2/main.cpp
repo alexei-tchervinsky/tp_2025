@@ -22,3 +22,4 @@ int main() {
     std::copy(ds.begin(), ds.end(), std::ostream_iterator<DataStruct>(std::cout, "\n"));
     return 0;
 }
+
