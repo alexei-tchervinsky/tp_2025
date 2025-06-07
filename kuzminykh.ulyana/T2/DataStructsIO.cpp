@@ -89,13 +89,11 @@ namespace kuzminykh
         {
             return in;
         }
-        std::string label = "";
-        for (std::size_t i = 0; i < dest.label.length(); ++i)
-        {
-            label += tolower(in.get());
-        }
+        std::string label;
+        std::copy_n(std::istream_iterator<char>(in), dest.label.length(), std::back_inserter(label));
         if (in && (label != dest.label))
         {
+
             in.setstate(std::ios_base::failbit);
         }
         return in;
@@ -109,8 +107,7 @@ namespace kuzminykh
         }
         char c;
         in >> c;
-        if (in && (c != dest.delimiter))
-        {
+        if (in && (c != dest.delimiter)) {
             in.setstate(std::ios::failbit);
         }
         return in;
