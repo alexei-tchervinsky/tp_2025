@@ -1,6 +1,7 @@
 #include "graph_TP.hpp"
 #include <iostream>
 #include <numeric>
+#include <limits>
 
 void runKruskalTest1_Empty() {
     std::cout << "  --- Kruskal Test 1: Empty Graph ---" << std::endl;
