@@ -2,9 +2,22 @@
 #include <algorithm>
 #include <iterator>
 #include <numeric>
+#include <utility>
 namespace popov {
 bool doPolygonsIntersect(const Polygon& poly1, const Polygon& poly2) {
-    auto getProjections = [](const Polygon& poly, double nx, double ny) {
+    auto getProjections = [](const Polygon& poly, double nx, double ny) -> std::pair<double, double> {
+        if (poly.points.empty()) return {0.0, 0.0};
+        double minProj = std::numeric_limits<double>::max();
+        double maxProj = std::numeric_limits<double>::lowest();
+        auto getProjections = [](const Polygon& poly, double nx, double ny) -> std::pair<double, double> {
+    if (poly.points.empty()) return {0.0, 0.0};
+    auto projections = poly.points | std::views::transform([nx, ny](const Point& point) {
+        return point.x * nx + point.y * ny;
+    });
+    auto [minIt, maxIt] = std::minmax_element(projections.begin(), projections.end());
+    return {*minIt, *maxIt};
+};
+        return {minProj, maxProj};
     };
     auto checkProjections = [&getProjections](const Polygon& poly1, const Polygon& poly2) {
         auto processPolygon = [&getProjections](const Polygon& sourcePoly, const Polygon& otherPoly) {
