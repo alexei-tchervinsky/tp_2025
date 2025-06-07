@@ -14,54 +14,56 @@ namespace tarasenko {
         }
 
         bool doPolygonsIntersect(const Polygon& poly1, const Polygon& poly2) {
-            bool edgesIntersect = std::any_of(poly1.points.begin(), poly1.points.end(),
-                [&poly1, &poly2](const Point& p1) {
-                    size_t i = &p1 - &poly1.points[0];
-                    const Point& p2 = poly1.points[(i + 1) % poly1.points.size()];
+            for (size_t i = 0; i < poly1.points.size(); ++i) {
+                const Point& p1 = poly1.points[i];
+                const Point& p2 = poly1.points[(i + 1) % poly1.points.size()];
 
-                    return std::any_of(poly2.points.begin(), poly2.points.end(),
-                        [&p1, &p2, &poly2](const Point& p3) {
-                            size_t j = &p3 - &poly2.points[0];
-                            const Point& p4 = poly2.points[(j + 1) % poly2.points.size()];
-                            int orient1 = (p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x);
-                            int orient2 = (p2.x - p1.x) * (p4.y - p1.y) - (p2.y - p1.y) * (p4.x - p1.x);
+                for (size_t j = 0; j < poly2.points.size(); ++j) {
+                    const Point& p3 = poly2.points[j];
+                    const Point& p4 = poly2.points[(j + 1) % poly2.points.size()];
 
-                            if (orient1 * orient2 < 0) {
-                                int orient3 = (p4.x - p3.x) * (p1.y - p3.y) - (p4.y - p3.y) * (p1.x - p3.x);
-                                int orient4 = (p4.x - p3.x) * (p2.y - p3.y) - (p4.y - p3.y) * (p2.x - p3.x);
-                                return orient3 * orient4 < 0;
-                            }
-                            return false;
-                        });
-                });
+                    int orient1 = (p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x);
+                    int orient2 = (p2.x - p1.x) * (p4.y - p1.y) - (p2.y - p1.y) * (p4.x - p1.x);
 
-            if (edgesIntersect) return true;
+                    if (orient1 * orient2 < 0) {
+                        int orient3 = (p4.x - p3.x) * (p1.y - p3.y) - (p4.y - p3.y) * (p1.x - p3.x);
+                        int orient4 = (p4.x - p3.x) * (p2.y - p3.y) - (p4.y - p3.y) * (p2.x - p3.x);
+                        if (orient3 * orient4 < 0) {
+                            return true;
+                        }
+                    }
+                }
+            }
+
             auto isPointInside = [](const Point& p, const Polygon& poly) {
                 bool inside = false;
                 for (size_t i = 0, j = poly.points.size() - 1; i < poly.points.size(); j = i++) {
                     const Point& pi = poly.points[i];
                     const Point& pj = poly.points[j];
 
-                    if (((pi.y > p.y) != (pj.y > p.y))) {
-                        int intersectX = (pj.x - pi.x) * (p.y - pi.y) / (pj.y - pi.y) + pi.x;
-                        if (p.x < intersectX) {
-                            inside = !inside;
-                        }
+                    if (((pi.y > p.y) != (pj.y > p.y)) &&
+                        (p.x < (pj.x - pi.x) * (p.y - pi.y) / (pj.y - pi.y) + pi.x)) {
+                        inside = !inside;
                     }
                 }
                 return inside;
-            };
-                    bool allInside1 = std::all_of(poly1.points.begin(), poly1.points.end(),
-                        [&poly2, &isPointInside](const Point& p) {
-                            return isPointInside(p, poly2);
-                        });
+                };
 
-                bool allInside2 = std::all_of(poly2.points.begin(), poly2.points.end(),
-                    [&poly1, &isPointInside](const Point& p) {
-                        return isPointInside(p, poly1);
-                    });
+            if (std::any_of(poly1.points.begin(), poly1.points.end(),
+                [&poly2, &isPointInside](const Point& p) {
+                    return isPointInside(p, poly2);
+                })) {
+                return true;
+            }
 
-                return allInside1 || allInside2;
+            if (std::any_of(poly2.points.begin(), poly2.points.end(),
+                [&poly1, &isPointInside](const Point& p) {
+                    return isPointInside(p, poly1);
+                })) {
+                return true;
+            }
+
+            return false;
         }
     }
 
@@ -224,6 +226,7 @@ namespace tarasenko {
         if (inputPolygon.points.size() < 3) {
             throw std::invalid_argument("INVALID COMMAND");
         }
+
         size_t count = std::count_if(polygons.begin(), polygons.end(),
             [&inputPolygon](const Polygon& poly) {
                 return doPolygonsIntersect(inputPolygon, poly);
@@ -231,6 +234,7 @@ namespace tarasenko {
 
         out << count << '\n';
     }
+
     void rmechoCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
         Polygon target;
         in >> target;
