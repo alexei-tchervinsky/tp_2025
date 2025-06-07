@@ -39,4 +39,3 @@ namespace orlov
 }
 
 #endif // !__IOOBJECTS_HPP
-

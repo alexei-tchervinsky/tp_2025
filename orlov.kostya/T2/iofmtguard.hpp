@@ -22,4 +22,3 @@ namespace orlov
 }
 
 #endif // !__IOFMTGUARD_HPP
-

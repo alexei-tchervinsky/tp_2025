@@ -2,19 +2,16 @@
 #define DATASTRUCT_HPP
 
 #include <string>
-#include <iostream>
+#include <sstream>
 
 namespace orlov
 {
+    std::string formatScientific(double data);
     struct DataStruct
     {
-        unsigned long long key1{0};
-        double key2{0.0};
-        std::string key3{};
-
-        DataStruct() = default;
-        DataStruct(unsigned long long k1, double k2, std::string k3) :
-            key1(k1), key2(k2), key3(std::move(k3)) {}
+        unsigned long long key1;
+        double key2;
+        std::string key3;
 
         friend std::ostream& operator<<(std::ostream& os, const DataStruct& src);
         friend std::istream& operator>>(std::istream& is, DataStruct& src);
@@ -23,5 +20,4 @@ namespace orlov
     bool compareDataStruct(const DataStruct& first, const DataStruct& second);
 }
 
-#endif // DATASTRUCT_HPP
-
+#endif // !__DATASTRUCT_HPP
