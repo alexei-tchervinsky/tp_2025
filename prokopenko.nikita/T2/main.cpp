@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <vector>
 #include <algorithm>
 #include <limits>
@@ -19,7 +19,7 @@ int main() {
 
   if (data.empty()) {
     std::cout << "Looks like there is no supported record. Cannot determine input. Test skipped\n";
-    return 2;
+    return 0; 
   }
 
   std::sort(data.begin(), data.end());
