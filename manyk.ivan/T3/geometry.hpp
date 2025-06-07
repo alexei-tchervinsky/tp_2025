@@ -45,5 +45,8 @@ double computeArea(const Polygon& poly);
 void areaCommand(const std::vector<Polygon>& polygons, const std::string& arg);
 void maxCommand(const std::vector<Polygon>& polygons, const std::string& arg);
 void minCommand(const std::vector<Polygon>& polygons, const std::string& arg);
-void countCommand(const std::vector<Polygon>& polygons, const std::string& arg);
+//void countCommand(const std::vector<Polygon>& polygons, const std::string& arg);
+void countOdd(const std::vector<Polygon>& polygons);
+void countEven(const std::vector<Polygon>& polygons);
+void countNum(const std::vector<Polygon>& polygons, int num);
 #endif

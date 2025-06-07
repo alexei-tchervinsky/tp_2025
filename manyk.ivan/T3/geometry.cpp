@@ -2,6 +2,11 @@
 
 std::istream& operator>>(std::istream& in, Point& point)
 {
+    if(in.peek() == '\n')
+    {
+        in.setstate(std::ios::failbit);
+        return in;
+    }
     std::istream::sentry sentry(in);
     if (!sentry)
     {
@@ -34,7 +39,7 @@ std::istream& operator>>(std::istream& in, Polygon& polygon)
 
     std::vector<Point> temp;
     std::copy_n(std::istream_iterator<Point>{ in }, countPoints , std::back_inserter(temp));
-    if (in.peek() != '\n')
+    if (in.peek() != '\n' && in.peek() != EOF)
     {
         in.setstate(std::ios::failbit);
         return in;

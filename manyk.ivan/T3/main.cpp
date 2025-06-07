@@ -19,10 +19,10 @@ int main(int argc, char **argv)
             in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
            // std::cout << 1;
         }
-        // for(auto &i : polygons) {
-        //     std::cout << i << std::endl;
-        // }
     }
+    // for(auto &i : polygons) {
+    //         std::cout << i << std::endl;
+    //     }
     std::string a;
     while (std::cin >> a)
     {
@@ -80,16 +80,34 @@ int main(int argc, char **argv)
                 continue;
             }
         }
-        else if (a == "COUNT") {
+         else if (a == "COUNT") {
             std::string arg;
-            if (std::cin >> arg)
-                countCommand(polygons, arg);
-            else
-            {
+            if (std::cin >> arg) {
+                if (arg == "ODD") {
+                    countOdd(polygons);
+                }
+                else if (arg == "EVEN") {
+                    countEven(polygons);
+                }
+                else {
+                    try {
+                        int num = std::stoi(arg);
+                        if (num < 3) {
+                            std::cout << "<INVALID COMMAND>\n";
+                        }
+                        countNum(polygons, num);
+                    }
+                    catch (...) {
+                        std::cin.clear();
+                        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                        std::cout << "<INVALID COMMAND>\n";
+                    }
+                }
+            }
+            else {
                 std::cin.clear();
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 std::cout << "<INVALID COMMAND>\n";
-                continue;
             }
         }
         else

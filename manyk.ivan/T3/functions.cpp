@@ -153,37 +153,32 @@ void minCommand(const std::vector<Polygon>& polygons, const std::string& arg)
     }
 }
 
-void countCommand(const std::vector<Polygon>& polygons, const std::string& arg)
-{
-    if (arg == "EVEN")
-    {
-        size_t count = 0;
-        for (const auto& poly : polygons)
-        {
-            if (poly.points.size() % 2 == 0) count++;
-        }
-        std::cout << count << "\n";
-    }
-    else if (arg == "ODD")
-    {
-        size_t count = 0;
-        for (const auto& poly : polygons)
-        {
-            if (poly.points.size() % 2 == 1) count++;
-        }
-        std::cout << count << "\n";
-    }
-    else {
-        try {
-            size_t num = std::stoul(arg);
-            size_t count = 0;
-            for (const auto& poly : polygons)
-            {
-                if (poly.points.size() == num) count++;
-            }
-            std::cout << count << "\n";
-        } catch (...) {
-            std::cout << "<INVALID COMMAND>\n";
+void countOdd(const std::vector<Polygon>& polygons) {
+    size_t count = 0;
+    for (const auto& poly : polygons) {
+        if (poly.points.size() % 2 == 1) {
+            count++;
         }
     }
+    std::cout << count << "\n";
+}
+
+void countEven(const std::vector<Polygon>& polygons) {
+    size_t count = 0;
+    for (const auto& poly : polygons) {
+        if (poly.points.size() % 2 == 0) {
+            count++;
+        }
+    }
+    std::cout << count << "\n";
+}
+
+void countNum(const std::vector<Polygon>& polygons, int num) {
+    size_t count = 0;
+    for (const auto& poly : polygons) {
+        if (static_cast<int>(poly.points.size()) == num) {
+            count++;
+        }
+    }
+    std::cout << count << "\n";
 }
