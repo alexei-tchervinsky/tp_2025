@@ -36,23 +36,23 @@ int main()
         return 1;
     }
 
-    try 
+    try
     {
-        while (std::cin) 
+        while (std::cin)
         {
             DataStruct tmp;
-            if (std::cin >> tmp) 
+            if (std::cin >> tmp)
             {
                 data.push_back(tmp);
             }
-            else 
+            else
             {
                 std::cin.clear();
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             }
         }
     }
-    catch (const std::exception& e) 
+    catch (const std::exception& e)
     {
         std::cerr << "Error: " << e.what() << '\n';
         return 1;

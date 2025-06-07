@@ -90,7 +90,7 @@ std::istream& operator>>(std::istream& in, StringIO&& d)
     return std::getline(in >> DelimiterIO{ '"' }, d.ref, '"');
 }
 
-std::istream& operator>>(std::istream& in, DataStruct& d) 
+std::istream& operator>>(std::istream& in, DataStruct& d)
 {
     std::istream::sentry sentry(in);
     if (!sentry) return in;
@@ -132,10 +132,10 @@ std::istream& operator>>(std::istream& in, DataStruct& d)
             }
             hasKey3 = true;
         }
-        else 
+        else
         {
             std::string dummy;
-            while (in && in.peek() != ':' && in.peek() != ')') 
+            while (in && in.peek() != ':' && in.peek() != ')')
             {
                 in >> dummy;
             }
@@ -143,12 +143,12 @@ std::istream& operator>>(std::istream& in, DataStruct& d)
         }
     }
 
-    if (hasKey1 && hasKey2 && hasKey3) 
+    if (hasKey1 && hasKey2 && hasKey3)
     {
         in >> DelimiterIO{ ')' };
         d = tmp;
     }
-    else 
+    else
     {
         in.setstate(std::ios::failbit);
     }
@@ -156,7 +156,7 @@ std::istream& operator>>(std::istream& in, DataStruct& d)
     return in;
 }
 
-std::ostream& operator<<(std::ostream& out, const DataStruct& d) 
+std::ostream& operator<<(std::ostream& out, const DataStruct& d)
 {
     std::ostream::sentry sentry(out);
     if (!sentry) return out;
