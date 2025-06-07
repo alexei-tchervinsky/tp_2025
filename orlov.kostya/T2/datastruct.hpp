@@ -19,7 +19,7 @@ namespace orlov
         friend std::istream& operator>>(std::istream& is, DataStruct& src);
     };
 
-    bool compareDataStruct(const DataStruct& first, const DataStruct& second)
+    bool compareDataStruct(const DataStruct& first, const DataStruct& second);
 }
 
 #endif // !__DATASTRUCT_HPP
