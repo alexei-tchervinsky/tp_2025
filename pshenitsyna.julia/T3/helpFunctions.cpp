@@ -1,5 +1,7 @@
 #include "helpFunctions.h"
 #include "Comands.h"
+#include <functional>
+#include <map>
 
 namespace wheatman {
 
@@ -13,7 +15,6 @@ namespace wheatman {
         {
             throw std::runtime_error("Incorrect input!");
         }
-//        polygon.points.resize(number);
         for (size_t i = 0; i < number; ++i)
         {
             Point point;
@@ -59,74 +60,69 @@ namespace wheatman {
         file.close();
         return polygons;
     }
-    void CommandsHandler (const std::string& command, std::vector<Polygon>& p)
-    {
-        std::stringstream in(command);
-        std::string commands;
-        in >> commands;
+    std::map<std::string, std::function<void(std::stringstream&)>> commandMap;
 
-        if(commands == "AREA")
-        {
-            std::string parameter;
-            in >> parameter;
-            area(p, parameter);
-        }
-        else if(commands == "MAX")
-        {
-            std::string parameter;
-            in >> parameter;
-            max(p, parameter);
-        }
-        else if(commands == "MIN")
-        {
-            std::string parameter;
-            in >> parameter;
-            min(p, parameter);
-        }
-        else if(commands == "COUNT")
-        {
-            std::string parameter;
-            in >> parameter;
-            count(p, parameter);
-        }
-        else if(commands == "ECHO")
-        {
-            std::string polygonStr;
-            std::getline(in, polygonStr);
-            if (polygonStr.empty()) {
+    void initializeCommands (std::vector<Polygon>& p)
+    {
+        commandMap["AREA"] = [&p](std::stringstream& in) {
+            std::string param; in >> param;
+            area(p, param);
+        };
+
+        commandMap["COUNT"] = [&p](std::stringstream& in) {
+            std::string param; in >> param;
+            count(p, param);
+        };
+
+        commandMap["MAX"] = [&p](std::stringstream& in) {
+            std::string param; in >> param;
+            max(p, param);
+        };
+
+        commandMap["MIN"] = [&p](std::stringstream& in) {
+            std::string param; in >> param;
+            min(p, param);
+        };
+
+        commandMap["ECHO"] = [&p](std::stringstream& in) {
+            std::string rest;
+            std::getline(in, rest);
+            if (rest.empty()) {
                 std::cout << "<INVALID COMMAND>\n";
                 return;
             }
-            try
-            {
-                Polygon figure = splitPolygon(polygonStr);
+            try {
+                Polygon figure = splitPolygon(rest);
                 echo(p, figure);
-            }
-            catch (const std::exception& e)
-            {
+            } catch (...) {
                 std::cout << "<INVALID COMMAND>\n";
             }
-        }
-        else if(commands == "INFRAME")
-        {
-            std::string polygonStr;
-            std::getline(in, polygonStr);
-            if (polygonStr.empty()) {
+        };
+
+        commandMap["INFRAME"] = [&p](std::stringstream& in) {
+            std::string rest;
+            std::getline(in, rest);
+            if (rest.empty()) {
                 std::cout << "<INVALID COMMAND>\n";
                 return;
             }
-            try
-            {
-                Polygon figure = splitPolygon(polygonStr);
+            try {
+                Polygon figure = splitPolygon(rest);
                 inframe(p, figure);
-            }
-            catch (const std::exception& e)
-            {
+            } catch (...) {
                 std::cout << "<INVALID COMMAND>\n";
             }
-        }
-        else
-        {
+        };
+    }
+    void CommandsHandler(const std::string& command, std::vector<Polygon>& p) {
+        std::stringstream in(command);
+        std::string cmd;
+        in >> cmd;
+
+        auto it = commandMap.find(cmd);
+        if (it != commandMap.end()) {
+            it->second(in);  // вызываем лямбду
+        } else {
             std::cout << "<INVALID COMMAND>\n";
         }
     }

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <functional>
 #include "Struct.h"
 #include "helpFunctions.h"
 
@@ -17,12 +18,12 @@ int main(int args, char* argv[]) {
     try
     {
         std::vector<Polygon> geometry = readFile(filename);
-
-        std::string command;
-        while (std::getline(std::cin, command))
+        initializeCommands(geometry);
+        std::string line;
+        while (std::getline(std::cin, line))
         {
-            if(std::cin.eof() || command.empty()) continue;
-            CommandsHandler(command, geometry);
+            if(std::cin.eof() || line.empty()) continue;
+            CommandsHandler(line, geometry);
         }
     }
     catch (const std::exception& e)
