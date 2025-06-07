@@ -42,75 +42,50 @@ namespace tarasenko {
                     return false;
                 };
 
-            auto hasSegmentIntersection = [&]() {
-                return std::any_of(poly1.points.begin(), poly1.points.end(),
-                    [&](const Point& p1) {
-                        const Point& p2 = poly1.points[(&p1 - &poly1.points[0] + 1) % poly1.points.size()];
-                        return std::any_of(poly2.points.begin(), poly2.points.end(),
-                            [&](const Point& q1) {
-                                const Point& q2 = poly2.points[(&q1 - &poly2.points[0] + 1) % poly2.points.size()];
-                                return segmentsIntersect(p1, p2, q1, q2);
-                            });
+            // Check segment intersections
+            auto checkSegments = [&](const Point& p1, const Point& p2) {
+                return std::any_of(poly2.points.begin(), poly2.points.end(),
+                    [&](const Point& q1) {
+                        const Point& q2 = poly2.points[(&q1 - &poly2.points[0] + 1) % poly2.points.size()];
+                        return segmentsIntersect(p1, p2, q1, q2);
                     });
                 };
 
-            if (hasSegmentIntersection()) {
+            bool hasIntersectingSegments = std::any_of(poly1.points.begin(), poly1.points.end(),
+                [&](const Point& p1) {
+                    const Point& p2 = poly1.points[(&p1 - &poly1.points[0] + 1) % poly1.points.size()];
+                    return checkSegments(p1, p2);
+                });
+
+            if (hasIntersectingSegments) {
                 return true;
             }
 
+            // Check point containment
             auto isPointInsidePolygon = [](const Point& point, const Polygon& poly) -> bool {
-                struct Accumulator {
-                    bool inside = false;
-                    Point prev;
+                bool inside = false;
+                Point prev = poly.points.back();
+                for (const auto& curr : poly.points) {
+                    if (((prev.y > point.y) != (curr.y > point.y)) &&
+                        (point.x <= (prev.x - curr.x) * (point.y - curr.y) / (prev.y - curr.y) + curr.x)) {
+                        inside = !inside;
+                    }
+                    prev = curr;
+                }
+                return inside;
                 };
 
-                Accumulator acc{ false, poly.points.back() };
+            bool hasPointInside1 = std::any_of(poly1.points.begin(), poly1.points.end(),
+                [&poly2, &isPointInsidePolygon](const Point& point) {
+                    return isPointInsidePolygon(point, poly2);
+                });
 
-                acc = std::accumulate(poly.points.begin(), poly.points.end(), acc,
-                    [&point](Accumulator a, const Point& curr) {
-                        if ((a.prev.y > point.y) != (curr.y > point.y)) {
-                            double intersectX = (curr.x - a.prev.x) * (point.y - a.prev.y) / (curr.y - a.prev.y) + a.prev.x;
-                            if (point.x <= intersectX) {
-                                a.inside = !a.inside;
-                            }
-                        }
-                        a.prev = curr;
-                        return a;
-                    });
+            bool hasPointInside2 = std::any_of(poly2.points.begin(), poly2.points.end(),
+                [&poly1, &isPointInsidePolygon](const Point& point) {
+                    return isPointInsidePolygon(point, poly1);
+                });
 
-                return acc.inside;
-                };
-
-            auto hasPointInside = [&](const Polygon& outer, const Polygon& inner) {
-                return std::any_of(inner.points.begin(), inner.points.end(),
-                    [&](const Point& p) { return isPointInsidePolygon(p, outer); });
-                };
-
-            return hasPointInside(poly1, poly2) || hasPointInside(poly2, poly1);
-        }
-
-        CommandMap createCommandMap() {
-            using namespace std::placeholders;
-            return {
-                {"AREA", std::bind(areaCommand, _1, _2, _3)},
-                {"MAX", std::bind(maxCommand, _1, _2, _3)},
-                {"MIN", std::bind(minCommand, _1, _2, _3)},
-                {"COUNT", std::bind(countCommand, _1, _2, _3)},
-                {"INTERSECTIONS", std::bind(intersectionsCommand, _1, _2, _3)},
-                {"RMECHO", std::bind(rmechoCommand, _1, _2, _3)}
-            };
-        }
-
-        void executeCommand(const CommandMap& commands,
-            const std::vector<Polygon>& polygons,
-            const std::string& command,
-            std::istream& in,
-            std::ostream& out) {
-            auto it = commands.find(command);
-            if (it == commands.end()) {
-                throw std::invalid_argument("UNKNOWN COMMAND");
-            }
-            it->second(polygons, in, out);
+            return hasPointInside1 || hasPointInside2;
         }
 
         void areaCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
@@ -158,7 +133,6 @@ namespace tarasenko {
 
         void maxCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
             iofmtguard guard(out);
-
             std::string subcmd;
             in >> subcmd;
             checkEmpty(polygons);
@@ -184,7 +158,6 @@ namespace tarasenko {
 
         void minCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
             iofmtguard guard(out);
-
             std::string subcmd;
             in >> subcmd;
             checkEmpty(polygons);
@@ -298,3 +271,28 @@ namespace tarasenko {
             }
         }
     }
+
+    CommandMap createCommandMap() {
+        using namespace std::placeholders;
+        return {
+            {"AREA", std::bind(areaCommand, _1, _2, _3)},
+            {"MAX", std::bind(maxCommand, _1, _2, _3)},
+            {"MIN", std::bind(minCommand, _1, _2, _3)},
+            {"COUNT", std::bind(countCommand, _1, _2, _3)},
+            {"INTERSECTIONS", std::bind(intersectionsCommand, _1, _2, _3)},
+            {"RMECHO", std::bind(rmechoCommand, _1, _2, _3)}
+        };
+    }
+
+    void executeCommand(const CommandMap& commands,
+        const std::vector<Polygon>& polygons,
+        const std::string& command,
+        std::istream& in,
+        std::ostream& out) {
+        auto it = commands.find(command);
+        if (it == commands.end()) {
+            throw std::invalid_argument("UNKNOWN COMMAND");
+        }
+        it->second(polygons, in, out);
+    }
+} // namespace tarasenko
