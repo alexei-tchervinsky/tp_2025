@@ -9,7 +9,7 @@ private:
   std::vector<int> rank;
 
 public:
-  DisjointSet(int size = 1000) {
+  DisjointSet(size_t size = 1000) {
     for (size_t i = 0; i < size; ++i) {
       parent.push_back(i);
       rank.push_back(0);
