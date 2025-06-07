@@ -15,7 +15,7 @@ int main() {
     );
 
     if (dataVector.empty()) {
-        std::cout << "Atleast one supported record type\n";
+        std::cout << "Looks like there is no supported record. Cannot determine input. Test skipped\n";
         return 0;
     }
 
