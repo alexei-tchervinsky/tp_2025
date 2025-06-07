@@ -1,35 +1,36 @@
 #ifndef IO_OBJECTS_HPP
 #define IO_OBJECTS_HPP
 
+#include <complex>
+#include <utility>
 #include <iostream>
-#include <iomanip>
 
 namespace myspace {
-    struct DelimiterIO {
-        char exp;
+    struct LimitingSymbolIO {
+        char symbol;
     };
 
-    struct DoubleSciIO {
-        double& ref;
+    struct LabelIO {
+        std::string label;
     };
 
-    struct CharLitIO {
-        char& ref;
+    struct ComplexIO {
+        std::complex<double>& ref;
     };
 
-    struct StringLitIO {
+    struct BinaryIO {
         std::string& ref;
     };
 
-    char readChar(std::istream& in);
+    struct StringIO {
+        std::string& ref;
+    };
 
-    std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
-
-    std::istream& operator>>(std::istream& in, DoubleSciIO&& dest);
-
-    std::istream& operator>>(std::istream& in, CharLitIO&& dest);
-
-    std::istream& operator>>(std::istream& in, StringLitIO&& dest);
+    std::istream& operator>>(std::istream&, LimitingSymbolIO&&);
+    std::istream& operator>>(std::istream&, LabelIO&&);
+    std::istream& operator>>(std::istream&, ComplexIO&&);
+    std::istream& operator>>(std::istream&, BinaryIO&&);
+    std::istream& operator>>(std::istream&, StringIO&&);
 }
 
 #endif

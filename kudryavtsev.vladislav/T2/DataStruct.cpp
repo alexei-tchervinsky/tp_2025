@@ -2,86 +2,68 @@
 #include "iofmtguard.hpp"
 #include "IO_Objects.hpp"
 
+#include <algorithm>
+#include <iomanip>
+
 namespace myspace {
-    bool DataStruct::operator<(const DataStruct& other) const {
-        if (key1 != other.key1) {
-            return key1 < other.key1;
-        }
-        if (key2 != other.key2) {
-            return key2 < other.key2;
-        }
-        return key3.length() < other.key3.length();
+    std::ostream& operator<<(std::ostream &os, const DataStruct& ds) {
+        std::ostream::sentry sentry(os);
+        if(!sentry) return os;
+        iofmtguard fmtguard(os);
+        os << ":key1 #c(" << ds.key1.real() << ' ' << ds.key1.imag() << ")\n";
+        os << ":key2 " << ds.key2 << ":\n";
+        os << ":key3 \"" << ds.key3 << "\":";
+        return os;
     }
 
-    std::istream& operator>>(std::istream& in, DataStruct& dest) {
-        const std::istream::sentry sentry(in);
-        if (!sentry) return in;
-
-        DataStruct data;
-        std::string key_label;
-        bool key1_read = false, key2_read = false, key3_read = false;
-
-        in >> DelimiterIO{'('} >> DelimiterIO{':'};
-        if (!in) return in;
-
-        while (in.peek() != ')') {
-            if (!(in >> key_label)) break;
-
-            if (key_label == "key1") {
-                if (!(in >> DoubleSciIO{data.key1} >> DelimiterIO{':'}) or data.key1 == 0) break;
-                key1_read = true;
-            } else if (key_label == "key2") {
-                if (!(in >> CharLitIO{data.key2} >> DelimiterIO{':'})) break;
-                key2_read = true;
-            } else if (key_label == "key3") {
-                if (!(in >> StringLitIO{data.key3} >> DelimiterIO{':'})) break;
-                key3_read = true;
-            } else {
-                std::string dummy;
-                std::getline(in, dummy, ':');
-                if (!in) break;
-            }
-
-            in >> std::ws;
-        }
-
-        in >> DelimiterIO{')'};
-
-        if (in && key1_read && key2_read && key3_read) {
-            dest = data;
-        } else {
-            in.setstate(std::ios::failbit);
-        }
-        return in;
-    }
-
-    std::string formatScientific(const double data) {
-        std::ostringstream oss;
-        oss << std::scientific << std::setprecision(1) << data;
-        std::string str = oss.str();
-
-        size_t e_pos = str.find('e');
-        if (e_pos != std::string::npos) {
-            if (str[e_pos + 2] == '0') {
-                str.erase(e_pos + 2, 1);
+    std::istream& operator>>(std::istream& is, DataStruct& ds) {
+        std::istream::sentry sentry(is);
+        if(!sentry) return is;
+        DataStruct temp;
+        is >> LimitingSymbolIO{'('};
+        for(std::size_t i = 0; i < 3; ++i) {
+            short number;
+            is >> LimitingSymbolIO{':'} >> LabelIO{"key"} >> number;
+            switch(number){
+                case 1: {
+                    is >> ComplexIO{temp.key1};
+                    break;
+                }
+                case 2: {
+                    is >> BinaryIO{temp.key2};
+                    break;
+                }
+                case 3: {
+                    is >> StringIO{temp.key3};
+                    break;
+                }
             }
         }
-        return str;
+        is >> LimitingSymbolIO { ':' } >> LimitingSymbolIO { ')' };
+        if(is) {
+            ds = temp;
+        }
+        return is;
     }
 
-    std::ostream& operator<<(std::ostream& out, const DataStruct& data) {
-        const std::ostream::sentry sentry(out);
-        if (!sentry) return out;
-
-        iofmtguard fmtguard(out);
-
-        out << "(:";
-        out << "key1 " << formatScientific(data.key1) << ":";
-        out << "key2 " << '\'' << data.key2 << '\'' << ":";
-        out << "key3 " << std::quoted(data.key3);
-        out << ":)";
-
-        return out;
+    bool compare(const DataStruct& ds1, const DataStruct& ds2) {
+        if(ds1.key1 == ds2.key1){
+            unsigned long long num1;
+            unsigned long long num2;
+            long long size1 = ds1.key2.size() - 3;
+            long long size2 = ds2.key2.size() - 3;
+            while(size1 >= 0){
+                num1 += ds1.key2[size1] * pow(2, size1);
+                --size1;
+            }
+            while(size2 >= 0){
+                num2 += ds2.key2[size1] * pow(2, size2);
+                --size2;
+            }
+            return num1 < num2;
+        }
+        else if(ds1.key1 == ds2.key1 and ds1.key2 == ds2.key2) return ds1.key3.size() < ds2.key3.size();
+        else return abs(ds1.key1) < abs(ds2.key1);
     }
 }
 
