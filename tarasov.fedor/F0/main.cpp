@@ -1,5 +1,6 @@
 #include "graph_TP.hpp"
 #include <iostream>
+#include <numeric>
 
 void runKruskalTest1_Empty() {
     std::cout << "  --- Kruskal Test 1: Empty Graph ---" << std::endl;
@@ -29,8 +30,12 @@ void runKruskalTest3_SimpleConnected() {
     std::cout << "  --- Kruskal Test 3: "
                  "Simple Connected Graph (3 nodes) ---" << std::endl;
     Graph g;
-    g.addNode(0); g.addNode(1); g.addNode(2);
-    g.addEdge(0, 1, 1); g.addEdge(1, 2, 2); g.addEdge(0, 2, 3);
+    g.addNode(0);
+    g.addNode(1);
+    g.addNode(2);
+    g.addEdge(0, 1, 1);
+    g.addEdge(1, 2, 2);
+    g.addEdge(0, 2, 3);
     std::cout << "  Original graph:" << std::endl;
     g.printGraph();
     Graph mst = algorithmKruscala(g);

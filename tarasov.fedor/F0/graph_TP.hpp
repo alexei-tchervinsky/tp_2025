@@ -8,7 +8,6 @@
 #include <iterator>
 #include <vector>
 #include <queue>
-#include <numeric>
 #include "DisjointSet_TP.hpp"
 
 using namespace std;
