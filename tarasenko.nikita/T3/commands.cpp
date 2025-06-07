@@ -14,6 +14,7 @@ namespace tarasenko {
         }
 
         bool doPolygonsIntersect(const Polygon& poly1, const Polygon& poly2) {
+            // Check if any edges intersect
             bool edgesIntersect = std::any_of(poly1.points.begin(), poly1.points.end(),
                 [&poly1, &poly2](const Point& p1) {
                     size_t i = &p1 - &poly1.points[0];
@@ -38,22 +39,26 @@ namespace tarasenko {
 
             if (edgesIntersect) return true;
 
+            // Check if one polygon is completely inside another
             auto isPointInside = [](const Point& p, const Polygon& poly) -> bool {
-                bool inside = false;
-                const std::vector<Point>& points = poly.points;
+                struct State {
+                    bool inside = false;
+                    Point prev = poly.points.back();
+                };
 
-                std::accumulate(points.begin(), points.end(), points.back(),
-                    [&p, &inside, &points](const Point& pj, const Point& pi) {
-                        if (((pi.y > p.y) != (pj.y > p.y))) {
-                            int intersectX = (pj.x - pi.x) * (p.y - pi.y) / (pj.y - pi.y) + pi.x;
+                State result = std::accumulate(poly.points.begin(), poly.points.end(), State{},
+                    [&p](State state, const Point& curr) {
+                        if (((curr.y > p.y) != (state.prev.y > p.y))) {
+                            int intersectX = (state.prev.x - curr.x) * (p.y - curr.y) / (state.prev.y - curr.y) + curr.x;
                             if (p.x < intersectX) {
-                                inside = !inside;
+                                state.inside = !state.inside;
                             }
                         }
-                        return pi;
+                        state.prev = curr;
+                        return state;
                     });
 
-                return inside;
+                return result.inside;
                 };
 
             bool allInside1 = std::all_of(poly1.points.begin(), poly1.points.end(),
