@@ -1,11 +1,21 @@
-#ifndef IO_OBJECTS_H
-#define IO_OBJECTS_H
+#ifndef IO_OBJECTS_HPP
+#define IO_OBJECTS_HPP
 
-#include <iosfwd>
-#include "DataStruct.h"
+#include <iostream>
+#include <string>
 
-std::istream& operator>>(std::istream& in, DataStruct& data);
-std::ostream& operator<<(std::ostream& out, const DataStruct& data);
-bool compareDataStruct(const DataStruct& a, const DataStruct& b);
+namespace nspace {
+    struct DelimiterIO { char exp; };
+    struct LabelIO { std::string label; };
+    struct ULLHexIO { unsigned long long& ref; };
+    struct DoubleSciIO { double& ref; };
+    struct StringIO { std::string& ref; };
+
+    std::istream& operator>>(std::istream&, DelimiterIO&&);
+    std::istream& operator>>(std::istream&, LabelIO&&);
+    std::istream& operator>>(std::istream&, ULLHexIO&&);
+    std::istream& operator>>(std::istream&, DoubleSciIO&&);
+    std::istream& operator>>(std::istream&, StringIO&&);
+}
 
 #endif
