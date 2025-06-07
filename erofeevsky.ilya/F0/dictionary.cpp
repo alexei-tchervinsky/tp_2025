@@ -101,7 +101,10 @@ bool Dictionary::insert(const std::string& eng, const std::string& rus){
         throw std::invalid_argument("English eord and translationcannot be empty");
     }
 
-    auto [hashValue, it] = findEntry(eng);
+    auto result = findEntry(eng);
+    size_t hashValue = result.first;
+    auto it = result.second;
+
     if (it != table[hashValue].end()){
         it->addTranslation(rus);
         return false;
@@ -130,7 +133,10 @@ bool Dictionary::remove(const std::string& eng, const std::string& rus){
         throw std::invalid_argument("English word cannot be empty");
     }
 
-    auto [hashValue, it] = findEntry(eng);
+    auto result = findEntry(eng);
+    size_t hashValue = result.first;
+    auto it = result.second;
+
     if (it != table[hashValue].end()){
         if (rus.empty()){
             table[hashValue].erase(it);
