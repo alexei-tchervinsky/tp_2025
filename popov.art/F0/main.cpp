@@ -1,19 +1,15 @@
 #include "dictionary.hpp"
 #include <iostream>
 #include <sstream>
-
 void runDictionary() {
     DictionaryHashTable dict;
     std::string command;
-    
     while (true) {
         std::cout << "> ";
         if (!std::getline(std::cin, command)) break;
-        
         std::istringstream iss(command);
         std::string cmd;
         iss >> cmd;
-        
         if (cmd == "INSERT") {
             std::string key, translation;
             if (iss >> key >> translation) {
@@ -43,7 +39,6 @@ void runDictionary() {
         }
     }
 }
-
 int main() {
     runDictionary();
     return 0;
