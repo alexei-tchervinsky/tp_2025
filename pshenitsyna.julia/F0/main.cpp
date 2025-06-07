@@ -55,7 +55,12 @@ int main() {
         {
             std::vector<std::string> words;
 
-            for (const auto& [word, _] : index) words.push_back(word);
+            for (const auto& entry : index)
+            {
+              const auto& word = entry.first;
+              words.push_back(word);
+            }
+
             std::sort(words.begin(), words.end());
 
             for (const auto& word : words) {
@@ -67,7 +72,7 @@ int main() {
         else if (cmd == "FIND")
         {
             iss >> parameter;
-            if (index.contains(parameter))
+            if (index.find(parameter) != index.end())
             {
                 std::cout << "Слово '" << parameter << "' встречается в строках: ";
                 for (const auto& line : index[parameter])
