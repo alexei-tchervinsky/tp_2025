@@ -1,43 +1,73 @@
-#include "DataStruct.h"
+#include "DataStruct.hpp"
+#include "IO_Objects.hpp"
+#include "iofmtguard.hpp"
+#include <iostream>
+#include <iomanip>
 #include <sstream>
-#include <cmath>
+#include <cctype>
+#include <algorithm>
+#include <regex>
 
-bool parseComplex(const std::string& str, std::complex<double>& value) {
-    if (str.size() < 5 || str.substr(0, 3) != "#c(" || str.back() != ')') {
-        return false;
-    }
-    std::istringstream iss(str.substr(3, str.size() - 4));
-    double real, imag;
-    if (!(iss >> real >> imag)) {
-        return false;
-    }
-    value = std::complex<double>(real, imag);
-    return true;
-}
+namespace nspace {
+    std::istream& operator>>(std::istream& is, DataStruct& ds) {
+        std::istream::sentry sentry(is);
+        if (!sentry) return is;
 
-bool parseRational(const std::string& str, std::pair<long long, unsigned long long>& value) {
-    if (str.size() < 7 || str.substr(0, 2) != "(:") {
-        return false;
-    }
-    size_t end = str.rfind(":)");
-    if (end == std::string::npos) {
-        return false;
-    }
-    std::istringstream iss(str.substr(2, end - 2));
-    std::string token;
-    bool hasN = false, hasD = false;
-    while (iss >> token) {
-        if (token == ":N") {
-            if (!(iss >> value.first)) {
-                return false;
+        DataStruct temp{0, 0.0, ""};
+        is >> DelimiterIO{ '(' };
+        if (!is) return is;
+
+        for (std::size_t i = 0; i < 3; ++i) {
+            short number = 0;
+            is >> DelimiterIO{ ':' } >> LabelIO{ "key" } >> number;
+            if (is.fail()) return is;
+
+            switch (number) {
+                case 1:
+                    is >> ULLHexIO{ temp.key1 };
+                    break;
+                case 2:
+                    is >> DoubleSciIO{ temp.key2 };
+                    break;
+                case 3:
+                    is >> StringIO{ temp.key3 };
+                    break;
+                default:
+                    is.setstate(std::ios::failbit);
+                    return is;
             }
-            hasN = true;
-        } else if (token == ":D") {
-            if (!(iss >> value.second)) {
-                return false;
-            }
-            hasD = true;
+            if (!is) return is;
         }
+
+        is >> DelimiterIO{ ':' } >> DelimiterIO{ ')' };
+        if (is) ds = std::move(temp);
+        return is;
     }
-    return hasN && hasD;
+
+    std::ostream& operator<<(std::ostream& os, const DataStruct& ds) {
+        std::ostream::sentry sentry(os);
+        if (!sentry) return os;
+
+        iofmtguard fmtguard(os);
+
+        std::ostringstream oss;
+        oss << std::scientific << std::setprecision(1) << ds.key2;
+        std::string key2_str = oss.str();
+        std::transform(key2_str.begin(), key2_str.end(), key2_str.begin(),
+                      [](unsigned char c) { return std::tolower(c); });
+
+        std::regex exp_regex(R"(e([+-])0(\d))");
+        key2_str = std::regex_replace(key2_str, exp_regex, "e$1$2");
+
+        os << "(:key1 0x" << std::hex << std::uppercase << ds.key1 << std::dec
+           << ":key2 " << key2_str
+           << ":key3 \"" << ds.key3 << "\":)";
+        return os;
+    }
+
+    bool compare(const DataStruct& ds1, const DataStruct& ds2) {
+        if (ds1.key1 != ds2.key1) return ds1.key1 < ds2.key1;
+        if (ds1.key2 != ds2.key2) return ds1.key2 < ds2.key2;
+        return ds1.key3.size() < ds2.key3.size();
+    }
 }
