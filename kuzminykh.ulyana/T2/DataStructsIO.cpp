@@ -129,6 +129,38 @@ namespace kuzminykh
         in >> LabelIO{ "ull" };
         return in;
     }
+
+    std::istream& operator>>(std::istream& in, LongLongIO&& dest)
+    {
+        std::istream::sentry sentry(in);
+        if (!sentry)
+        {
+            return in;
+        }
+
+        unsigned long long value;
+        in >> value;
+
+        if (in.peek() == 'l' || in.peek() == 'L')
+        {
+            in.ignore(1);
+            if (in.peek() == 'l' || in.peek() == 'L')
+            {
+                in.ignore(1);
+            }
+            else
+            {
+                in.setstate(std::ios::failbit);
+            }
+        }
+
+        if (in)
+        {
+            dest.ref = value;
+        }
+        return in;
+    }
+
     iofmtguard::iofmtguard(std::basic_ios<char>& s) :
         s_(s),
         width_(s.width()),
