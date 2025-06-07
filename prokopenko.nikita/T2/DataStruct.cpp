@@ -21,7 +21,9 @@ namespace prokopenko {
 
   std::istream& operator>>(std::istream& in, DataStruct& data) {
     std::istream::sentry guard(in);
-    if (!guard) return in;
+    if (!guard) {
+      return in;
+    }
 
     DataStruct temp;
     bool hasKey1 = false;
@@ -65,12 +67,11 @@ namespace prokopenko {
 
   std::ostream& operator<<(std::ostream& out, const DataStruct& data) {
     std::ostream::sentry guard(out);
-    if (!guard) return out;
+    if (!guard) {
+      return out;
+    }
 
     iofmtguard fmtguard(out);
-
-    double real = data.key1.real();
-    double imag = data.key1.imag();
 
     out << "(:";
     out << "key1 '" << data.key1 << "':";

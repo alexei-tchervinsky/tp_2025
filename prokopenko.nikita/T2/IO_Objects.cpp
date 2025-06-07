@@ -1,6 +1,5 @@
 #include "IO_Objects.hpp"
 
-#include <cctype>
 #include <sstream>
 #include <iomanip>
 
@@ -19,7 +18,9 @@ namespace prokopenko {
     std::string result;
     char ch;
     while (in.get(ch)) {
-      if (ch == ' ') break;
+      if (ch == ' ') {
+        break;
+      }
       result += ch;
     }
     if (in) {
