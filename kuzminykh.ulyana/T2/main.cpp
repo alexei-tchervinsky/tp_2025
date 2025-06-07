@@ -21,7 +21,7 @@ int main() {
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
-    std::sort(ds.begin(), ds.end(), compareDataStructs);
+    std::sort(ds.begin(), ds.end(), DataStructSort);
     std::copy(
         ds.begin(),
         ds.end(),

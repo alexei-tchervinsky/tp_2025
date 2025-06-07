@@ -177,7 +177,7 @@ bool DataStructSort(const DataStruct& a, const DataStruct& d) {
         return a.key1 < d.key1;
     }
     if (a.key2 != d.key2) {
-        return d.key2 < d.key2;
+        return a.key2 < d.key2;
     }
     return a.key3.length() < d.key3.length();
 }
