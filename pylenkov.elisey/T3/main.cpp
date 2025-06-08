@@ -114,7 +114,7 @@ int main(int argc, char* argv[])
             }
             else
             {
-                throw std::invalid_argument("<INVALID COMMAND>");
+                throw std::invalid_argument("<INVALID COMMAND>\n");
             }
         }
         catch (const std::invalid_argument& e)
