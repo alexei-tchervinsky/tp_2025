@@ -4,11 +4,15 @@
 #include <string>
 #include <iterator>
 #include <limits>
+#include <map>
+#include <functional>
 #include "DataStruct.hpp"
 #include "commands.hpp"
 #include "iofmtguard.hpp"
 
 using namespace nspace;
+
+using CommandHandler = std::function<void(const std::vector<Polygon>&)>;
 
 int main(int argc, char* argv[])
 {
@@ -47,68 +51,70 @@ int main(int argc, char* argv[])
     }
 #endif // ALEXEIT
 
+    std::map<std::string, CommandHandler> commands;
+
+    commands["AREA"] = [](const std::vector<Polygon>& polygons)
+    {
+        std::string param;
+        std::cin >> param;
+        area(polygons, param);
+    };
+
+    commands["MAX"] = [](const std::vector<Polygon>& polygons)
+    {
+        std::string param;
+        std::cin >> param;
+        max(polygons, param);
+    };
+
+    commands["MIN"] = [](const std::vector<Polygon>& polygons)
+    {
+        std::string param;
+        std::cin >> param;
+        max(polygons, param);
+    };
+
+    commands["COUNT"] = [](const std::vector<Polygon>& polygons)
+    {
+        std::string param;
+        std::cin >> param;
+        count(polygons, param);
+    };
+
+    commands["ECHO"] = [&polygons, argv](const std::vector<Polygon>&)
+    {
+        Polygon target;
+        std::cin >> target;
+        echo(polygons, target, argv[1]);
+    };
+
+    commands["MAXSEQ"] = [](const std::vector<Polygon>& polygons)
+    {
+        Polygon target;
+        std::cin >> target;
+        if (std::cin.fail())
+        {
+            std::cin.clear();
+            std::cout << "<INVALID COMMAND>\n";
+            throw std::invalid_argument("<INVALID COMMAND>");
+        }
+        maxSeq(polygons, target);
+    };
+
+
     std::string cmd;
     while (std::cin >> cmd)
     {
         try
         {
-            if (cmd == "AREA")
+            auto it = commands.find(cmd);
+            if (it != commands.end())
             {
-                std::string param;
-                std::cin >> param;
-                area(polygons, param);
-            }
-            else if (cmd == "MAX")
-            {
-                std::string param;
-                std::cin >> param;
-                max(polygons, param);
-            }
-            else if (cmd == "MIN")
-            {
-                std::string param;
-                std::cin >> param;
-                min(polygons, param);
-            }
-            else if (cmd == "COUNT")
-            {
-                std::string param;
-                std::cin >> param;
-                count(polygons, param);
-            }
-            else if (cmd == "ECHO")
-            {
-                Polygon target;
-                std::cin >> target;
-                echo(polygons, target, argv[1]);
-            }
-            else if (cmd == "MAXSEQ")
-            {
-
-                LOG("MAXSEQ")
-                Polygon target;
-                std::cin >> target;
-
-                if (std::cin.fail())
-                {
-#ifdef ALEXEIT
-#if 1
-                std::cin.clear();  // Очищаем состояние ошибки
-                // std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                std::cout << INV_CMD;
-                continue;
-#endif
-                throw std::invalid_argument(INV_CMD);
-#else
-                    throw std::invalid_argument("<INVALID COMMAND>");
-#endif // ALEXEIT
-                }
-
-                maxSeq(polygons, target);
+                it -> second(polygons);
             }
             else
             {
-                throw std::invalid_argument(INV_CMD);
+                throw std::invalid_argument("<INVALID COMMAND>");
             }
         }
         catch (const std::invalid_argument& e)
