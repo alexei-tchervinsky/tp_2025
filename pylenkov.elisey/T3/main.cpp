@@ -42,8 +42,8 @@ int main(int argc, char* argv[])
         {
             continue;
         }
-        file.clear();  // Очищаем состояние ошибки
-        file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // Игнорируем оставшийся ввод
+        file.clear();
+        file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
 #endif // ALEXEIT
 
@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
 #ifdef ALEXEIT
 #if 1
                 std::cin.clear();  // Очищаем состояние ошибки
-                // std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // Игнорируем оставшийся ввод
+                // std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 std::cout << INV_CMD;
                 continue;
 #endif
@@ -115,13 +115,13 @@ int main(int argc, char* argv[])
         {
             std::cout << e.what();  // Выводим ошибку один раз
             std::cin.clear();  // Очищаем состояние ошибки
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // Игнорируем оставшийся ввод
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
         catch (const std::logic_error& e)
         {
             std::cout << e.what();  // Выводим ошибку один раз
             std::cin.clear();  // Очищаем состояние ошибки
-            // std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // Игнорируем оставшийся ввод
+            // std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
     }
 
