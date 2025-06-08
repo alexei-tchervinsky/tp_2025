@@ -45,7 +45,7 @@ namespace nspace
         {
             if (polygons.empty())
             {
-                std::cout << "<INVALID COMMAND>\n";
+                std::cout << INV_CMD;
                 return;
             }
             double sum = std::accumulate(polygons.begin(), polygons.end(), 0.0,
@@ -55,13 +55,14 @@ namespace nspace
         else
         {
             size_t num = std::stoul(param);
+#ifdef ALEXEIT
+            if (num < 3)
+            {
+                throw std::invalid_argument(INV_CMD);
+            }
+#endif
             auto pred = [num](const nspace::Polygon& p) { return p.points.size() == num; };
             double sum = std::accumulate(polygons.begin(), polygons.end(), 0.0, makeAreaAccumulator(pred));
-            if (sum == 0.0)
-            {
-                std::cout << "<INVALID COMMAND>\n";
-                return;
-            }
             std::cout << sum << '\n';
         }
     }
@@ -70,7 +71,7 @@ namespace nspace
     {
         if (polygons.empty())
         {
-            std::cout << "<INVALID COMMAND>\n";
+            std::cout << INV_CMD;
             return;
         }
 
@@ -86,7 +87,7 @@ namespace nspace
         }
         else
         {
-            std::cout << "<INVALID COMMAND>\n";
+            std::cout << INV_CMD;
             return;
         }
     }
@@ -95,7 +96,7 @@ namespace nspace
     {
         if (polygons.empty())
         {
-            std::cout << "<INVALID COMMAND>\n";
+            std::cout << INV_CMD;
             return;
         }
 
@@ -111,7 +112,7 @@ namespace nspace
         }
         else
         {
-            std::cout << "<INVALID COMMAND>\n";
+            std::cout << INV_CMD;
             return;
         }
     }
@@ -143,7 +144,7 @@ namespace nspace
                 size_t num = std::stoul(param);
                 if (num < 3)
                 {
-                    std::cout << "<INVALID COMMAND>\n";
+                    std::cout << INV_CMD;
                     return;
                 }
                 auto pred = [num](const Polygon& p)
@@ -155,7 +156,7 @@ namespace nspace
             }
             catch(...)
             {
-                std::cout << "<INVALID COMMAND>\n";
+                std::cout << INV_CMD;
                 return;
             }
         }
@@ -184,7 +185,7 @@ void echo(std::vector<Polygon>& polygons, const Polygon& target, const std::stri
 
     if (count == 0)
     {
-        std::cout << "<INVALID COMMAND>\n";
+        std::cout << INV_CMD;
         return;
     }
 
@@ -205,9 +206,25 @@ void echo(std::vector<Polygon>& polygons, const Polygon& target, const std::stri
 
     void maxSeq(const std::vector<Polygon>& polygons, const Polygon& target)
     {
+        if (std::cin.fail())
+        {
+            std::cout << INV_CMD;
+            return;
+        }
+
         if (polygons.empty() || target.points.size() < 3)
         {
-            throw std::invalid_argument("");
+#if 0
+            throw std::invalid_argument("exception 1");
+#else
+            throw std::invalid_argument(INV_CMD);
+#endif
+        }
+
+        if (std::adjacent_find(target.points.begin(), target.points.end()) != target.points.end())
+        {
+            std::cout << INV_CMD;
+            return;
         }
 
         std::vector<bool> matches;
@@ -229,7 +246,11 @@ void echo(std::vector<Polygon>& polygons, const Polygon& target, const std::stri
 
         if (max_count == 0)
         {
-            throw std::invalid_argument("");
+#if 0
+            throw std::invalid_argument("exception 2");
+#else
+            throw std::invalid_argument(INV_CMD);
+#endif
         }
 
         std::cout << max_count << '\n';

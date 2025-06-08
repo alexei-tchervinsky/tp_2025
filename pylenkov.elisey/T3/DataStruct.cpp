@@ -3,6 +3,9 @@
 #include <numeric>
 #include <algorithm>
 #include <iterator>
+#ifdef ALEXEIT
+#include <limits>
+#endif
 
 namespace nspace
 {
@@ -34,16 +37,40 @@ namespace nspace
 
     std::istream& operator>>(std::istream& in, Point& point)
     {
+#ifdef ALEXEIT
+        // std::cin >> std::noskipws;
+#endif
         char ignore;
         if (!(in >> ignore)) return in;
         if (ignore != '(')
         {
+
+            LOG(ignore)
+
+            LOG("** ошибка со чтением точки ( **\n")
+#ifndef ALEXEIT
             in.setstate(std::ios::failbit);
+#endif
+#ifdef ALEXEIT
+            in.putback(ignore);
+#if 0
+            std::string cmd;
+            std::cin >> cmd;
+            std::cout << __FILE__ << ':' << __LINE__ << ':' << cmd << '\n';
+#endif
+#if 1
+            in.setstate(std::ios::failbit);
+#endif
+            // in.clear();
+            throw std::logic_error(INV_CMD);
+#endif // ALEXEIT
+
             return in;
         }
 
         if (!(in >> point.x))
         {
+            LOG("** ошибка со чтением точки x **\n")
             in.setstate(std::ios::failbit);
             return in;
         }
@@ -51,13 +78,14 @@ namespace nspace
         if (!(in >> ignore)) return in;
         if (ignore != ';')
         {
+            LOG("** ошибка со чтением точки ; **\n")
             in.setstate(std::ios::failbit);
-            std::cout << "точка хуйня\n";
             return in;
         }
 
         if (!(in >> point.y))
         {
+            LOG("** ошибка со чтением точки y **\n")
             in.setstate(std::ios::failbit);
             return in;
         }
@@ -65,6 +93,7 @@ namespace nspace
         if (!(in >> ignore)) return in;
         if (ignore != ')')
         {
+            LOG("** ошибка со чтением точки )**\n")
             in.setstate(std::ios::failbit);
             return in;
         }
@@ -72,40 +101,105 @@ namespace nspace
         return in;
     }
 
-    std::istream& operator>>(std::istream& in, Polygon& poly) {
+    std::istream& operator>>(std::istream& in, Polygon& poly)
+    {
         size_t numPoints;
         if (!(in >> numPoints))
         {
+            LOG("** количество точек невалидно **\n")
+            in.setstate(std::ios::failbit);
             return in;
         }
 
         if (numPoints < 3)
         {
+            LOG("** точек < 3 **\n")
             in.setstate(std::ios::failbit);
             return in;
         }
 
-        poly.points.resize(numPoints);
+        poly.points.clear();  // Очищаем старые точки
 
-        std::generate(poly.points.begin(), poly.points.end(),
-            [&in]() {
-                Point p;
-                in >> p;
-                return p;
-            });
+        // Временный вектор для точек
+        std::vector<Point> temp_points;
+#ifdef ALEXEIT
+// temp_points.reserve(numPoints);
+// auto it_start = std::istream_iterator<Point>(in);
+// auto it_start = temp_points.begin();
+// auto it_end = std::copy_n(std::istream_iterator<Point>(in), numPoints, temp_points.begin());
+        std::copy_n(std::istream_iterator<Point>(in), numPoints, std::back_inserter(temp_points));
+#if 1
+        auto it_start = temp_points.begin();
+        auto it_end = temp_points.end();
+        if ((static_cast<size_t>(it_end - it_start)) != numPoints)
+        {
+            LOG("** copy_n copy LESS THAN expected **\n")
+            in.setstate(std::ios::failbit);
+            return in;
+        }
+        else
+        {
+            LOG("** copy_n copy EXACTLY AS expected **")
+        }
+#endif
+#else
+        std::copy_n(std::istream_iterator<Point>(in), numPoints, std::back_inserter(temp_points));
+#endif // ALEXEIT
 
-        if (in.fail()) {
-            poly.points.clear();
+        if (in.fail())
+        {
+            LOG("** ошибка std::copy_n **\n")
+#ifdef ALEXEIT
+            std::cin.clear();  // Очищаем состояние ошибки
+// std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');// Игнорируем оставшийся ввод
+#endif // ALEXEIT
+            return in;
+        }
+
+#ifdef ALEXEIT
+        std::string tail;
+        std::getline(in, tail);
+        LOG(tail.size())
+        LOG(tail.c_str())
+#if 1
+        if (tail.size() > 1)
+#else
+        if (tail.size() != 0)
+#endif
+        {
+            in.setstate(std::ios::failbit);
+            // std::cout << in.get();
+            // in.putback('X');
+            // in.putback('\n');
+            LOG("** ошибка, лишние точки: ") LOG(tail) LOG(" **\n")
+            return in;
+        }
+#endif // ALEXEIT
+
+
+        if (temp_points.size() != numPoints)
+        {
+            in.setstate(std::ios::failbit);
+            LOG("** ошибка, неверное количество точек **\n")
+            return in;
+        }
+
+        // Проверка на дубликаты
+        if (std::adjacent_find(temp_points.begin(), temp_points.end()) != temp_points.end())
+        {
+            LOG("** ошибка, дубликаты точек **\n")
+            temp_points.clear();
             in.setstate(std::ios::failbit);
             return in;
         }
 
-        if (std::adjacent_find(poly.points.begin(), poly.points.end()) != poly.points.end()) {
-            poly.points.clear();
-            in.setstate(std::ios::failbit);
-            return in;
-        }
+        // Если все в порядке, присваиваем точки полигону
+        poly.points = std::move(temp_points);
 
+        LOG("** Полигон: ") LOG(poly) LOG(" **\n")
+#ifdef ALEXEIT
+        in.clear();
+#endif // ALEXEIT
         return in;
     }
 
