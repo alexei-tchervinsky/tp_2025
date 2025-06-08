@@ -119,7 +119,7 @@ int main(int argc, char* argv[])
         }
         catch (const std::invalid_argument& e)
         {
-            std::cout << e.what() << std::endl;  // Выводим ошибку один раз
+            std::cout << e.what();  // Выводим ошибку один раз
             std::cin.clear();  // Очищаем состояние ошибки
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
