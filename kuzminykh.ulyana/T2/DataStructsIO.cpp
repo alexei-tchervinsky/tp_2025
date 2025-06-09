@@ -27,11 +27,14 @@ namespace kuzminykh
         {
             return in;
         }
+        DataStruct tmp;
+
         bool key1 = false;
         bool key2 = false;
         bool key3 = false;
-        DataStruct tmp;
+
         in >> DelimiterIO{ '(' };
+
         for (std::size_t i = 0; i < 3; i++)
         {
             short number = 0;
@@ -46,9 +49,9 @@ namespace kuzminykh
                 key1 = true;
                 break;
             }
-            case OCT:
+            case Char:
             {
-                in >> OctUnsignedLongLongIO{ tmp.key2_ };
+                in >> CharIO{ tmp.key2_ };
                 key2 = true;
                 break;
             }
@@ -107,32 +110,21 @@ namespace kuzminykh
         }
         char c;
         in >> c;
-        if (in && (c != dest.delimiter)) {
+        if (in && (c != dest.delimiter))
+        {
             in.setstate(std::ios::failbit);
         }
         return in;
     }
 
-    std::istream& operator>>(std::istream& in, OctUnsignedLongLongIO&& dest)
+    std::istream& operator>>(std::istream& in, CharIO&& dest)
     {
         std::istream::sentry sentry(in);
         if (!sentry)
         {
             return in;
         }
-        unsigned long long tmp;
-        in >> tmp;
-        for (char c : std::to_string(tmp))
-        {
-            if (c > '7')
-            {
-                in.setstate(std::ios_base::failbit);
-                return in;
-            }
-        }
-        dest.ref = tmp;
-        in >> LabelIO{ "ull" };
-        return in;
+        return in >> DelimiterIO{ '\'' } >> dest.ref >> DelimiterIO{ '\'' };
     }
 
     std::istream& operator>>(std::istream& in, LongLongIO&& dest)
@@ -142,7 +134,6 @@ namespace kuzminykh
         {
             return in;
         }
-
 
         in >> dest.ref;
 
