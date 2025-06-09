@@ -12,7 +12,7 @@ namespace kuzminykh
         }
         os << "(:key1 ";
         os << ds.key1_ << "ll";
-        os << ":key2 " << ds.key2_;
+        os << ":key2 '" << ds.key2_ << "'";
         os << ":key3 \"";
         os << ds.key3_;
         os << "\":)";
