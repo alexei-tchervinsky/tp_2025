@@ -47,11 +47,10 @@ namespace prokopenko {
   std::istream& operator>>(std::istream& in, UnsignedLongLongIO&& v) {
     std::string token;
     in >> token;
-    if (token.size() >= 4 && token.substr(token.size() - 3) == "ull") {
+    if (token.size() >= 3 && token.substr(token.size() - 3) == "ull") {
       token = token.substr(0, token.size() - 3);
       try {
         v.ref = std::stoull(token);
-        return in;
       }
       catch (...) {
         in.setstate(std::ios::failbit);

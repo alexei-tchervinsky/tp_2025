@@ -1,43 +1,43 @@
 #ifndef IO_OBJECTS_HPP
 #define IO_OBJECTS_HPP
 
+#include <iostream>
 #include <string>
 #include <complex>
-#include <iostream>
 
 namespace prokopenko {
 
+  struct DelimiterIO {
+    char expected;
+  };
 
-    struct DelimiterIO {
-        char expected;
-    };
+  struct LabelIO {
+    std::string& ref;
+  };
 
+  struct ComplexIO {
+    std::complex<double>& ref;
+  };
 
-    struct LabelIO {
-        std::string& ref;
-    };
+  struct CharIO {
+    char& ref;
+  };
 
+  struct StringIO {
+    std::string& ref;
+  };
 
-    struct ComplexIO {
-        std::complex<double>& ref;
-    };
+  struct UnsignedLongLongIO {
+    unsigned long long& ref;
+  };
 
+  std::istream& operator>>(std::istream& in, DelimiterIO&& d);
+  std::istream& operator>>(std::istream& in, LabelIO&& label);
+  std::istream& operator>>(std::istream& in, ComplexIO&& c);
+  std::istream& operator>>(std::istream& in, CharIO&& c);
+  std::istream& operator>>(std::istream& in, StringIO&& s);
+  std::istream& operator>>(std::istream& in, UnsignedLongLongIO&& v);
 
-    struct CharIO {
-        char& ref;
-    };
-
-
-    struct StringIO {
-        std::string& ref;
-    };
-
-
-    std::istream& operator>>(std::istream& in, DelimiterIO&&);
-    std::istream& operator>>(std::istream& in, LabelIO&&);
-    std::istream& operator>>(std::istream& in, ComplexIO&&);
-    std::istream& operator>>(std::istream& in, CharIO&&);
-    std::istream& operator>>(std::istream& in, StringIO&&);
 }
 
-#endif
+#endif // IO_OBJECTS_HPP
