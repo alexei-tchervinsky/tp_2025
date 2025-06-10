@@ -2,13 +2,16 @@
 #include "IO_Objects.hpp"
 #include "iofmtguard.hpp"
 
+#include <cmath>
 #include <iomanip>
 
 namespace prokopenko {
 
   bool DataStruct::operator<(const DataStruct& other) const {
-    if (key1 != other.key1) {
-      return key1 < other.key1;
+    double firstAbs = std::abs(key1);
+    double secondAbs = std::abs(other.key1);
+    if (firstAbs != secondAbs) {
+      return firstAbs < secondAbs;
     }
     if (key2 != other.key2) {
       return key2 < other.key2;
@@ -31,11 +34,11 @@ namespace prokopenko {
       in >> LabelIO{ label };
 
       if (label == "key1") {
-        in >> CharIO{ temp.key1 } >> DelimiterIO{ ':' };
+        in >> ComplexIO{ temp.key1 } >> DelimiterIO{ ':' };
         hasKey1 = in.good();
       }
       else if (label == "key2") {
-        in >> UnsignedLongLongIO{ temp.key2 } >> DelimiterIO{ ':' };
+        in >> CharIO{ temp.key2 } >> DelimiterIO{ ':' };
         hasKey2 = in.good();
       }
       else if (label == "key3") {
@@ -68,8 +71,9 @@ namespace prokopenko {
     iofmtguard fmtguard(out);
 
     out << "(:";
-    out << "key1 '" << data.key1 << "':";
-    out << "key2 " << data.key2 << "ull:";
+    out << "key1 #c(" << std::fixed << std::setprecision(1)
+      << data.key1.real() << " " << data.key1.imag() << "):";
+    out << "key2 '" << data.key2 << "':";
     out << "key3 " << std::quoted(data.key3) << ":)";
     return out;
   }
