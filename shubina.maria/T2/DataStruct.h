@@ -3,16 +3,20 @@
 
 #include <iostream>
 #include <string>
+#include <complex>
+#include <utility>
 
 struct DataStruct {
-    std::string key1;
-    std::string key2;
+    char key1;
+    unsigned long long key2;
     std::string key3;
 };
 
-// Перегрузки операторов (объявления)
+// Перегрузки операторов
 std::istream& operator>>(std::istream& in, DataStruct& data);
 std::ostream& operator<<(std::ostream& out, const DataStruct& data);
+
+bool operator<(const DataStruct& a, const DataStruct& b);
 
 #endif // DATASTRUCT_H
 
