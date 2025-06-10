@@ -3,6 +3,15 @@
 #include <cctype>
 #include <regex>
 
+// Вспомогательная функция для проверки начала строки (C++14 совместимость)
+bool starts_with(const std::string& str, const std::string& prefix) {
+    if (prefix.size() > str.size()) return false;
+    for (size_t i = 0; i < prefix.size(); ++i) {
+        if (str[i] != prefix[i]) return false;
+    }
+    return true;
+}
+
 std::istream& operator>>(std::istream& in, DataStruct& data) {
     char ch;
 
@@ -15,10 +24,7 @@ std::istream& operator>>(std::istream& in, DataStruct& data) {
 
     while (in >> ch && ch == ':') {
         std::string key;
-        if (!(in >> key)) {
-            in.setstate(std::ios_base::failbit);
-            return in;
-        }
+        in >> key;
 
         if (!(in >> ch) || ch != ':') {
             in.setstate(std::ios_base::failbit);
@@ -28,13 +34,12 @@ std::istream& operator>>(std::istream& in, DataStruct& data) {
         std::ostringstream valueStream;
         in >> std::noskipws;
 
-        // Чтение значения до следующего : или конца записи
         int depth = 0;
         while (in >> ch) {
             if (ch == '(') depth++;
             else if (ch == ')') {
                 if (--depth == 0) {
-                    in.putback(ch); // Сохраняем закрывающую скобку
+                    in.putback(ch);
                     break;
                 }
             } else if (ch == ':' && depth == 0) {
@@ -59,20 +64,20 @@ std::istream& operator>>(std::istream& in, DataStruct& data) {
             std::istringstream valStream(value);
             std::string temp;
             valStream >> temp;
+
             if (temp.empty()) {
                 in.setstate(std::ios_base::failbit);
                 return in;
             }
 
-            // Поддержка различных форматов ULL
             unsigned long long ullVal = 0;
             try {
                 size_t pos;
-                if (temp.starts_with("0x") || temp.starts_with("0X")) {
-                    ullVal = std::stoull(temp.substr(2), &pos, 16);
-                } else if (temp.starts_with("0b") || temp.starts_with("0B")) {
+                if (starts_with(temp, "0x") || starts_with(temp, "0X")) {
+                    ullVal = std::stoull(temp, &pos, 16);
+                } else if (starts_with(temp, "0b") || starts_with(temp, "0B")) {
                     ullVal = std::stoull(temp.substr(2), &pos, 2);
-                } else if (temp.starts_with('0')) {
+                } else if (starts_with(temp, "0")) {
                     ullVal = std::stoull(temp, &pos, 8);
                 } else {
                     ullVal = std::stoull(temp, &pos, 10);
