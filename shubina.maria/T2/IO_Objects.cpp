@@ -78,6 +78,11 @@ std::istream& operator>>(std::istream& is, DataStruct& ds) {
     return is;
 }
 
+std::ostream& operator<<(std::ostream& os, const DataStruct& ds) {
+    os << "(:key1 '" << ds.key1 << "':key2 " << ds.key2 << ":key3 \"" << ds.key3 << "\":)";
+    return os;
+}
+
 std::vector<DataStruct> readDataStructs(std::istream& is) {
     std::vector<DataStruct> result;
     while (true) {
