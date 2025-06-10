@@ -40,4 +40,4 @@ namespace prokopenko {
 
 }
 
-#endif // IO_OBJECTS_HPP
+#endif
