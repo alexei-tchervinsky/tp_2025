@@ -1,4 +1,5 @@
-#pragma once
+#ifndef IO_OBJECTS_H
+#define IO_OBJECTS_H
 
 #include <vector>
 #include <istream>
@@ -10,4 +11,6 @@ std::ostream& operator<<(std::ostream& os, const DataStruct& ds);
 
 extern std::vector<DataStruct> readDataStructs(std::istream& is);
 extern void writeDataStructs(const std::vector<DataStruct>& data, std::ostream& os);
+
+#endif // IO_OBJECTS_H
 

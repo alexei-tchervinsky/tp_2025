@@ -1,4 +1,5 @@
-#pragma once
+#ifndef IOFMTGUARD_H
+#define IOFMTGUARD_H
 
 #include <ios>
 #include <iostream>
@@ -14,4 +15,6 @@ private:
     std::streamsize m_width;
     std::basic_ios<char>::fmtflags m_flags;
 };
+
+#endif // IOFMTGUARD_H
 

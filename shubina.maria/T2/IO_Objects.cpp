@@ -53,7 +53,7 @@ std::istream& operator>>(std::istream& is, DataStruct& ds) {
     }
 
     std::string key1Str = fields["key1"];
-    if (key1Str.size() != 1 || key1Str[0] != '\'' || key1Str.back() != '\'') {
+    if (key1Str.size() != 3 || key1Str[0] != '\'' || key1Str.back() != '\'') {
         is.setstate(std::ios_base::failbit);
         return is;
     }

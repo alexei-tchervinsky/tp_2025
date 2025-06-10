@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <iomanip> // добавлено для setprecision
+
 #include "DataStruct.h"
 #include "IO_Objects.h"
 #include "iofmtguard.h"

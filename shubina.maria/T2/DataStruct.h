@@ -1,4 +1,5 @@
-#pragma once
+#ifndef DATASTRUCT_H
+#define DATASTRUCT_H
 
 #include <string>
 #include <ostream>
@@ -11,4 +12,6 @@ struct DataStruct {
 
     bool operator<(const DataStruct& other) const;
 };
+
+#endif // DATASTRUCT_H
 
