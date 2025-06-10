@@ -26,7 +26,15 @@ std::istream& operator>>(std::istream& in, DataStruct& data) {
 
         if (keyName == "key1") {
             char ch, quote;
-            if (!(in >> ch >> quote) || ch != '\'' || quote != '\'') {
+            if (!(in >> ch) || ch != '\'') {
+                in.setstate(std::ios_base::failbit);
+                return in;
+            }
+            if (!(in >> ch)) {
+                in.setstate(std::ios_base::failbit);
+                return in;
+            }
+            if (!(in >> quote) || quote != '\'') {
                 in.setstate(std::ios_base::failbit);
                 return in;
             }
@@ -35,15 +43,23 @@ std::istream& operator>>(std::istream& in, DataStruct& data) {
         } else if (keyName == "key2") {
             unsigned long long value = 0;
             char suffix;
-            if (!(in >> value >> suffix) || (suffix != 'u' && suffix != 'U')) {
+            if (!(in >> value >> suffix)) {
+                in.setstate(std::ios_base::failbit);
+                return in;
+            }
+            if (suffix != 'u' && suffix != 'U') {
+                in.setstate(std::ios_base::failbit);
+                return in;
+            }
+            if ((in.peek() != ':') && !isspace(in.peek())) {
                 in.setstate(std::ios_base::failbit);
                 return in;
             }
             data.key2 = value;
             hasKey2 = true;
         } else if (keyName == "key3") {
-            char quote1;
-            if (!(in >> quote1) || quote1 != '"') {
+            char quote;
+            if (!(in >> quote) || quote != '"') {
                 in.setstate(std::ios_base::failbit);
                 return in;
             }

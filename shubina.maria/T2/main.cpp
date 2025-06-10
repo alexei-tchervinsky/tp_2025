@@ -2,20 +2,16 @@
 #include <vector>
 #include <algorithm>
 #include <iterator>
-#include <sstream>
 #include "DataStruct.h"
 
 int main() {
     std::vector<DataStruct> dataVector;
 
-    std::string line;
-    while (std::getline(std::cin, line)) {
-        std::istringstream iss(line);
-        DataStruct ds;
-        if (iss >> ds) {
-            dataVector.push_back(ds);
-        }
-    }
+    std::copy(
+        std::istream_iterator<DataStruct>(std::cin),
+        std::istream_iterator<DataStruct>(),
+        std::back_inserter(dataVector)
+    );
 
     if (dataVector.empty()) {
         std::cout << "Looks like there is no supported record. Cannot determine input. Test skipped\n";
