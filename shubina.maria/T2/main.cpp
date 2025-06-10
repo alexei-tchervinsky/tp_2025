@@ -10,8 +10,6 @@ int main() {
     iofmtguard guard(std::cout);
     std::cout << std::fixed << std::setprecision(1);
 
-    std::cerr << "Enter records:\n";
-
     std::vector<DataStruct> data = readDataStructs(std::cin);
 
     if (data.empty()) {
@@ -21,7 +19,6 @@ int main() {
 
     std::sort(data.begin(), data.end());
 
-    std::cerr << "Sorted output:\n";
     writeDataStructs(data, std::cout);
 
     return 0;
