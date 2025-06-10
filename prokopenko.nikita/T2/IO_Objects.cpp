@@ -1,5 +1,4 @@
 #include "IO_Objects.hpp"
-#include <cctype>
 #include <sstream>
 #include <iomanip>
 
@@ -32,29 +31,28 @@ namespace prokopenko {
     return in;
   }
 
+  std::istream& operator>>(std::istream& in, ComplexIO&& c) {
+    char hash, cM, open, close;
+    double real = 0.0, imag = 0.0;
+    in >> hash >> cM >> open;
+    if (hash != '#' || cM != 'c' || open != '(') {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    in >> real >> imag >> close;
+    if (!in || close != ')') {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    c.ref = std::complex<double>(real, imag);
+    return in;
+  }
+
   std::istream& operator>>(std::istream& in, CharIO&& c) {
     char quote1, value, quote2;
     in >> quote1 >> value >> quote2;
     if (in && quote1 == '\'' && quote2 == '\'') {
       c.ref = value;
-    }
-    else {
-      in.setstate(std::ios::failbit);
-    }
-    return in;
-  }
-
-  std::istream& operator>>(std::istream& in, UnsignedLongLongIO&& v) {
-    std::string token;
-    in >> token;
-    if (token.size() >= 3 && token.substr(token.size() - 3) == "ull") {
-      token = token.substr(0, token.size() - 3);
-      try {
-        v.ref = std::stoull(token);
-      }
-      catch (...) {
-        in.setstate(std::ios::failbit);
-      }
     }
     else {
       in.setstate(std::ios::failbit);
@@ -76,4 +74,16 @@ namespace prokopenko {
     return in;
   }
 
-}
+  std::istream& operator>>(std::istream& in, UnsignedLongLongIO&& v) {
+    std::string token;
+    in >> token;
+    try {
+      v.ref = std::stoull(token);
+    }
+    catch (...) {
+      in.setstate(std::ios::failbit);
+    }
+    return in;
+  }
+
+} // namespace prokopenko
