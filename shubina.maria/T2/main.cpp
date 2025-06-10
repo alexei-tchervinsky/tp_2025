@@ -18,7 +18,6 @@ int main() {
     }
 
     std::sort(data.begin(), data.end());
-
     writeDataStructs(data, std::cout);
 
     return 0;
