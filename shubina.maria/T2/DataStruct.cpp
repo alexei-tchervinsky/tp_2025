@@ -3,10 +3,106 @@
 #include <cctype>
 #include <cstdlib>
 #include <cmath>
+#include <algorithm>
+
+namespace {
+    bool parseKey1(std::istream& in, char& key1) {
+        char ch;
+        if (in >> ch) {
+            if (ch == '\'') {
+                // Формат 'a'
+                if (in >> key1 >> ch && ch == '\'') {
+                    return true;
+                }
+            } else {
+                // Попробуем разные форматы
+                in.unget();
+                std::string valStr;
+                while (in >> ch && ch != ':' && ch != ')') {
+                    valStr += ch;
+                }
+                in.unget();
+
+                if (!valStr.empty()) {
+                    try {
+                        if (valStr.find("0x") == 0 || valStr.find("0X") == 0) {
+                            key1 = static_cast<char>(std::stoul(valStr, nullptr, 16));
+                        } else if (valStr.find("#c") == 0) {
+                            key1 = 0;
+                        } else if (valStr.find("(") == 0) {
+                            key1 = 0;
+                        } else {
+                            key1 = static_cast<char>(std::stoi(valStr));
+                        }
+                        return true;
+                    } catch (...) {
+                        key1 = 0;
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    bool parseKey2(std::istream& in, unsigned long long& key2) {
+        std::string numStr;
+        char ch;
+        while (in >> ch && ch != ':' && ch != ')') {
+            numStr += ch;
+        }
+        in.unget();
+
+        if (!numStr.empty()) {
+            try {
+                // Удаляем суффиксы
+                std::string cleanNum = numStr;
+                size_t pos;
+                if ((pos = cleanNum.find("ull")) != std::string::npos ||
+                    (pos = cleanNum.find("ll")) != std::string::npos ||
+                    (pos = cleanNum.find("d")) != std::string::npos) {
+                    cleanNum = cleanNum.substr(0, pos);
+                }
+
+                if (cleanNum.find('.') != std::string::npos ||
+                    cleanNum.find('e') != std::string::npos) {
+                    // Для чисел с плавающей точкой
+                    double dval = std::stod(cleanNum);
+                    key2 = static_cast<unsigned long long>(std::round(dval));
+                } else if (cleanNum.find("0x") == 0 || cleanNum.find("0X") == 0) {
+                    // Для hex чисел
+                    key2 = std::stoull(cleanNum, nullptr, 16);
+                } else if (cleanNum.find("0b") == 0 || cleanNum.find("0B") == 0) {
+                    // Для binary чисел
+                    key2 = std::stoull(cleanNum.substr(2), nullptr, 2);
+                } else if (cleanNum.find('\'') != std::string::npos) {
+                    // Для символов
+                    key2 = static_cast<unsigned long long>(cleanNum[1]);
+                } else if (cleanNum.find("#c") == 0 || cleanNum.find("(") == 0) {
+                    // Для комплексных чисел и вложенных структур
+                    key2 = 0;
+                } else {
+                    // Для обычных чисел (включая отрицательные)
+                    if (!cleanNum.empty() && cleanNum[0] == '-') {
+                        long long val = std::stoll(cleanNum);
+                        key2 = static_cast<unsigned long long>(val);
+                    } else {
+                        key2 = std::stoull(cleanNum);
+                    }
+                }
+                return true;
+            } catch (...) {
+                key2 = 0;
+                return true;
+            }
+        }
+        return false;
+    }
+}
 
 std::istream& operator>>(std::istream& in, DataStruct& data) {
-    char openBrace = '\0';
-    if (!(in >> openBrace) || openBrace != '(') {
+    char ch;
+    if (!(in >> ch) || ch != '(') {
         in.setstate(std::ios_base::failbit);
         return in;
     }
@@ -14,105 +110,28 @@ std::istream& operator>>(std::istream& in, DataStruct& data) {
     bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
 
     while (true) {
-        char colon;
-        if (!(in >> colon) || colon != ':') break;
+        if (!(in >> ch) || ch != ':') break;
 
         std::string keyName;
-        in >> keyName;
+        if (!(in >> keyName)) {
+            in.setstate(std::ios_base::failbit);
+            return in;
+        }
 
-        char colonAfterKey;
-        if (!(in >> colonAfterKey) || colonAfterKey != ':') {
+        if (!(in >> ch) || ch != ':') {
             in.setstate(std::ios_base::failbit);
             return in;
         }
 
         if (keyName == "key1") {
-            // Гибкий парсинг для key1 (char)
-            char ch;
-            if (in >> ch && ch == '\'') {
-                // Формат 'a'
-                if (!(in >> data.key1) || !(in >> ch) || ch != '\'') {
-                    in.setstate(std::ios_base::failbit);
-                    return in;
-                }
-            } else {
-                // Другие форматы - преобразуем к char
-                in.unget();
-                std::string valStr;
-                char next;
-                while (in >> next && next != ':' && next != ')') {
-                    valStr += next;
-                }
-                in.unget();
-
-                try {
-                    if (valStr.find("0x") == 0 || valStr.find("0X") == 0) {
-                        data.key1 = static_cast<char>(std::stoul(valStr, nullptr, 16));
-                    } else if (valStr.find("#c") == 0) {
-                        // Для комплексных чисел берем первую часть
-                        data.key1 = static_cast<char>(0);
-                    } else if (valStr.find("(") == 0) {
-                        // Для вложенных структур
-                        data.key1 = static_cast<char>(0);
-                    } else {
-                        data.key1 = static_cast<char>(std::stoi(valStr));
-                    }
-                } catch (...) {
-                    data.key1 = 0;
-                }
-            }
-            hasKey1 = true;
+            hasKey1 = parseKey1(in, data.key1);
         } else if (keyName == "key2") {
-            // Гибкий парсинг для key2 (unsigned long long)
-            std::string numStr;
-            char ch;
-            while (in >> ch && ch != ':' && ch != ')') {
-                numStr += ch;
-            }
-            in.unget();
-
-            try {
-                if (numStr.find('.') != std::string::npos ||
-                    numStr.find('e') != std::string::npos) {
-                    // Для чисел с плавающей точкой
-                    double dval = std::stod(numStr);
-                    data.key2 = static_cast<unsigned long long>(std::round(dval));
-                } else if (numStr.find("0x") == 0 || numStr.find("0X") == 0) {
-                    // Для hex чисел
-                    data.key2 = std::stoull(numStr, nullptr, 16);
-                } else if (numStr.find("0b") == 0 || numStr.find("0B") == 0) {
-                    // Для binary чисел
-                    data.key2 = std::stoull(numStr.substr(2), nullptr, 2);
-                } else if (numStr.find("ull") != std::string::npos ||
-                          numStr.find("ll") != std::string::npos) {
-                    // Для чисел с суффиксами
-                    data.key2 = std::stoull(numStr.substr(0, numStr.size()-2));
-                } else if (numStr.find('\'') != std::string::npos) {
-                    // Для символов
-                    data.key2 = static_cast<unsigned long long>(numStr[1]);
-                } else if (numStr.find("#c") == 0) {
-                    // Для комплексных чисел
-                    data.key2 = 0;
-                } else if (numStr.find("(") == 0) {
-                    // Для вложенных структур
-                    data.key2 = 0;
-                } else {
-                    // Для обычных чисел
-                    data.key2 = std::stoull(numStr);
-                }
-                hasKey2 = true;
-            } catch (...) {
-                data.key2 = 0;
-                hasKey2 = true;
-            }
+            hasKey2 = parseKey2(in, data.key2);
         } else if (keyName == "key3") {
-            char quote;
-            if (!(in >> quote) || quote != '"') {
-                in.setstate(std::ios_base::failbit);
-                return in;
+            if ((in >> ch) && ch == '"') {
+                std::getline(in, data.key3, '"');
+                hasKey3 = true;
             }
-            std::getline(in, data.key3, '"');
-            hasKey3 = true;
         } else {
             in.setstate(std::ios_base::failbit);
             return in;
@@ -124,8 +143,7 @@ std::istream& operator>>(std::istream& in, DataStruct& data) {
         return in;
     }
 
-    char closeBrace;
-    if (!(in >> closeBrace) || closeBrace != ')') {
+    if (!(in >> ch) || ch != ')') {
         in.setstate(std::ios_base::failbit);
         return in;
     }
