@@ -1,104 +1,66 @@
 #include "DataStruct.h"
 #include <sstream>
-#include <cctype>
 
 std::istream& operator>>(std::istream& in, DataStruct& data) {
-    char openBrace = '\0';
-    if (!(in >> openBrace) || openBrace != '(') {
+    char ch;
+
+    if (!(in >> ch) || ch != '(') {
         in.setstate(std::ios_base::failbit);
         return in;
     }
 
-    bool hasKey1 = false, hasKey2 = false;
-
-    while (true) {
-        char colon;
-        if (!(in >> colon) || colon != ':') break;
-
-        std::string keyName;
-        in >> keyName;
-
-        char colonAfterKey;
-        if (!(in >> colonAfterKey) || colonAfterKey != ':') {
+    for (int i = 0; i < 3; ++i) {
+        if (!(in >> ch) || ch != ':') {
             in.setstate(std::ios_base::failbit);
             return in;
         }
 
-        if (keyName == "key1") {
-            char ch, quote;
-            if (!(in >> ch) || ch != '\'') {
-                in.setstate(std::ios_base::failbit);
-                return in;
-            }
-            if (!(in >> ch)) {
-                in.setstate(std::ios_base::failbit);
-                return in;
-            }
-            if (!(in >> quote) || quote != '\'') {
-                in.setstate(std::ios_base::failbit);
-                return in;
-            }
-            data.key1 = ch;
-            hasKey1 = true;
-        } else if (keyName == "key2") {
-            std::string valueStr;
-            char c;
-            while (in.peek() != ':' && !isspace(in.peek())) {
-                in >> c;
-                valueStr += c;
-            }
+        std::string key;
+        in >> key;
 
-            try {
-                data.key2 = std::stoull(valueStr);
-            } catch (...) {
-                in.setstate(std::ios_base::failbit);
-                return in;
-            }
+        if (!(in >> ch) || ch != ':') {
+            in.setstate(std::ios_base::failbit);
+            return in;
+        }
 
-            char suffix;
-            if (!(in >> suffix) || (suffix != 'u' && suffix != 'U')) {
-                in.setstate(std::ios_base::failbit);
-                return in;
-            }
-            if ((in.peek() != ':') && !isspace(in.peek())) {
-                in.setstate(std::ios_base::failbit);
-                return in;
-            }
+        std::ostringstream valueStream;
+        in >> std::noskipws;
 
-            hasKey2 = true;
-        } else if (keyName == "key3") {
-            char quote;
-            if (!(in >> quote) || quote != '"') {
-                in.setstate(std::ios_base::failbit);
-                return in;
+        int depth = 0;
+        while (in >> ch) {
+            if (ch == '(') depth++;
+            else if (ch == ')') {
+                if (--depth == 0) break;
+            } else if (ch == ':' && depth == 0) {
+                in.putback(ch);
+                break;
             }
+            valueStream << ch;
+        }
 
-            std::getline(in, data.key3, '"');
+        if (key == "key1") {
+            data.key1 = valueStream.str();
+        } else if (key == "key2") {
+            data.key2 = valueStream.str();
+        } else if (key == "key3") {
+            data.key3 = valueStream.str();
         } else {
             in.setstate(std::ios_base::failbit);
             return in;
         }
     }
 
-    if (!hasKey1 || !hasKey2) {
+    if (!(in >> ch) || ch != ')') {
         in.setstate(std::ios_base::failbit);
-        return in;
-    }
-
-    char closeBrace;
-    if (!(in >> closeBrace) || closeBrace != ')') {
-        in.setstate(std::ios_base::failbit);
-        return in;
     }
 
     return in;
 }
 
 std::ostream& operator<<(std::ostream& out, const DataStruct& data) {
-    out << "(:key1 \'" << data.key1 << "\':"
-        << ":key2 " << data.key2 << "ull:"
-        << ":key3 \"" << data.key3 << "\":)";
+    out << "(:key1 " << data.key1 << ":"
+        << ":key2 " << data.key2 << ":"
+        << ":key3 " << data.key3 << ":)";
     return out;
 }
-
 

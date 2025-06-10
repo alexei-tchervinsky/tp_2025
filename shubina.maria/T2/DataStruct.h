@@ -5,8 +5,8 @@
 #include <string>
 
 struct DataStruct {
-    char key1;
-    unsigned long long key2;
+    std::string key1;
+    std::string key2;
     std::string key3;
 };
 
