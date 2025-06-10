@@ -1,20 +1,59 @@
-#ifndef DATASTRUCT_H
-#define DATASTRUCT_H
+#ifndef _DATA_STRUCT_H_
+#define _DATA_STRUCT_H_
 
 #include <iostream>
 #include <string>
 
-struct DataStruct {
-    char key1;
-    unsigned long long key2;
+namespace shub
+{
+  struct DataStruct
+  {
+    unsigned long long key1;
+    char key2;
     std::string key3;
-};
+  };
 
-// Перегрузки операторов
-std::istream& operator>>(std::istream& in, DataStruct& data);
-std::ostream& operator<<(std::ostream& out, const DataStruct& data);
+  struct ULLOctIO
+  {
+    unsigned long long& ull;
+  };
 
-bool operator<(const DataStruct& a, const DataStruct& b);
+  struct DelimiterIO
+  {
+    char delimiter;
+  };
 
-#endif // DATASTRUCT_H
+  struct StringIO
+  {
+    std::string& str;
+  };
+
+  struct CharLitIO
+  {
+    char& chr;
+  };
+
+  std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
+  std::istream& operator>>(std::istream& in, ULLOctIO&& dest);
+  std::istream& operator>>(std::istream& in, StringIO&& dest);
+  std::istream& operator>>(std::istream& in, CharLitIO&& dest);
+  std::istream& operator>>(std::istream& in, DataStruct& dest);
+  std::ostream& operator<<(std::ostream& out, const DataStruct& dest);
+
+  bool operator<(const DataStruct& a, const DataStruct& b);
+
+  class iofmtguard
+  {
+  public:
+    explicit iofmtguard(std::basic_ios< char >& s);
+    ~iofmtguard();
+  private:
+    std::basic_ios< char >& s_;
+    char fill_;
+    std::streamsize precision_;
+    std::basic_ios< char >::fmtflags fmt_;
+  };
+}
+
+#endif // _DATA_STRUCT_H_
 
