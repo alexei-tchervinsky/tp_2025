@@ -10,6 +10,7 @@ struct DataStruct {
     unsigned long long key2;
     std::string key3;
 
+    DataStruct();
     bool operator<(const DataStruct& other) const;
 };
 

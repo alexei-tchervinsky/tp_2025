@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include <iomanip> // добавлено для setprecision
+#include <iomanip>
 
 #include "DataStruct.h"
 #include "IO_Objects.h"
@@ -15,6 +15,11 @@ int main() {
     std::cerr << "Enter records:\n";
 
     std::vector<DataStruct> data = readDataStructs(std::cin);
+    if (data.empty()) {
+        std::cerr << "Looks like there is no supported record. Cannot determine input. Test skipped\n";
+        return 0;
+    }
+
     std::sort(data.begin(), data.end());
 
     std::cerr << "Sorted output:\n";

@@ -9,8 +9,8 @@
 std::istream& operator>>(std::istream& is, DataStruct& ds);
 std::ostream& operator<<(std::ostream& os, const DataStruct& ds);
 
-extern std::vector<DataStruct> readDataStructs(std::istream& is);
-extern void writeDataStructs(const std::vector<DataStruct>& data, std::ostream& os);
+std::vector<DataStruct> readDataStructs(std::istream& is);
+void writeDataStructs(const std::vector<DataStruct>& data, std::ostream& os);
 
 #endif // IO_OBJECTS_H
 
