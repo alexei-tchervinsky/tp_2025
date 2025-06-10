@@ -1,5 +1,5 @@
-#ifndef _DATA_STRUCT_H_
-#define _DATA_STRUCT_H_
+#ifndef DATASTRUCT_H
+#define DATASTRUCT_H
 
 #include <iostream>
 #include <string>
@@ -55,5 +55,5 @@ namespace shub
   };
 }
 
-#endif // _DATA_STRUCT_H_
+#endif // DATASTRUCT_H
 
