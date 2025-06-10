@@ -1,5 +1,3 @@
-// IO_Objects.cpp
-
 #include "IO_Objects.h"
 #include <sstream>
 #include <cctype>
@@ -87,12 +85,17 @@ std::vector<DataStruct> readDataStructs(std::istream& is) {
         DataStruct ds;
         is >> ds;
 
-        // Если после оператора>> поток в состоянии fail — выходим
         if (!is) break;
 
         result.push_back(ds);
     }
 
     return result;
+}
+
+void writeDataStructs(const std::vector<DataStruct>& data, std::ostream& os) {
+    for (const auto& ds : data) {
+        os << ds << '\n';
+    }
 }
 
