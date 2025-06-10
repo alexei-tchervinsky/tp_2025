@@ -1,3 +1,5 @@
+// IO_Objects.cpp
+
 #include "IO_Objects.h"
 #include <sstream>
 #include <cctype>
@@ -78,25 +80,19 @@ std::istream& operator>>(std::istream& is, DataStruct& ds) {
     return is;
 }
 
-std::ostream& operator<<(std::ostream& os, const DataStruct& ds) {
-    os << "(:key1 '" << ds.key1 << "':key2 " << ds.key2 << ":key3 \"" << ds.key3 << "\":)";
-    return os;
-}
-
 std::vector<DataStruct> readDataStructs(std::istream& is) {
     std::vector<DataStruct> result;
+
     while (true) {
         DataStruct ds;
-        bool success = static_cast<bool>(is >> ds);
-        if (!success) break;
+        is >> ds;
+
+        // Если после оператора>> поток в состоянии fail — выходим
+        if (!is) break;
+
         result.push_back(ds);
     }
-    return result;
-}
 
-void writeDataStructs(const std::vector<DataStruct>& data, std::ostream& os) {
-    for (const auto& ds : data) {
-        os << ds << '\n';
-    }
+    return result;
 }
 
