@@ -1,70 +1,63 @@
 #include "DataStruct.h"
-#include <string>
+#include <sstream>
+#include <cctype>
 
 std::istream& operator>>(std::istream& in, DataStruct& data) {
     char openBrace = '\0';
-    char colon1 = '\0', colon2 = '\0', colon3 = '\0';
-    std::string keyName;
-    char quote1 = '\0', quote2 = '\0';
-    char ch;
-    unsigned long long ullValue = 0;
-
     if (!(in >> openBrace) || openBrace != '(') {
         in.setstate(std::ios_base::failbit);
         return in;
     }
 
-    for (int i = 0; i < 3; ++i) {
-        if (!(in >> colon1)) {
-            in.setstate(std::ios_base::failbit);
-            return in;
-        }
-        if (colon1 != ':') {
-            in.setstate(std::ios_base::failbit);
-            return in;
-        }
+    bool hasKey1 = false, hasKey2 = false;
 
+    while (true) {
+        char colon;
+        if (!(in >> colon) || colon != ':') break;
+
+        std::string keyName;
         in >> keyName;
 
+        char colonAfterKey;
+        if (!(in >> colonAfterKey) || colonAfterKey != ':') {
+            in.setstate(std::ios_base::failbit);
+            return in;
+        }
+
         if (keyName == "key1") {
-            if (!(in >> ch >> colon2)) {
-                in.setstate(std::ios_base::failbit);
-                return in;
-            }
-            if (ch != '\'' || colon2 != ':') {
+            char ch, quote;
+            if (!(in >> ch >> quote) || ch != '\'' || quote != '\'') {
                 in.setstate(std::ios_base::failbit);
                 return in;
             }
             data.key1 = ch;
+            hasKey1 = true;
         } else if (keyName == "key2") {
-            if (!(in >> ullValue >> ch >> colon2)) {
+            unsigned long long value = 0;
+            char suffix;
+            if (!(in >> value >> suffix) || (suffix != 'u' && suffix != 'U')) {
                 in.setstate(std::ios_base::failbit);
                 return in;
             }
-            if ((ch != 'u' && ch != 'U') || colon2 != ':') {
-                in.setstate(std::ios_base::failbit);
-                return in;
-            }
-            data.key2 = ullValue;
+            data.key2 = value;
+            hasKey2 = true;
         } else if (keyName == "key3") {
-            if (!(in >> quote1)) {
-                in.setstate(std::ios_base::failbit);
-                return in;
-            }
-            if (quote1 != '"') {
+            char quote1;
+            if (!(in >> quote1) || quote1 != '"') {
                 in.setstate(std::ios_base::failbit);
                 return in;
             }
 
             std::getline(in, data.key3, '"');
-            if (!(in >> quote2 >> colon3) || quote2 != '"' || colon3 != ':') {
-                in.setstate(std::ios_base::failbit);
-                return in;
-            }
         } else {
             in.setstate(std::ios_base::failbit);
             return in;
         }
+    }
+
+    if (!hasKey1 || !hasKey2) {
+        in.setstate(std::ios_base::failbit);
+        return in;
     }
 
     char closeBrace;
