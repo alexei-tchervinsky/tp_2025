@@ -7,6 +7,7 @@
 std::string extractRecord(std::istream& is) {
     std::string line;
     std::getline(is, line);
+    if (is.fail()) return "";
     size_t start = line.find("(:");
     size_t end = line.rfind(":)");
     if (start == std::string::npos || end == std::string::npos || end <= start)
@@ -77,15 +78,12 @@ std::istream& operator>>(std::istream& is, DataStruct& ds) {
     return is;
 }
 
-std::ostream& operator<<(std::ostream& os, const DataStruct& ds) {
-    os << "(:key1 '" << ds.key1 << "':key2 " << ds.key2 << ":key3 \"" << ds.key3 << "\":)";
-    return os;
-}
-
 std::vector<DataStruct> readDataStructs(std::istream& is) {
     std::vector<DataStruct> result;
-    DataStruct ds;
-    while (is >> ds) {
+    while (true) {
+        DataStruct ds;
+        bool success = static_cast<bool>(is >> ds);
+        if (!success) break;
         result.push_back(ds);
     }
     return result;
