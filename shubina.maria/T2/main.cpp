@@ -8,12 +8,12 @@
 
 int main() {
     iofmtguard guard(std::cout);
-
     std::cout << std::fixed << std::setprecision(1);
 
     std::cerr << "Enter records:\n";
 
     std::vector<DataStruct> data = readDataStructs(std::cin);
+
     if (data.empty()) {
         std::cerr << "Looks like there is no supported record. Cannot determine input. Test skipped\n";
         return 0;

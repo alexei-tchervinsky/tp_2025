@@ -6,12 +6,14 @@
 
 std::string extractRecord(std::istream& is) {
     std::string line;
-    std::getline(is, line);
-    if (is.fail()) return "";
+    if (!std::getline(is, line) || line.empty()) {
+        return "";
+    }
     size_t start = line.find("(:");
     size_t end = line.rfind(":)");
-    if (start == std::string::npos || end == std::string::npos || end <= start)
+    if (start == std::string::npos || end == std::string::npos || end <= start) {
         return "";
+    }
     return line.substr(start + 2, end - start - 2);
 }
 
@@ -36,8 +38,10 @@ void parseField(const std::string& token, std::unordered_map<std::string, std::s
 
 std::istream& operator>>(std::istream& is, DataStruct& ds) {
     std::string record = extractRecord(is);
-    if (record.empty())
+    if (record.empty()) {
+        is.setstate(std::ios_base::failbit);
         return is;
+    }
 
     std::unordered_map<std::string, std::string> fields;
     std::istringstream ss(record);
@@ -48,13 +52,13 @@ std::istream& operator>>(std::istream& is, DataStruct& ds) {
         }
     }
 
-    if (!fields.count("key1") || !fields.count("key2") || !fields.count("key3")) {
+    if (fields.size() != 3 || !fields.count("key1") || !fields.count("key2") || !fields.count("key3")) {
         is.setstate(std::ios_base::failbit);
         return is;
     }
 
     std::string key1Str = fields["key1"];
-    if (key1Str.size() != 3 || key1Str[0] != '\'' || key1Str.back() != '\'') {
+    if (key1Str.size() != 3 || key1Str[0] != '\'' || key1Str[2] != '\'') {
         is.setstate(std::ios_base::failbit);
         return is;
     }
@@ -69,7 +73,7 @@ std::istream& operator>>(std::istream& is, DataStruct& ds) {
     }
 
     std::string key3Str = fields["key3"];
-    if (key3Str.front() != '"' || key3Str.back() != '"') {
+    if (key3Str.size() < 2 || key3Str.front() != '"' || key3Str.back() != '"') {
         is.setstate(std::ios_base::failbit);
         return is;
     }
@@ -85,16 +89,14 @@ std::ostream& operator<<(std::ostream& os, const DataStruct& ds) {
 
 std::vector<DataStruct> readDataStructs(std::istream& is) {
     std::vector<DataStruct> result;
+    DataStruct ds;
 
-    while (true) {
-        DataStruct ds;
-        is >> ds;
-
-        if (!is) break;
-
+    while (is >> ds) {
         result.push_back(ds);
+        is.clear();
     }
 
+    is.clear();
     return result;
 }
 
