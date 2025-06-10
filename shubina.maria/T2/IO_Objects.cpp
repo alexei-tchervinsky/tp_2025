@@ -3,7 +3,7 @@
 #include <cctype>
 #include <unordered_map>
 #include <stdexcept>
-#include <istream>  // Добавлено
+#include <istream>
 
 std::string extractRecord(std::istream& is) {
     std::string line;
@@ -58,6 +58,7 @@ std::istream& operator>>(std::istream& is, DataStruct& ds) {
         return is;
     }
 
+    // Parse key1 (char)
     std::string key1Str = fields["key1"];
     if (key1Str.size() != 3 || key1Str[0] != '\'' || key1Str[2] != '\'') {
         is.setstate(std::ios_base::failbit);
@@ -65,14 +66,29 @@ std::istream& operator>>(std::istream& is, DataStruct& ds) {
     }
     ds.key1 = key1Str[1];
 
+    // Parse key2 (unsigned long long)
     std::string key2Str = fields["key2"];
     try {
-        ds.key2 = std::stoull(key2Str);
+        size_t pos = 0;
+        if (key2Str.find("0x") == 0 || key2Str.find("0X") == 0) {
+            ds.key2 = std::stoull(key2Str.substr(2), &pos, 16);
+        } else if (key2Str.find("0b") == 0 || key2Str.find("0B") == 0) {
+            ds.key2 = std::stoull(key2Str.substr(2), &pos, 2);
+        } else if (key2Str[0] == '0' && key2Str.size() > 1) {
+            ds.key2 = std::stoull(key2Str.substr(1), &pos, 8);
+        } else {
+            ds.key2 = std::stoull(key2Str, &pos, 10);
+        }
+        if (pos != key2Str.size()) {
+            is.setstate(std::ios_base::failbit);
+            return is;
+        }
     } catch (...) {
         is.setstate(std::ios_base::failbit);
         return is;
     }
 
+    // Parse key3 (string)
     std::string key3Str = fields["key3"];
     if (key3Str.size() < 2 || key3Str.front() != '"' || key3Str.back() != '"') {
         is.setstate(std::ios_base::failbit);
@@ -91,12 +107,10 @@ std::ostream& operator<<(std::ostream& os, const DataStruct& ds) {
 std::vector<DataStruct> readDataStructs(std::istream& is) {
     std::vector<DataStruct> result;
     DataStruct ds;
-
     while (is >> ds) {
         result.push_back(ds);
         is.clear();
     }
-
     is.clear();
     return result;
 }
