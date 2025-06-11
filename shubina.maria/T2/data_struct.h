@@ -48,5 +48,5 @@ namespace shubina
     void writeDataStructs(const std::vector<DataStruct>& data, std::ostream& out);
 }
 
-#endif // DATA_STRUCT_H
+#endif
 

@@ -13,9 +13,7 @@ namespace shubina
         char c;
         in >> c;
         if (in && c != dest.exp)
-        {
             in.setstate(std::ios::failbit);
-        }
         return in;
     }
 
@@ -35,9 +33,7 @@ namespace shubina
         std::string token;
         char c;
         while (in.get(c) && (std::isdigit(c) || c == 'u' || c == 'U' || c == 'l' || c == 'L'))
-        {
             token += c;
-        }
         in.putback(c);
 
         try
@@ -49,19 +45,12 @@ namespace shubina
                 while (pos < token.size() &&
                        (token[pos] == 'u' || token[pos] == 'U' ||
                         token[pos] == 'l' || token[pos] == 'L'))
-                {
                     ++pos;
-                }
                 if (pos != token.size())
-                {
                     in.setstate(std::ios::failbit);
-                }
             }
         }
-        catch (...)
-        {
-            in.setstate(std::ios::failbit);
-        }
+        catch (...) { in.setstate(std::ios::failbit); }
 
         return in;
     }
@@ -86,9 +75,7 @@ namespace shubina
         in.read(&actual[0], dest.exp.length());
 
         if (!in || actual != dest.exp)
-        {
             in.setstate(std::ios::failbit);
-        }
 
         return in;
     }
@@ -137,13 +124,10 @@ namespace shubina
         }
 
         if (has_key1 && has_key2 && has_key3)
-        {
             dest = input;
-        }
         else
-        {
             in.setstate(std::ios::failbit);
-        }
+
         return in;
     }
 
@@ -181,19 +165,29 @@ namespace shubina
     {
         std::vector<DataStruct> result;
         DataStruct ds;
-        while (in >> ds)
+
+        while (true)
         {
-            result.push_back(ds);
+            char c;
+            // Пропуск пробелов
+            while (in.get(c) && std::isspace(c)) {}
+            if (!in) break;
+            in.putback(c);
+
+            if (in >> ds)
+                result.push_back(ds);
+            else
+                in.clear(in.rdstate() & ~std::ios::failbit & ~std::ios::badbit),
+                in.ignore(1000, '\n');
         }
+
         return result;
     }
 
     void writeDataStructs(const std::vector<DataStruct>& data, std::ostream& out)
     {
         for (const auto& ds : data)
-        {
-            out << ds;
-        }
+            out << ds << "\n";
     }
 }
 
