@@ -2,9 +2,8 @@
 #include <vector>
 #include <algorithm>
 #include <iomanip>
-#include "DataStruct.h"
-#include "IO_Objects.h"
-#include "iofmtguard.h"
+#include "data_struct.h"
+
 
 int main() {
     iofmtguard guard(std::cout);
