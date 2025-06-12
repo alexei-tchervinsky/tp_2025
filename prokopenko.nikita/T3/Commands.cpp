@@ -1,276 +1,121 @@
-#include "Commands.hpp"
-#include <numeric>
-#include <functional>
-#include <algorithm>
+#include "commands.hpp"
 #include <cmath>
-#include <iterator>
+#include <algorithm>
 
 namespace prokopenko
 {
-  double get_sum(double result, const Polygon& polygon, std::size_t param)
+  double calculate_area(const Polygon& polygon)
   {
-    if (param == 0)
+    double area = 0.0;
+    size_t n = polygon.size();
+    for (size_t i = 0; i < n; ++i)
     {
-      return result + area(polygon);
+      const Point& p1 = polygon[i];
+      const Point& p2 = polygon[(i + 1) % n];
+      area += (p1.x * p2.y - p2.x * p1.y);
     }
-    else if (param == 1 && polygon.points.size() % 2 != 0)
-    {
-      return result + area(polygon);
-    }
-    else if (param == 2 && polygon.points.size() % 2 == 0)
-    {
-      return result + area(polygon);
-    }
-    else if (param == polygon.points.size())
-    {
-      return result + area(polygon);
-    }
-    return result;
+    return std::abs(area) / 2.0;
   }
 
-  double get_area(std::size_t param, const std::vector< ananev::Polygon > polygons)
+  double area_param(const std::vector<Polygon>& data, std::istream&, std::ostream& out)
   {
-    std::function< double(double, const Polygon&) > BinaryOperation = std::bind(get_sum,
-      std::placeholders::_1,
-      std::placeholders::_2,
-      param);
-    if (param == 0)
+    double total = 0.0;
+    for (const auto& poly : data)
     {
-      return std::accumulate(polygons.cbegin(), polygons.cend(), 0.0, BinaryOperation) / polygons.size();
+      total += calculate_area(poly);
     }
-    return std::accumulate(polygons.cbegin(), polygons.cend(), 0.0, BinaryOperation);
+    out << total << '\n';
+    return total;
   }
 
-  double get_max(std::size_t param, const std::vector< ananev::Polygon > polygons)
+  double max_param(const std::vector<Polygon>& data, std::istream&, std::ostream& out)
   {
-    if (param == 0)
+    if (data.empty())
     {
-      return area(*std::max_element(polygons.cbegin(), polygons.cend(), [](const Polygon& a, const Polygon& b)
-        {
-          return area(a) < area(b);
-        }));
+      out << "0\n";
+      return 0.0;
     }
-    return std::max_element(polygons.cbegin(), polygons.cend(), [](const Polygon& a, const Polygon& b)
-      {
-        return a.points.size() < b.points.size();
-      })->points.size();
+    double max_area = 0.0;
+    for (const auto& poly : data)
+    {
+      max_area = std::max(max_area, calculate_area(poly));
+    }
+    out << max_area << '\n';
+    return max_area;
   }
 
-  double get_min(std::size_t param, const std::vector< ananev::Polygon > polygons)
+  double min_param(const std::vector<Polygon>& data, std::istream&, std::ostream& out)
   {
-    if (param == 0)
+    if (data.empty())
     {
-      return area(*std::min_element(polygons.cbegin(), polygons.cend(), [](const Polygon& a, const Polygon& b)
-        {
-          return area(a) < area(b);
-        }));
+      out << "0\n";
+      return 0.0;
     }
-    return std::min_element(polygons.cbegin(), polygons.cend(), [](const Polygon& a, const Polygon& b)
-      {
-        return a.points.size() < b.points.size();
-      })->points.size();
+    double min_area = calculate_area(data.front());
+    for (const auto& poly : data)
+    {
+      min_area = std::min(min_area, calculate_area(poly));
+    }
+    out << min_area << '\n';
+    return min_area;
   }
 
-  std::size_t get_count(std::size_t param, const std::vector< ananev::Polygon > polygons)
+  size_t count_param(const std::vector<Polygon>& data, std::istream& in, std::ostream& out)
   {
-    if (param == 1)
-    {
-      return std::count_if(polygons.cbegin(), polygons.cend(), [](const Polygon& a)
-        {
-          return a.points.size() % 2 != 0;
-        });
-    }
-    else if (param == 2)
-    {
-      return std::count_if(polygons.cbegin(), polygons.cend(), [](const Polygon& a)
-        {
-          return a.points.size() % 2 == 0;
-        });
-    }
-    std::function< std::size_t(const Polygon&) > UnarOperation = std::bind([](const Polygon& a, std::size_t param)
-      {
-        return a.points.size() == param;
-      },
-      std::placeholders::_1,
-      param);
-    return std::count_if(polygons.cbegin(), polygons.cend(), UnarOperation);
+    size_t vertex_count = 0;
+    in >> vertex_count;
+    size_t count = std::count_if(data.begin(), data.end(), [vertex_count](const Polygon& poly) {
+      return poly.size() == vertex_count;
+      });
+    out << count << '\n';
+    return count;
   }
 
-  bool get_rects(const Point& start, const Point& end1, const Point& end2, const Point& end3)
+  std::vector<Polygon> rects_param(const std::vector<Polygon>& data, std::istream&, std::ostream& out)
   {
-    Point vectors[3];
-    vectors[0].x = end1.x - start.x;
-    vectors[0].y = end1.y - start.y;
-    vectors[1].x = end2.x - start.x;
-    vectors[1].y = end2.y - start.y;
-    vectors[2].x = end3.x - start.x;
-    vectors[2].y = end3.y - start.y;
-    bool angle01 = ((vectors[0].x * vectors[1].x + vectors[0].y * vectors[1].y) /
-      (sqrt(std::pow(vectors[0].x, 2) + std::pow(vectors[0].y, 2)) * sqrt(std::pow(vectors[1].x, 2) + std::pow(vectors[1].y, 2))) == 0);
-    bool angle02 = ((vectors[0].x * vectors[2].x + vectors[0].y * vectors[2].y) /
-      (sqrt(std::pow(vectors[0].x, 2) + std::pow(vectors[0].y, 2)) * sqrt(std::pow(vectors[2].x, 2) + std::pow(vectors[2].y, 2))) == 0);
-    bool angle12 = ((vectors[2].x * vectors[1].x + vectors[2].y * vectors[1].y) /
-      (sqrt(std::pow(vectors[2].x, 2) + std::pow(vectors[2].y, 2)) * sqrt(std::pow(vectors[1].x, 2) + std::pow(vectors[1].y, 2))) == 0);
-    return angle01 || angle02 || angle12;
-  }
-  std::size_t get_seq(std::vector< ananev::Polygon >::const_iterator begin,
-    std::vector< ananev::Polygon >::const_iterator end, const Polygon& param)
-  {
-    bool repeat = true;
-    std::function<bool(const Polygon&)> FindIfUO = std::bind([](const Polygon& polygon, const Polygon& param)
-      {
-        return (polygon == param);
-      }, std::placeholders::_1, param);
-    std::function<bool(const Polygon&)> CountIfUO = std::bind([](const Polygon& polygon, const Polygon& param, bool& repeat)
-      {
-        if (polygon == param && repeat == true)
-        {
-          return true;
-        }
-        repeat = false;
-        return false;
-      }, std::placeholders::_1, param, repeat);
-    std::vector< ananev::Polygon >::const_iterator begin_new = std::find_if(begin, end, FindIfUO);
-    if (begin_new != end)
+    std::vector<Polygon> rectangles;
+    for (const auto& poly : data)
     {
-      std::size_t count_current = std::count_if(begin_new, end, CountIfUO);
-      std::size_t count_next = get_seq(begin_new + count_current, end, param);
-      if (count_current > count_next)
+      if (poly.size() == 4)
       {
-        return count_current;
+        rectangles.push_back(poly);
       }
-      return count_next;
     }
-    else
+    for (const auto& rect : rectangles)
     {
+      out << rect << '\n';
+    }
+    return rectangles;
+  }
+
+  size_t maxseq_param(const std::vector<Polygon>& data, std::istream&, std::ostream& out)
+  {
+    if (data.empty())
+    {
+      out << "0\n";
       return 0;
     }
-  }
 
-  void area_param(const std::vector< ananev::Polygon > polygons, std::istream& in, std::ostream& out)
-  {
-    std::string param;
-    in >> param;
-    try
+    size_t max_seq = 1;
+    size_t curr_seq = 1;
+    double last_area = calculate_area(data[0]);
+
+    for (size_t i = 1; i < data.size(); ++i)
     {
-      if (param == "MEAN" && polygons.size() >= 1)
+      double area = calculate_area(data[i]);
+      if (area > last_area)
       {
-        out << std::setprecision(1) << get_area(0, polygons) << '\n';
-      }
-      else if (param == "ODD")
-      {
-        out << std::setprecision(1) << get_area(1, polygons) << '\n';
-      }
-      else if (param == "EVEN")
-      {
-        out << std::setprecision(1) << get_area(2, polygons) << '\n';
-      }
-      else if (stoll(param) >= 3)
-      {
-        out << std::setprecision(1) << get_area(stoll(param), polygons) << '\n';
+        ++curr_seq;
+        max_seq = std::max(max_seq, curr_seq);
       }
       else
       {
-        throw std::invalid_argument("<INVALID COMMAND>");
+        curr_seq = 1;
       }
+      last_area = area;
     }
-    catch (std::exception& ex)
-    {
-      throw std::invalid_argument("<INVALID COMMAND>");
-    }
-  }
 
-  void max_param(const std::vector< ananev::Polygon > polygons, std::istream& in, std::ostream& out)
-  {
-    std::string param;
-    in >> param;
-    if (param == "AREA" && polygons.size() >= 1)
-    {
-      out << std::setprecision(1) << get_max(0, polygons) << '\n';
-    }
-    else if (param == "VERTEXES" && polygons.size() >= 1)
-    {
-      out << std::setprecision(0) << get_max(1, polygons) << '\n';
-    }
-    else
-    {
-      throw std::invalid_argument("<INVALID COMMAND>");
-    }
-  }
-
-  void min_param(const std::vector< ananev::Polygon > polygons, std::istream& in, std::ostream& out)
-  {
-    std::string param;
-    in >> param;
-    if (param == "AREA" && polygons.size() >= 1)
-    {
-      out << std::setprecision(1) << get_min(0, polygons) << '\n';
-    }
-    else if (param == "VERTEXES" && polygons.size() >= 1)
-    {
-      out << std::setprecision(0) << get_min(1, polygons) << '\n';
-    }
-    else
-    {
-      throw std::invalid_argument("<INVALID COMMAND>");
-    }
-  }
-
-  void count_param(const std::vector< ananev::Polygon > polygons, std::istream& in, std::ostream& out)
-  {
-    std::string param;
-    in >> param;
-    try
-    {
-      if (param == "ODD")
-      {
-        out << std::setprecision(0) << get_count(1, polygons) << '\n';
-      }
-      else if (param == "EVEN")
-      {
-        out << std::setprecision(0) << get_count(2, polygons) << '\n';
-      }
-      else if (stoll(param) >= 3)
-      {
-        out << std::setprecision(0) << get_count(stoll(param), polygons) << '\n';
-      }
-      else
-      {
-        throw std::invalid_argument("<INVALID COMMAND>");
-      }
-    }
-    catch (std::exception& ex)
-    {
-      throw std::invalid_argument("<INVALID COMMAND>");
-    }
-  }
-
-  void rects_param(const std::vector< ananev::Polygon > polygons, std::istream& in, std::ostream& out)
-  {
-    if (!in)
-    {
-      throw std::invalid_argument("<INVALID COMMAND>");
-    }
-    out << std::setprecision(0) << std::count_if(polygons.cbegin(), polygons.cend(), [](const Polygon& polygon)
-      {
-        if (polygon.points.size() == 4)
-        {
-          return get_rects(polygon.points[0], polygon.points[1], polygon.points[2], polygon.points[3]) &&
-            get_rects(polygon.points[1], polygon.points[2], polygon.points[3], polygon.points[0]) &&
-            get_rects(polygon.points[2], polygon.points[3], polygon.points[0], polygon.points[1]);
-        }
-        return false;
-      }) << '\n';
-  }
-
-  void maxseq_param(const std::vector< ananev::Polygon > polygons, std::istream& in, std::ostream& out)
-  {
-    Polygon param;
-    in >> param;
-    if (!in || in.peek() != '\n')
-    {
-      throw std::invalid_argument("<INVALID COMMAND>");
-    }
-    out << std::setprecision(0) << get_seq(polygons.cbegin(), polygons.cend(), param) << '\n';
+    out << max_seq << '\n';
+    return max_seq;
   }
 }

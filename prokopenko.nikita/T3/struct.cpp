@@ -1,85 +1,59 @@
-#include "Struct.hpp"
+#include "polygon.hpp"
+#include <iostream>
 
 namespace prokopenko
 {
-  std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
+  std::istream& operator>>(std::istream& in, Point& point)
   {
-    std::istream::sentry sentry(in);
-    if (!sentry)
-    {
-      return in;
-    }
-    char c = '\0';
-    in >> c;
-    if (in && (c != dest.del))
+    char ch1 = 0;
+    char ch2 = 0;
+    in >> ch1 >> point.x >> ch2 >> point.y;
+    if (ch1 != '(' || ch2 != ')')
     {
       in.setstate(std::ios::failbit);
     }
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, Point& dest)
+  std::istream& operator>>(std::istream& in, Polygon& polygon)
   {
-    std::istream::sentry sentry(in);
-    if (!sentry)
-    {
-      return in;
-    }
-    Point temp_point;
-    in >> temp_point.x;
-    in >> DelimiterIO{ ';' };
-    in >> temp_point.y;
-    dest = temp_point;
-    return in;
-  }
-
-  std::istream& operator>>(std::istream& in, Polygon& dest)
-  {
-    std::istream::sentry sentry(in);
-    if (!sentry)
-    {
-      return in;
-    }
-    std::size_t count_points;
-    in >> count_points;
-    if (count_points < 3)
+    size_t size = 0;
+    in >> size;
+    if (size < 3)
     {
       in.setstate(std::ios::failbit);
       return in;
     }
-    Polygon temp_polygon;
-    for (size_t i = 0; i < count_points; i++)
+    polygon.clear();
+    for (size_t i = 0; i < size; ++i)
     {
-      Point temp_point;
-      in >> DelimiterIO{ '(' };
-      in >> temp_point;
-      in >> DelimiterIO{ ')' };
-      temp_polygon.points.push_back(temp_point);
-    }
-    if (in && count_points == temp_polygon.points.size())
-    {
-      dest = temp_polygon;
+      Point point;
+      in >> point;
+      if (!in)
+      {
+        return in;
+      }
+      polygon.push_back(point);
     }
     return in;
   }
 
-  double area(const Polygon& polygon)
+  std::ostream& operator<<(std::ostream& out, const Point& point)
   {
-    double area = 0;
-    std::size_t count_points = polygon.points.size();
-    for (std::size_t point = 0; point < count_points; point++)
+    out << '(' << point.x << ';' << point.y << ')';
+    return out;
+  }
+
+  std::ostream& operator<<(std::ostream& out, const Polygon& polygon)
+  {
+    for (size_t i = 0; i < polygon.size(); ++i)
     {
-      if (point == count_points - 1)
+      out << polygon[i];
+      if (i + 1 < polygon.size())
       {
-        area += (polygon.points[point].x * polygon.points[0].y - polygon.points[point].y *
-          polygon.points[0].x);
-      }
-      else
-      {
-        area += (polygon.points[point].x * polygon.points[point + 1].y - polygon.points[point].y *
-          polygon.points[point + 1].x);
+        out << ' ';
       }
     }
-    return 0.5 * abs(area);
+    return out;
   }
 }

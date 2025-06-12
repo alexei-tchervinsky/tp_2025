@@ -1,38 +1,24 @@
-#ifndef STRUCT_HPP
-#define STRUCT_HPP
-#include <iostream>
+#ifndef POLYGON_HPP
+#define POLYGON_HPP
+
 #include <vector>
-#include <string>
-#include <fstream>
+#include <iostream>
+#include <cstddef>
 
 namespace prokopenko
 {
-  struct DelimiterIO
-  {
-    char del;
-  };
-
   struct Point
   {
-    int x, y;
-    bool operator==(const Point& other) const
-    {
-      return (this->x == other.x) && (this->y == other.y);
-    }
+    int x;
+    int y;
   };
 
-  struct Polygon
-  {
-    std::vector< Point > points;
-    bool operator==(const Polygon& other) const
-    {
-      return (this->points == other.points);
-    }
-  };
+  using Polygon = std::vector<Point>;
 
-  std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
-  std::istream& operator>>(std::istream& in, Point& dest);
-  std::istream& operator>>(std::istream& in, Polygon& dest);
-  double area(const Polygon& polygon);
+  std::istream& operator>>(std::istream& in, Point& point);
+  std::istream& operator>>(std::istream& in, Polygon& polygon);
+  std::ostream& operator<<(std::ostream& out, const Point& point);
+  std::ostream& operator<<(std::ostream& out, const Polygon& polygon);
 }
+
 #endif

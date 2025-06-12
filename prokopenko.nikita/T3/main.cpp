@@ -1,73 +1,58 @@
-#include "Struct.hpp"
-#include "Commands.hpp"
-#include <algorithm>
-#include <limits>
-#include <exception>
+#include <iostream>
 #include <map>
 #include <functional>
+#include "polygon.hpp"
 
-using namespace prokopenko;
-
-int main(int argc, char* argv[])
+namespace prokopenko
 {
-  if (argc != 2)
+  double area_param(const std::vector<Polygon>, std::istream&, std::ostream&);
+  double max_param(const std::vector<Polygon>, std::istream&, std::ostream&);
+  double min_param(const std::vector<Polygon>, std::istream&, std::ostream&);
+  size_t count_param(const std::vector<Polygon>, std::istream&, std::ostream&);
+  std::vector<Polygon> rects_param(const std::vector<Polygon>, std::istream&, std::ostream&);
+  size_t maxseq_param(const std::vector<Polygon>, std::istream&, std::ostream&);
+}
+
+int main()
+{
+  using namespace prokopenko;
+
+  std::vector<Polygon> data;
+  Polygon polygon;
+
+  while (std::cin >> polygon)
   {
-    std::cerr << "FILENAME_NOT_SPECIFIED\n";
-    return 1;
-  }
-  std::ifstream in;
-  in.open(argv[1]);
-  if (!in)
-  {
-    std::cerr << "FILE_NOT_FOUND\n";
-    return 1;
-  }
-  std::vector< ananev::Polygon > polygons;
-  while (!in.eof())
-  {
-    std::copy(std::istream_iterator< ananev::Polygon >(in),
-      std::istream_iterator< ananev::Polygon >(),
-      std::back_inserter(polygons));
-    if (in.fail())
-    {
-      in.clear();
-      in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    }
+    data.push_back(polygon);
   }
 
-  std::map< std::string, std::function< void(const std::vector< ananev::Polygon >, std::istream&, std::ostream&) > > commands
+  if (!std::cin.eof())
   {
-    {"AREA", ananev::area_param},
-    {"MAX", ananev::max_param},
-    {"MIN", ananev::min_param},
-    {"COUNT", ananev::count_param},
-    {"RECTS", ananev::rects_param},
-    {"MAXSEQ", ananev::maxseq_param}
+    std::cerr << "Error while reading input\n";
+    return 1;
+  }
+
+  std::map<std::string, std::function<void(const std::vector<Polygon>, std::istream&, std::ostream&)>> commands{
+    {"AREA", prokopenko::area_param},
+    {"MAX", prokopenko::max_param},
+    {"MIN", prokopenko::min_param},
+    {"COUNT", prokopenko::count_param},
+    {"RECTS", prokopenko::rects_param},
+    {"MAXSEQ", prokopenko::maxseq_param}
   };
 
-  std::cout << std::fixed;
-  while (!std::cin.eof())
+  std::string command;
+  while (std::cin >> command)
   {
-    try
+    auto it = commands.find(command);
+    if (it != commands.end())
     {
-      std::string key;
-      std::cin >> key;
-      if (commands.find(key) != commands.end())
-      {
-        auto command = std::bind(commands[key], std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-        command(polygons, std::cin, std::cout);
-      }
-      else if (!std::cin.eof())
-      {
-        throw std::invalid_argument("<INVALID COMMAND>");
-      }
+      it->second(data, std::cin, std::cout);
     }
-    catch (const std::exception& ex)
+    else
     {
-      std::cout << ex.what() << '\n';
-      std::cin.clear();
-      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      std::cerr << "<INVALID COMMAND>\n";
     }
   }
+
   return 0;
 }
