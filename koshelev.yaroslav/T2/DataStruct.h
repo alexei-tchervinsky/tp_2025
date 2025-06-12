@@ -1,5 +1,5 @@
-#ifndef DATASTRUCT_HPP
-#define DATASTRUCT_HPP
+#ifndef DATASTRUCT_H
+#define DATASTRUCT_H
 
 #include <string>
 #include <iostream>
