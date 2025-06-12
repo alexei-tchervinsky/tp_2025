@@ -7,6 +7,7 @@
 #include <iomanip>
 #include <string>
 #include <cmath>
+#include <cctype>
 
 void prokopenko::outMessage(std::ostream& out, const std::string& message)
 {
@@ -161,9 +162,36 @@ void prokopenko::minVertexes(const std::vector<Polygon>& polygons, std::ostream&
   out << *std::min_element(vertexes.begin(), vertexes.end()) << '\n';
 }
 
-void prokopenko::Count(const std::vector<Polygon>& polygons, std::ostream& out, std::istream&)
+// ✅ ИСПРАВЛЕННАЯ Count
+void prokopenko::Count(const std::vector<Polygon>& polygons, std::ostream& out, std::istream& in)
 {
-  out << polygons.size() << '\n';
+  std::string param;
+  in >> param;
+
+  if (param == "EVEN") {
+    std::size_t count = std::count_if(polygons.begin(), polygons.end(),
+      [](const Polygon& p) { return p.points.size() % 2 == 0; });
+    out << count << '\n';
+  }
+  else if (param == "ODD") {
+    std::size_t count = std::count_if(polygons.begin(), polygons.end(),
+      [](const Polygon& p) { return p.points.size() % 2 == 1; });
+    out << count << '\n';
+  }
+  else if (std::all_of(param.begin(), param.end(), ::isdigit)) {
+    int n = std::stoi(param);
+    if (n < 3) {
+      out << "<INVALID COMMAND>\n";
+    }
+    else {
+      std::size_t count = std::count_if(polygons.begin(), polygons.end(),
+        [n](const Polygon& p) { return static_cast<int>(p.points.size()) == n; });
+      out << count << '\n';
+    }
+  }
+  else {
+    out << "<INVALID COMMAND>\n";
+  }
 }
 
 void prokopenko::Perms(const std::vector<Polygon>& polygons, std::ostream& out, std::istream&)
