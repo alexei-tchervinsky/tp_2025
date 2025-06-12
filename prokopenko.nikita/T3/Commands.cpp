@@ -4,158 +4,129 @@
 #include <iomanip>
 #include <algorithm>
 #include <numeric>
+#include <cmath>
+#include <iterator>
 #include <sstream>
 
 namespace prokopenko {
 
-  void areaCommand(const std::vector<Polygon>& v, std::istream& in) {
-    std::string arg;
-    in >> arg;
-    iofmtguard guard(std::cout);
-    std::cout << std::fixed << std::setprecision(1);
-    if (arg == "EVEN" || arg == "ODD") {
-      bool even = (arg == "EVEN");
-      double s = std::accumulate(v.begin(), v.end(), 0.0,
-        [even](double acc, const Polygon& p) {
-          return (p.points.size() % 2 == even) ? acc + getArea(p) : acc;
-        });
-      std::cout << s << "\n";
+  double getArea(const Polygon& p) {
+    double area = 0.0;
+    for (size_t i = 0; i < p.points.size(); ++i) {
+      const Point& a = p.points[i];
+      const Point& b = p.points[(i + 1) % p.points.size()];
+      area += (a.x * b.y - b.x * a.y);
     }
-    else if (arg == "MEAN") {
-      if (v.empty()) {
+    return std::abs(area) / 2.0;
+  }
+
+  bool parsePolygon(const std::string& line, Polygon& poly) {
+    std::istringstream iss(line);
+    std::string dummy;
+    int count;
+    if (!(iss >> dummy >> count)) return false;
+    if (count < 3) return false;
+
+    Polygon p;
+    for (int i = 0; i < count; ++i) {
+      char ch;
+      Point pt;
+      if (!(iss >> ch) || ch != '(') return false;
+      if (!(iss >> pt.x)) return false;
+      if (!(iss >> ch) || ch != ';') return false;
+      if (!(iss >> pt.y)) return false;
+      if (!(iss >> ch) || ch != ')') return false;
+      p.points.push_back(pt);
+    }
+    if (p.points.size() != static_cast<size_t>(count)) return false;
+    poly = p;
+    return true;
+  }
+
+  void doCommand(const std::string& cmd, std::vector<Polygon>& polygons, std::istream& in) {
+    if (cmd == "COUNT") {
+      std::string arg;
+      if (!(in >> arg)) {
         std::cout << "<INVALID COMMAND>\n";
         return;
       }
-      double total = std::accumulate(v.begin(), v.end(), 0.0,
-        [](double acc, const Polygon& p) {
-          return acc + getArea(p);
-        });
-      std::cout << total / v.size() << "\n";
+
+      if (arg == "EVEN" || arg == "ODD") {
+        int parity = (arg == "EVEN") ? 0 : 1;
+        int count = std::count_if(polygons.begin(), polygons.end(), [parity](const Polygon& p) {
+          return p.points.size() % 2 == parity;
+          });
+        std::cout << count << '\n';
+      }
+      else {
+        try {
+          int n = std::stoi(arg);
+          int count = std::count_if(polygons.begin(), polygons.end(), [n](const Polygon& p) {
+            return p.points.size() == static_cast<size_t>(n);
+            });
+          std::cout << count << '\n';
+        }
+        catch (...) {
+          std::cout << "<INVALID COMMAND>\n";
+        }
+      }
     }
-    else {
-      size_t n;
-      std::istringstream iss(arg);
-      if (!(iss >> n) || n < 3) {
+    else if (cmd == "AREA") {
+      std::string arg;
+      if (!(in >> arg)) {
         std::cout << "<INVALID COMMAND>\n";
         return;
       }
-      double s = std::accumulate(v.begin(), v.end(), 0.0,
-        [n](double acc, const Polygon& p) {
-          return (p.points.size() == n) ? acc + getArea(p) : acc;
-        });
-      std::cout << s << "\n";
-    }
-  }
 
-  void countCommand(const std::vector<Polygon>& v, std::istream& in) {
-    std::string arg;
-    in >> arg;
-    if (arg == "EVEN" || arg == "ODD") {
-      bool even = (arg == "EVEN");
-      auto c = std::count_if(v.begin(), v.end(),
-        [even](const Polygon& p) {
-          return p.points.size() % 2 == even;
-        });
-      std::cout << c << "\n";
+      if (arg == "EVEN" || arg == "ODD") {
+        int parity = (arg == "EVEN") ? 0 : 1;
+        double total = 0.0;
+        for (const auto& p : polygons) {
+          if (p.points.size() % 2 == parity) {
+            total += getArea(p);
+          }
+        }
+        std::cout << std::fixed << std::setprecision(1) << total << '\n';
+      }
+      else {
+        try {
+          int n = std::stoi(arg);
+          double total = 0.0;
+          for (const auto& p : polygons) {
+            if (p.points.size() == static_cast<size_t>(n)) {
+              total += getArea(p);
+            }
+          }
+          std::cout << std::fixed << std::setprecision(1) << total << '\n';
+        }
+        catch (...) {
+          std::cout << "<INVALID COMMAND>\n";
+        }
+      }
     }
-    else {
-      size_t n;
-      std::istringstream iss(arg);
-      if (!(iss >> n) || n < 3) {
+    else if (cmd == "ECHO") {
+      std::string line;
+      std::getline(in, line);
+      if (line.empty()) {
         std::cout << "<INVALID COMMAND>\n";
         return;
       }
-      auto c = std::count_if(v.begin(), v.end(),
-        [n](const Polygon& p) {
-          return p.points.size() == n;
-        });
-      std::cout << c << "\n";
-    }
-  }
-
-  void maxCommand(const std::vector<Polygon>& v, std::istream& in) {
-    std::string arg;
-    in >> arg;
-    if (v.empty() || (arg != "AREA" && arg != "VERTEXES")) {
-      std::cout << "<INVALID COMMAND>\n";
-      return;
-    }
-    if (arg == "AREA") {
-      iofmtguard guard(std::cout);
-      std::cout << std::fixed << std::setprecision(1);
-      auto it = std::max_element(v.begin(), v.end(),
-        [](const Polygon& a, const Polygon& b) {
-          return getArea(a) < getArea(b);
-        });
-      std::cout << getArea(*it) << "\n";
-    }
-    else {
-      auto it = std::max_element(v.begin(), v.end(),
-        [](const Polygon& a, const Polygon& b) {
-          return a.points.size() < b.points.size();
-        });
-      std::cout << it->points.size() << "\n";
-    }
-  }
-
-  void minCommand(const std::vector<Polygon>& v, std::istream& in) {
-    std::string arg;
-    in >> arg;
-    if (v.empty() || (arg != "AREA" && arg != "VERTEXES")) {
-      std::cout << "<INVALID COMMAND>\n";
-      return;
-    }
-    if (arg == "AREA") {
-      iofmtguard guard(std::cout);
-      std::cout << std::fixed << std::setprecision(1);
-      auto it = std::min_element(v.begin(), v.end(),
-        [](const Polygon& a, const Polygon& b) {
-          return getArea(a) < getArea(b);
-        });
-      std::cout << getArea(*it) << "\n";
-    }
-    else {
-      auto it = std::min_element(v.begin(), v.end(),
-        [](const Polygon& a, const Polygon& b) {
-          return a.points.size() < b.points.size();
-        });
-      std::cout << it->points.size() << "\n";
-    }
-  }
-
-  void echoCommand(std::vector<Polygon>& v, std::istream& in) {
-    Polygon target;
-    if (!(in >> target)) {
-      std::cout << "<INVALID COMMAND>\n";
-      return;
-    }
-    size_t count = 0;
-    for (size_t i = 0; i < v.size(); ++i) {
-      if (v[i] == target) {
-        v.insert(v.begin() + i + 1, target);
-        ++i;
-        ++count;
+      Polygon p;
+      if (parsePolygon("ECHO" + line, p)) {
+        if (p.points.size() >= 3) {
+          polygons.push_back(p);
+        }
+        else {
+          std::cout << "<INVALID COMMAND>\n";
+        }
+      }
+      else {
+        std::cout << "<INVALID COMMAND>\n";
       }
     }
-    std::cout << count << "\n";
-  }
-
-  void rightShapesCommand(const std::vector<Polygon>& v, std::istream&) {
-    auto c = std::count_if(v.begin(), v.end(),
-      [](const Polygon& p) {
-        return hasRightAngle(p);
-      });
-    std::cout << c << "\n";
-  }
-
-  void doCommand(const std::string& cmd, std::vector<Polygon>& v, std::istream& in) {
-    if (cmd == "AREA") areaCommand(v, in);
-    else if (cmd == "COUNT") countCommand(v, in);
-    else if (cmd == "MAX") maxCommand(v, in);
-    else if (cmd == "MIN") minCommand(v, in);
-    else if (cmd == "ECHO") echoCommand(v, in);
-    else if (cmd == "RIGHTSHAPES") rightShapesCommand(v, in);
-    else std::cout << "<INVALID COMMAND>\n";
+    else {
+      std::cout << "<INVALID COMMAND>\n";
+    }
   }
 
 }
