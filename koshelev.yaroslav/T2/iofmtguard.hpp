@@ -1,8 +1,6 @@
 #ifndef IOFMTGUARD_HPP
 #define IOFMTGUARD_HPP
-
 #include <iostream>
-
 namespace solution
 {
     class iofmtguard
@@ -10,7 +8,6 @@ namespace solution
     public:
         explicit iofmtguard(std::basic_ios<char>& stream);
         ~iofmtguard();
-
     private:
         std::basic_ios<char>& stream_;
         char fill_;
@@ -18,5 +15,4 @@ namespace solution
         std::ios::fmtflags flags_;
     };
 }
-
 #endif

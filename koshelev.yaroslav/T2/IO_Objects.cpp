@@ -1,69 +1,131 @@
 #include "IO_Objects.hpp"
+#include <iomanip>
 #include <sstream>
-
+#include <cctype>
 namespace solution {
-
-    std::istream& operator>>(std::istream& in, DoubleSciIO&& d) {
-        double value;
-        std::string token;
-        if (!(in >> token)) {
+    std::istream& operator>>(std::istream& in, DelimiterIO&& d) {
+        char c;
+        in >> std::ws >> c;
+        if (!in || c != d.expected) {
             in.setstate(std::ios::failbit);
-            return in;
         }
-
-        std::istringstream iss(token);
-        iss >> std::scientific >> value;
-
-        if (!iss || !iss.eof()) {
-            in.setstate(std::ios::failbit);
-            return in;
-        }
-
-        d.ref = value;
         return in;
     }
-
+    std::istream& operator>>(std::istream& in, LabelIO&& l) {
+        l.ref.clear();
+        char c;
+        while (in.get(c)) {
+            if (c == ' ' || c == ':') {
+                in.unget();
+                break;
+            }
+            l.ref += c;
+        }
+        if (l.ref.empty()) {
+            in.setstate(std::ios::failbit);
+        }
+        return in;
+    }
+    std::istream& operator>>(std::istream& in, DoubleIO&& d) {
+        std::string numStr;
+        char c;
+        bool hasDigit = false;
+        if (in.peek() == '+' || in.peek() == '-') {
+            in.get(c);
+            numStr += c;
+        }
+        while (in.get(c)) {
+            if (isdigit(c)) {
+                numStr += c;
+                hasDigit = true;
+            }
+            else if (c == '.' || c == 'e' || c == 'E') {
+                numStr += c;
+            }
+            else {
+                in.unget();
+                break;
+            }
+        }
+        if (!hasDigit && numStr.length() <= (bool)(numStr.find('+') != std::string::npos || numStr.find('-') != std::string::npos)) {
+            in.setstate(std::ios::failbit);
+            return in;
+        }
+        try {
+            size_t pos = 0;
+            d.ref = std::stod(numStr, &pos);
+            if (pos != numStr.length()) {
+                 in.setstate(std::ios::failbit);
+            }
+        } catch (...) {
+            in.setstate(std::ios::failbit);
+        }
+        return in;
+    }
     std::istream& operator>>(std::istream& in, HexUllIO&& h) {
-        in >> std::hex >> h.ref >> std::dec;
-        if (!in) {
+        std::string numStr;
+        char c;
+        in >> std::ws;
+        char first_char = in.peek();
+        if (first_char == '0') {
+            in.get(c);
+            numStr += c;
+            char next = in.peek();
+            if (next == 'x' || next == 'X' || next == 'b' || next == 'B') {
+                in.get(c);
+                numStr += c;
+            }
+        } else if (isdigit(first_char)) {
+            in.get(c);
+            numStr += c;
+        } else {
+            in.setstate(std::ios::failbit);
+            return in;
+        }
+
+        while (in.get(c)) {
+            if (isxdigit(c)) {
+                numStr += c;
+            } else {
+                in.unget();
+                break;
+            }
+        }
+
+        if (numStr.empty()) {
+             in.setstate(std::ios::failbit);
+             return in;
+        }
+
+        try {
+            size_t pos = 0;
+            h.ref = std::stoull(numStr, &pos, 0);
+            if (pos != numStr.length()) {
+                in.setstate(std::ios::failbit);
+            }
+        } catch (...) {
             in.setstate(std::ios::failbit);
         }
         return in;
     }
-
     std::istream& operator>>(std::istream& in, StringIO&& s) {
-        std::string str;
-        if (!(in >> std::ws) || in.get() != '"') {
+        in >> std::ws;
+        char quote;
+        in.get(quote);
+        if (quote != '"') {
             in.setstate(std::ios::failbit);
             return in;
         }
-
-        std::getline(in, str, '"');
-        if (!in) {
-            in.setstate(std::ios::failbit);
-            return in;
-        }
-
-        s.ref = str;
+        std::getline(in, s.ref, '"');
         return in;
     }
-
-    std::ostream& operator<<(std::ostream& out, const DoubleSciIO& d) {
-        std::ios::fmtflags f(out.flags());
-        out << std::scientific << std::setprecision(6) << d.ref;
-        out.flags(f);
-        return out;
-    }
-
-    std::ostream& operator<<(std::ostream& out, const HexUllIO& h) {
-        std::ios::fmtflags f(out.flags());
-        out << std::uppercase << std::hex << "0x" << h.ref;
-        out.flags(f);
-        return out;
-    }
-
-    std::ostream& operator<<(std::ostream& out, const StringIO& s) {
-        out << '"' << s.ref << '"';
-        return out;
+    std::istream& operator>>(std::istream& in, Key1IO&& k) {
+        in >> std::ws;
+        char c = in.peek();
+        if (c == '"' || c == '\'' || c == '#' || c == '(') {
+            in.setstate(std::ios::failbit);
+            return in;
+        }
+        return in >> solution::DoubleIO{k.ref};
     }
 }
