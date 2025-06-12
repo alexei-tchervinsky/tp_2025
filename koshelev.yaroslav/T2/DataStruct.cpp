@@ -2,6 +2,7 @@
 #include "IO_Objects.hpp"
 #include <iomanip>
 #include <sstream>
+#include "iofmtguard.hpp"
 
 namespace solution {
     bool DataStruct::operator<(const DataStruct& other) const {
