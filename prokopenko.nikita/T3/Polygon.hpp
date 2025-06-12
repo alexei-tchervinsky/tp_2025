@@ -1,23 +1,21 @@
-#ifndef PROKOPENKO_POLYGON_HPP
-#define PROKOPENKO_POLYGON_HPP
-
-#include <iostream>
+#pragma once
 #include <vector>
+#include <iostream>
 
 namespace prokopenko {
 
   struct Point {
-    int x = 0, y = 0;
+    int x, y;
   };
 
   struct Polygon {
     std::vector<Point> points;
   };
 
-  double getArea(const Polygon& p);
   std::istream& operator>>(std::istream& in, Point& p);
-  std::istream& operator>>(std::istream& in, Polygon& p);
+  std::ostream& operator<<(std::ostream& out, const Point& p);
+  std::istream& operator>>(std::istream& in, Polygon& poly);
+  std::ostream& operator<<(std::ostream& out, const Polygon& poly);
+  double getArea(const Polygon& poly);
 
 }
-
-#endif

@@ -1,21 +1,23 @@
-#ifndef IOFMTGUARD_HPP
-#define IOFMTGUARD_HPP
-
+#pragma once
 #include <iostream>
+#include <iomanip>
 
 namespace prokopenko {
 
   class iofmtguard {
   public:
-    iofmtguard(std::basic_ios<char>& stream);
-    ~iofmtguard();
+    iofmtguard(std::ios& s)
+      : s_(s), flags_(s.flags()), precision_(s.precision()) {
+    }
+    ~iofmtguard() {
+      s_.flags(flags_);
+      s_.precision(precision_);
+    }
+
   private:
-    std::basic_ios<char>& stream_;
-    char fill_;
+    std::ios& s_;
+    std::ios::fmtflags flags_;
     std::streamsize precision_;
-    std::basic_ios<char>::fmtflags flags_;
   };
 
 }
-
-#endif

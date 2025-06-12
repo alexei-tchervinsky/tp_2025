@@ -1,13 +1,9 @@
-#ifndef PROKOPENKO_COMMANDS_HPP
-#define PROKOPENKO_COMMANDS_HPP
-
-#include <iostream>
+#pragma once
+#include "Polygon.hpp"
 #include <string>
 #include <vector>
-#include "Polygon.hpp"
+#include <iostream>
 
 namespace prokopenko {
-  void doCommand(const std::string& command, std::vector<Polygon>& data, std::istream& in);
+  bool doCommand(const std::string& command, std::vector<Polygon>& data, std::istream& in);
 }
-
-#endif

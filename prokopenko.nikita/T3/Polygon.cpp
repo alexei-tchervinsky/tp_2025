@@ -1,46 +1,73 @@
 #include "Polygon.hpp"
 #include <cmath>
+#include <limits>
 
 namespace prokopenko {
 
-  double getArea(const Polygon& p) {
-    double area = 0.0;
-    int n = static_cast<int>(p.points.size());
-    for (int i = 0; i < n; ++i) {
-      const Point& a = p.points[i];
-      const Point& b = p.points[(i + 1) % n];
-      area += (a.x * b.y - b.x * a.y);
-    }
-    return std::abs(area) / 2.0;
-  }
-
   std::istream& operator>>(std::istream& in, Point& p) {
-    char c1, c2, c3;
-    in >> c1 >> p.x >> c2 >> p.y >> c3;
-    if (c1 != '(' || c2 != ';' || c3 != ')') {
+    char ch;
+    in >> ch;
+    if (ch != '(') {
       in.setstate(std::ios::failbit);
+      return in;
+    }
+    in >> p.x >> ch;
+    if (ch != ';') {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    in >> p.y >> ch;
+    if (ch != ')') {
+      in.setstate(std::ios::failbit);
+      return in;
     }
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, Polygon& p) {
-    int n;
-    if (!(in >> n) || n < 3) {
+  std::ostream& operator<<(std::ostream& out, const Point& p) {
+    return out << '(' << p.x << ';' << p.y << ')';
+  }
+
+  std::istream& operator>>(std::istream& in, Polygon& poly) {
+    size_t count;
+    if (!(in >> count)) {
       in.setstate(std::ios::failbit);
       return in;
     }
 
-    p.points.clear();
-    for (int i = 0; i < n; ++i) {
-      Point pt;
-      if (!(in >> pt)) {
+    poly.points.clear();
+    for (size_t i = 0; i < count; ++i) {
+      Point p;
+      if (!(in >> p)) {
         in.setstate(std::ios::failbit);
         return in;
       }
-      p.points.push_back(pt);
+      poly.points.push_back(p);
     }
 
     return in;
+  }
+
+  std::ostream& operator<<(std::ostream& out, const Polygon& poly) {
+    out << poly.points.size();
+    for (const auto& p : poly.points) {
+      out << ' ' << p;
+    }
+    return out;
+  }
+
+  double getArea(const Polygon& poly) {
+    double area = 0.0;
+    const auto& pts = poly.points;
+    size_t n = pts.size();
+
+    for (size_t i = 0; i < n; ++i) {
+      const Point& p1 = pts[i];
+      const Point& p2 = pts[(i + 1) % n];
+      area += (p1.x * p2.y) - (p2.x * p1.y);
+    }
+
+    return std::abs(area) / 2.0;
   }
 
 }
