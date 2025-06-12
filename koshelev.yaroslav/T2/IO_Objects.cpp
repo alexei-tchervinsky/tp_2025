@@ -1,54 +1,65 @@
-#include "IO_Objects.hpp"
-#include <iterator>
-#include <algorithm>
+#include "IO_Objects.h"
+#include <sstream>
+#include <iomanip>
 #include <cctype>
 
-namespace nspace {
-    std::istream& operator>>(std::istream& is, DelimiterIO&& dlim) {
-        char c;
-        if (is >> c && c != dlim.exp) {
-            is.setstate(std::ios::failbit);
-        }
-        return is;
+namespace solution {
+
+  std::istream& operator>>(std::istream& in, DelimiterIO&& d) {
+    char ch;
+    in >> std::ws >> ch;
+    if (!in || ch != d.expected) {
+      in.setstate(std::ios::failbit);
     }
+    return in;
+  }
 
-    std::istream& operator>>(std::istream& is, LabelIO&& l) {
-        std::string temp;
-        temp.reserve(l.label.size());
-
-        for (size_t i = 0; i < l.label.size(); ++i) {
-            char c = '\0';
-            if (is.get(c)) {
-                temp.push_back(c);
-            } else {
-                is.setstate(std::ios::failbit);
-                return is;
-            }
-        }
-
-        if (temp != l.label) {
-            is.setstate(std::ios::failbit);
-        }
-        return is;
+  std::istream& operator>>(std::istream& in, LabelIO&& l) {
+    char ch;
+    std::string result;
+    while (in.get(ch)) {
+      if (ch == ' ') break;
+      result += ch;
     }
+    if (in) l.ref = result;
+    else in.setstate(std::ios::failbit);
+    return in;
+  }
 
-    std::istream& operator>>(std::istream& is, ULLHexIO&& ullhex) {
-        char c1 = '\0', c2 = '\0';
-        is >> c1 >> c2;
-        if (!is || c1 != '0' || (c2 != 'x' && c2 != 'X')) {
-            is.setstate(std::ios::failbit);
-        } else {
-            is >> std::hex >> ullhex.ref >> std::dec;
-        }
-        return is;
+  std::istream& operator>>(std::istream& in, DoubleSciIO&& d) {
+    in >> std::ws;
+    double value;
+    in >> value;
+    if (in) {
+      d.ref = value;
+    } else {
+      in.setstate(std::ios::failbit);
     }
+    return in;
+  }
 
-    std::istream& operator>>(std::istream& is, DoubleSciIO&& dsci) {
-        is >> dsci.ref;
-        return is;
+  std::istream& operator>>(std::istream& in, ULLHexIO&& d) {
+    std::string prefix;
+    in >> prefix;
+    if (prefix.size() < 3 || (prefix[0] != '0') || (prefix[1] != 'x' && prefix[1] != 'X')) {
+      in.setstate(std::ios::failbit);
+      return in;
     }
+    std::stringstream hexStream(prefix);
+    hexStream >> std::hex >> d.ref;
+    if (!hexStream) in.setstate(std::ios::failbit);
+    return in;
+  }
 
-    std::istream& operator>>(std::istream& is, StringIO&& s) {
-        return std::getline(is >> DelimiterIO{'\"'}, s.ref, '\"');
+  std::istream& operator>>(std::istream& in, StringIO&& s) {
+    char quote;
+    in >> std::ws >> quote;
+    if (quote != '"') {
+      in.setstate(std::ios::failbit);
+      return in;
     }
+    std::getline(in, s.ref, '"');
+    return in;
+  }
+
 }
