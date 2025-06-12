@@ -1,7 +1,7 @@
 #ifndef IOFMTGUARD_H
 #define IOFMTGUARD_H
 
-#include <iostream>
+#include <ios>
 
 namespace solution {
 
