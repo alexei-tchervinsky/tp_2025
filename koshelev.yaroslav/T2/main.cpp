@@ -1,28 +1,18 @@
-#include "DataStruct.h"
-#include "IO_Objects.h"
+#include <iostream>
 #include <vector>
 #include <algorithm>
-#include <limits>
-#include <iostream>
+#include <iterator>
+#include "DataStruct.h"
 
 int main() {
-    std::vector<DataStruct> data;
-    DataStruct temp;
-
-    while (std::cin >> temp) {
-        if (std::cin.fail()) {
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            continue;
-        }
-        data.push_back(temp);
-    }
-
-    std::sort(data.begin(), data.end(), compareDataStruct);
-
-    for (const auto& item : data) {
-        std::cout << item << '\n';
-    }
-
+    std::vector<solution::DataStruct> data;
+    std::istream_iterator<solution::DataStruct> inputIt(std::cin), eos;
+    std::copy_if(inputIt, eos, std::back_inserter(data), [](const solution::DataStruct&) {
+        return !std::cin.fail();
+    });
+    std::cin.clear();
+    std::sort(data.begin(), data.end());
+    std::ostream_iterator<solution::DataStruct> outputIt(std::cout, "\n");
+    std::copy(data.begin(), data.end(), outputIt);
     return 0;
 }
