@@ -1,58 +1,65 @@
 #include <iostream>
 #include <map>
+#include <vector>
+#include <fstream>
+#include <string>
+#include <limits>
 #include <functional>
-#include "polygon.hpp"
+#include <iterator>
+#include "commands.hpp"
 
-namespace prokopenko
+using namespace prokopenko;
+
+int main(int argc, char* argv[])
 {
-  double area_param(const std::vector<Polygon>, std::istream&, std::ostream&);
-  double max_param(const std::vector<Polygon>, std::istream&, std::ostream&);
-  double min_param(const std::vector<Polygon>, std::istream&, std::ostream&);
-  size_t count_param(const std::vector<Polygon>, std::istream&, std::ostream&);
-  std::vector<Polygon> rects_param(const std::vector<Polygon>, std::istream&, std::ostream&);
-  size_t maxseq_param(const std::vector<Polygon>, std::istream&, std::ostream&);
-}
-
-int main()
-{
-  using namespace prokopenko;
-
-  std::vector<Polygon> data;
-  Polygon polygon;
-
-  while (std::cin >> polygon)
+  if (argc != 2)
   {
-    data.push_back(polygon);
-  }
-
-  if (!std::cin.eof())
-  {
-    std::cerr << "Error while reading input\n";
+    std::cerr << "Error: wrong input\n";
     return 1;
   }
 
-  std::map<std::string, std::function<void(const std::vector<Polygon>, std::istream&, std::ostream&)>> commands{
-    {"AREA", prokopenko::area_param},
-    {"MAX", prokopenko::max_param},
-    {"MIN", prokopenko::min_param},
-    {"COUNT", prokopenko::count_param},
-    {"RECTS", prokopenko::rects_param},
-    {"MAXSEQ", prokopenko::maxseq_param}
-  };
-
-  std::string command;
-  while (std::cin >> command)
+  std::ifstream input(argv[1]);
+  std::vector<Polygon> polygons;
+  while (!input.eof())
   {
-    auto it = commands.find(command);
-    if (it != commands.end())
+    std::copy(
+      std::istream_iterator<Polygon>{input},
+      std::istream_iterator<Polygon>{},
+      std::back_inserter(polygons));
+    if (input.fail())
     {
-      it->second(data, std::cin, std::cout);
-    }
-    else
-    {
-      std::cerr << "<INVALID COMMAND>\n";
+      input.clear();
+      input.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
   }
 
+  std::map<std::string, std::function<void(
+    std::vector<Polygon>& polygons,
+    std::ostream& out,
+    std::istream& in)>> commands;
+  {
+    using namespace std::placeholders;
+    commands["AREA"] = std::bind(prokopenko::Area, _1, _2, _3);
+    commands["MAX"] = std::bind(prokopenko::Max, _1, _2, _3);
+    commands["MIN"] = std::bind(prokopenko::Min, _1, _2, _3);
+    commands["COUNT"] = std::bind(prokopenko::Count, _1, _2, _3);
+    commands["PERMS"] = std::bind(prokopenko::Perms, _1, _2, _3);
+    commands["RIGHTSHAPES"] = std::bind(prokopenko::Rightshapes, _1, _2);
+  }
+
+  auto outInvalid = std::bind(outMessage, std::placeholders::_1, "<INVALID COMMAND>\n");
+  std::string parameter;
+  while (std::cin >> parameter)
+  {
+    try
+    {
+      commands.at(parameter)(polygons, std::cout, std::cin);
+    }
+    catch (const std::out_of_range& ex)
+    {
+      outInvalid(std::cout);
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+  }
   return 0;
 }
