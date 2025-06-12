@@ -10,7 +10,6 @@
 #include "commands.hpp"
 #include "iofmtguard.hpp"
 
-
 using namespace nspace;
 
 using CommandHandler = std::function<void(const std::vector<Polygon>&)>;
@@ -47,172 +46,90 @@ int main(int argc, char* argv[])
         {
             continue;
         }
-        file.clear();  // Очищаем состояние ошибки
-        file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // Игнорируем оставшийся ввод
+        file.clear();
+        file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
 #endif // ALEXEIT
 
-    if (polygons.empty())
-    {
-        LOG("Warning: No polygons loaded from file\n")
-    }
-
     std::map<std::string, CommandHandler> commands;
 
-    commands["AREA"] = [](const std::vector<Polygon>& polygons) {
+    commands["AREA"] = [](const std::vector<Polygon>& polygons)
+    {
         std::string param;
         std::cin >> param;
         area(polygons, param);
     };
 
-    commands["MAX"] = [](const std::vector<Polygon>& polygons) {
+    commands["MAX"] = [](const std::vector<Polygon>& polygons)
+    {
         std::string param;
         std::cin >> param;
         max(polygons, param);
     };
 
-    commands["MIN"] = [](const std::vector<Polygon>& polygons) {
+    commands["MIN"] = [](const std::vector<Polygon>& polygons)
+    {
         std::string param;
         std::cin >> param;
-        min(polygons, param);
+        max(polygons, param);
     };
 
-    commands["COUNT"] = [](const std::vector<Polygon>& polygons) {
+    commands["COUNT"] = [](const std::vector<Polygon>& polygons)
+    {
         std::string param;
         std::cin >> param;
         count(polygons, param);
     };
 
-    commands["ECHO"] = [&polygons, argv](const std::vector<Polygon>&) {
+    commands["ECHO"] = [&polygons, argv](const std::vector<Polygon>&)
+    {
         Polygon target;
         std::cin >> target;
         echo(polygons, target, argv[1]);
     };
 
-    commands["MAXSEQ"] = [](const std::vector<Polygon>& polygons) {
+    commands["MAXSEQ"] = [](const std::vector<Polygon>& polygons)
+    {
         Polygon target;
         std::cin >> target;
-#ifdef ALEXEIT
         if (std::cin.fail())
         {
-#if 1
-            std::cin.clear();  // Очищаем состояние ошибки
-            // std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // Игнорируем оставшийся ввод
-            std::cout << INV_CMD;
-            return;
+            std::cin.clear();
+            std::cout << "<INVALID COMMAND>\n";
+            throw std::invalid_argument("<INVALID COMMAND>");
         }
-#endif
-            // throw std::invalid_argument(INV_CMD);
-            // throw std::invalid_argument("<INVALID COMMAND>");
-#else
-                    throw std::invalid_argument("<INVALID COMMAND>");
-        }
-#endif // ALEXEIT
         maxSeq(polygons, target);
     };
+
 
     std::string cmd;
     while (std::cin >> cmd)
     {
-        LOG(cmd)
         try
         {
             auto it = commands.find(cmd);
             if (it != commands.end())
             {
-                it->second(polygons);
+                it -> second(polygons);
             }
             else
             {
-                throw std::invalid_argument("<INVALID COMMAND 0>");
-            }
-        }
-        catch (const std::invalid_argument& e)
-        {
-            std::cout << e.what() << '\n';
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        }
-    }
-
-#if 0
-    std::string cmd;
-    while (std::cin >> cmd)
-    {
-        try
-        {
-            if (cmd == "AREA")
-            {
-                std::string param;
-                std::cin >> param;
-                area(polygons, param);
-            }
-            else if (cmd == "MAX")
-            {
-                std::string param;
-                std::cin >> param;
-                max(polygons, param);
-            }
-            else if (cmd == "MIN")
-            {
-                std::string param;
-                std::cin >> param;
-                min(polygons, param);
-            }
-            else if (cmd == "COUNT")
-            {
-                std::string param;
-                std::cin >> param;
-                count(polygons, param);
-            }
-            else if (cmd == "ECHO")
-            {
-                Polygon target;
-                std::cin >> target;
-                echo(polygons, target, argv[1]);
-            }
-            else if (cmd == "MAXSEQ")
-            {
-
-                LOG("MAXSEQ")
-                Polygon target;
-                std::cin >> target;
-
-                if (std::cin.fail())
-                {
-#ifdef ALEXEIT
-#if 1
-                std::cin.clear();  // Очищаем состояние ошибки
-                // std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // Игнорируем оставшийся ввод
-                std::cout << INV_CMD;
-                continue;
-#endif
-                throw std::invalid_argument(INV_CMD);
-#else
-                    throw std::invalid_argument("<INVALID COMMAND>");
-#endif // ALEXEIT
-                }
-
-                maxSeq(polygons, target);
-            }
-            else
-            {
-                throw std::invalid_argument(INV_CMD);
+                throw std::invalid_argument("<INVALID COMMAND>\n");
             }
         }
         catch (const std::invalid_argument& e)
         {
             std::cout << e.what();  // Выводим ошибку один раз
             std::cin.clear();  // Очищаем состояние ошибки
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // Игнорируем оставшийся ввод
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
         catch (const std::logic_error& e)
         {
-            std::cout << e.what();  // Выводим ошибку один раз
+            std::cout << e.what() << std::endl;  // Выводим ошибку один раз
             std::cin.clear();  // Очищаем состояние ошибки
-            // std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // Игнорируем оставшийся ввод
+            // std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
     }
-#endif
+
     return 0;
 }

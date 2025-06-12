@@ -58,8 +58,7 @@ namespace nspace
 #ifdef ALEXEIT
             if (num < 3)
             {
-                throw std::invalid_argument("<INVALID COMMAND>");
-                // throw std::invalid_argument(INV_CMD);
+                throw std::invalid_argument(INV_CMD);
             }
 #endif
             auto pred = [num](const nspace::Polygon& p) { return p.points.size() == num; };
@@ -207,30 +206,25 @@ void echo(std::vector<Polygon>& polygons, const Polygon& target, const std::stri
 
     void maxSeq(const std::vector<Polygon>& polygons, const Polygon& target)
     {
-#if 0
         if (std::cin.fail())
         {
             std::cout << INV_CMD;
             return;
         }
-#endif
+
         if (polygons.empty() || target.points.size() < 3)
         {
 #if 0
             throw std::invalid_argument("exception 1");
 #else
-            throw std::invalid_argument("<INVALID COMMAND 1>");
+            throw std::invalid_argument(INV_CMD);
 #endif
         }
 
         if (std::adjacent_find(target.points.begin(), target.points.end()) != target.points.end())
         {
-#if 1
-            throw std::invalid_argument("<INVALID COMMAND 2>");
-#else
             std::cout << INV_CMD;
             return;
-#endif
         }
 
         std::vector<bool> matches;
@@ -255,7 +249,7 @@ void echo(std::vector<Polygon>& polygons, const Polygon& target, const std::stri
 #if 0
             throw std::invalid_argument("exception 2");
 #else
-            throw std::invalid_argument("<INVALID COMMAND 3>");
+            throw std::invalid_argument(INV_CMD);
 #endif
         }
 

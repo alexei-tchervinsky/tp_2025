@@ -150,8 +150,8 @@ namespace nspace
         {
             LOG("** ошибка std::copy_n **\n")
 #ifdef ALEXEIT
-            std::cin.clear();  // Очищаем состояние ошибки
-// std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');// Игнорируем оставшийся ввод
+            std::cin.clear();
+// std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 #endif // ALEXEIT
             return in;
         }

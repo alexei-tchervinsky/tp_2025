@@ -5,7 +5,7 @@
 
 #define ALEXEIT
 
-#define DO_LOG
+// #define DO_LOG
 
 #ifdef DO_LOG
 #define LOG(s) \
