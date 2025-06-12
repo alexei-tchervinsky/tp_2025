@@ -1,18 +1,21 @@
-#ifndef DATA_STRUCT_HPP
-#define DATA_STRUCT_HPP
+#ifndef DATA_STRUCT_H
+#define DATA_STRUCT_H
 
 #include <string>
+#include <iostream>
 
-namespace nspace {
+namespace solution {
+
     struct DataStruct {
-        unsigned long long key1; // ULL HEX
-        double key2; // DBL SCI
+        double key1;
+        unsigned long long key2;
         std::string key3;
 
-        friend std::istream& operator>>(std::istream&, DataStruct&);
-        friend std::ostream& operator<<(std::ostream&, const DataStruct&);
+        bool operator<(const DataStruct& other) const;
     };
-    bool compare(const DataStruct&, const DataStruct&);
+
+    std::istream& operator>>(std::istream& in, DataStruct& data);
+    std::ostream& operator<<(std::ostream& out, const DataStruct& data);
 }
 
 #endif
