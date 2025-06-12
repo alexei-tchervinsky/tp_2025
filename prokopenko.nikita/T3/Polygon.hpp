@@ -1,4 +1,6 @@
-#pragma once
+#ifndef POLYGON_HPP
+#define POLYGON_HPP
+
 #include <vector>
 #include <iostream>
 
@@ -19,3 +21,5 @@ namespace prokopenko {
   double getArea(const Polygon& poly);
 
 }
+
+#endif
