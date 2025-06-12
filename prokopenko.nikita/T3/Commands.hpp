@@ -13,6 +13,7 @@ namespace prokopenko {
   void minCommand(const std::vector<Polygon>&, std::istream&);
   void echoCommand(std::vector<Polygon>&, std::istream&);
   void rightShapesCommand(const std::vector<Polygon>&, std::istream&);
+  void doCommand(const std::string&, std::vector<Polygon>&, std::istream&);
 
 }
 

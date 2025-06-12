@@ -4,12 +4,12 @@
 
 namespace prokopenko {
 
-  bool Point::operator==(const Point& other) const {
-    return x == other.x && y == other.y;
+  bool Point::operator==(const Point& o) const {
+    return x == o.x && y == o.y;
   }
 
-  bool Polygon::operator==(const Polygon& other) const {
-    return points == other.points;
+  bool Polygon::operator==(const Polygon& o) const {
+    return points == o.points;
   }
 
   std::istream& operator>>(std::istream& in, Point& pt) {
@@ -29,13 +29,14 @@ namespace prokopenko {
   std::istream& operator>>(std::istream& in, Polygon& pg) {
     std::istream::sentry s(in);
     if (!s) return in;
-    size_t n = 0;
+    size_t n;
     in >> n;
     if (!in || n < 3) {
       in.setstate(std::ios::failbit);
       return in;
     }
     std::vector<Point> tmp;
+    tmp.reserve(n);
     for (size_t i = 0; i < n; ++i) {
       Point p;
       if (!(in >> p)) {
@@ -50,15 +51,14 @@ namespace prokopenko {
 
   double getArea(const Polygon& pg) {
     const auto& v = pg.points;
-    double sum = std::abs(std::accumulate(
-      v.begin(), v.end(), 0.0,
-      [&v](double acc, const Point& p) {
-        size_t i = (&p - &v[0]);
-        const Point& q = v[(i + 1) % v.size()];
-        return acc + p.x * q.y - q.x * p.y;
-      }
-    )) / 2.0;
-    return sum;
+    size_t n = v.size();
+    double sum = 0;
+    for (size_t i = 0; i < n; ++i) {
+      const auto& a = v[i];
+      const auto& b = v[(i + 1) % n];
+      sum += a.x * b.y - b.x * a.y;
+    }
+    return fabs(sum) / 2.0;
   }
 
   bool hasRightAngle(const Polygon& pg) {
