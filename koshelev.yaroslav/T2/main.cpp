@@ -2,17 +2,27 @@
 #include <vector>
 #include <algorithm>
 #include <iterator>
-#include "DataStruct.h"
+#include "iofmtguard.hpp"
+#include "DataStruct.hpp"
 
 int main() {
-    std::vector<solution::DataStruct> data;
-    std::istream_iterator<solution::DataStruct> inputIt(std::cin), eos;
-    std::copy_if(inputIt, eos, std::back_inserter(data), [](const solution::DataStruct&) {
-        return !std::cin.fail();
-    });
-    std::cin.clear();
+    using namespace solution;
+
+    std::vector<DataStruct> data;
+    std::istream_iterator<DataStruct> inputIt(std::cin);
+    std::istream_iterator<DataStruct> eos;
+
+    std::copy(inputIt, eos, std::back_inserter(data));
+
+    if (data.empty()) {
+        std::cout << "Looks like there is no supported record. Cannot determine input. Test skipped\n";
+        return 0;
+    }
+
     std::sort(data.begin(), data.end());
-    std::ostream_iterator<solution::DataStruct> outputIt(std::cout, "\n");
+
+    std::ostream_iterator<DataStruct> outputIt(std::cout, "\n");
     std::copy(data.begin(), data.end(), outputIt);
+
     return 0;
 }
