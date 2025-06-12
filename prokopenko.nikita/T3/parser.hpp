@@ -1,10 +1,10 @@
 #pragma once
 #include "polygon.hpp"
-#include <string>
 #include <vector>
+#include <istream>
 
 namespace prokopenko {
 
-  void executeCommand(const std::string& line, std::vector<Polygon>& polygons);
+  std::vector<Polygon> parseFile(std::istream& input);
 
 } // namespace prokopenko
