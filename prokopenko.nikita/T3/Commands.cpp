@@ -1,130 +1,66 @@
 #include "Commands.hpp"
+#include "Polygon.hpp"
 #include "iofmtguard.hpp"
-#include <iostream>
-#include <iomanip>
 #include <algorithm>
+#include <iomanip>
+#include <iostream>
+#include <limits>
 #include <numeric>
-#include <cmath>
-#include <iterator>
-#include <sstream>
 
 namespace prokopenko {
 
-  double getArea(const Polygon& p) {
-    double area = 0.0;
-    for (size_t i = 0; i < p.points.size(); ++i) {
-      const Point& a = p.points[i];
-      const Point& b = p.points[(i + 1) % p.points.size()];
-      area += (a.x * b.y - b.x * a.y);
-    }
-    return std::abs(area) / 2.0;
+  using namespace std;
+
+  std::istream& operator>>(std::istream& in, Point& p) {
+    char c;
+    in >> c >> p.x >> c >> p.y >> c;
+    return in;
   }
 
-  bool parsePolygon(const std::string& line, Polygon& poly) {
-    std::istringstream iss(line);
-    std::string dummy;
-    int count;
-    if (!(iss >> dummy >> count)) return false;
-    if (count < 3) return false;
-
-    Polygon p;
-    for (int i = 0; i < count; ++i) {
-      char ch;
-      Point pt;
-      if (!(iss >> ch) || ch != '(') return false;
-      if (!(iss >> pt.x)) return false;
-      if (!(iss >> ch) || ch != ';') return false;
-      if (!(iss >> pt.y)) return false;
-      if (!(iss >> ch) || ch != ')') return false;
-      p.points.push_back(pt);
+  Polygon parsePolygon(std::istream& in) {
+    int n;
+    in >> n;
+    Polygon poly;
+    poly.points.reserve(n);
+    for (int i = 0; i < n; ++i) {
+      Point p;
+      in >> p;
+      poly.points.push_back(p);
     }
-    if (static_cast<int>(p.points.size()) != count) return false;
-    poly = p;
-    return true;
+    return poly;
   }
 
-  void doCommand(const std::string& cmd, std::vector<Polygon>& polygons, std::istream& in) {
-    if (cmd == "COUNT") {
-      std::string arg;
-      if (!(in >> arg)) {
-        std::cout << "<INVALID COMMAND>\n";
-        return;
-      }
-
-      if (arg == "EVEN" || arg == "ODD") {
-        int parity = (arg == "EVEN") ? 0 : 1;
-        int count = std::count_if(polygons.begin(), polygons.end(), [parity](const Polygon& p) {
-          return static_cast<int>(p.points.size()) % 2 == parity;
-          });
-        std::cout << count << '\n';
-      }
-      else {
-        try {
-          int n = std::stoi(arg);
-          int count = std::count_if(polygons.begin(), polygons.end(), [n](const Polygon& p) {
-            return static_cast<int>(p.points.size()) == n;
-            });
-          std::cout << count << '\n';
-        }
-        catch (...) {
-          std::cout << "<INVALID COMMAND>\n";
-        }
-      }
+  void doCommand(const std::string& command, std::vector<Polygon>& data, std::istream& in) {
+    if (command == "ECHO") {
+      Polygon p = parsePolygon(in);
+      data.push_back(p);
     }
-    else if (cmd == "AREA") {
-      std::string arg;
-      if (!(in >> arg)) {
-        std::cout << "<INVALID COMMAND>\n";
-        return;
-      }
-
-      if (arg == "EVEN" || arg == "ODD") {
-        int parity = (arg == "EVEN") ? 0 : 1;
-        double total = 0.0;
-        for (const auto& p : polygons) {
-          if (static_cast<int>(p.points.size()) % 2 == parity) {
-            total += getArea(p);
-          }
-        }
-        std::cout << std::fixed << std::setprecision(1) << total << '\n';
-      }
-      else {
-        try {
-          int n = std::stoi(arg);
-          double total = 0.0;
-          for (const auto& p : polygons) {
-            if (static_cast<int>(p.points.size()) == n) {
-              total += getArea(p);
-            }
-          }
-          std::cout << std::fixed << std::setprecision(1) << total << '\n';
-        }
-        catch (...) {
-          std::cout << "<INVALID COMMAND>\n";
-        }
-      }
+    else if (command == "COUNT") {
+      int n;
+      in >> n;
+      int count = std::count_if(data.begin(), data.end(), [n](const Polygon& p) {
+        return static_cast<int>(p.points.size()) == n;
+        });
+      std::cout << count << '\n';
     }
-    else if (cmd == "ECHO") {
-      std::string line;
-      std::getline(in, line);
-      if (line.empty()) {
-        std::cout << "<INVALID COMMAND>\n";
-        return;
-      }
-      Polygon p;
-      if (parsePolygon("ECHO" + line, p)) {
-        if (p.points.size() >= 3) {
-          polygons.push_back(p);
-        }
-        else {
-          std::cout << "<INVALID COMMAND>\n";
-        }
-      }
-      else {
-        std::cout << "<INVALID COMMAND>\n";
-      }
+    else if (command == "COUNT ODD" || command == "COUNT EVEN") {
+      int parity = (command == "COUNT ODD") ? 1 : 0;
+      int count = std::count_if(data.begin(), data.end(), [parity](const Polygon& p) {
+        return static_cast<int>(p.points.size()) % 2 == parity;
+        });
+      std::cout << count << '\n';
     }
-    else {
+    else if (command == "AREA ODD" || command == "AREA EVEN") {
+      int parity = (command == "AREA ODD") ? 1 : 0;
+      double sum = 0.0;
+      for (const Polygon& p : data) {
+        if (static_cast<int>(p.points.size()) % 2 == parity) {
+          sum += getArea(p);
+        }
+      }
+      std::cout << std::fixed << std::setprecision(1) << sum << '\n';
+    }
+    else if (command.rfind("AREA", 0) == 0 || command.rfind("COUNT", 0) == 0) {
       std::cout << "<INVALID COMMAND>\n";
     }
   }
