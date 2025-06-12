@@ -1,22 +1,22 @@
 #ifndef IOFMTGUARD_H
 #define IOFMTGUARD_H
 
-#include <ios>
+#include <iostream>
 
-namespace solution {
+namespace solution
+{
+  class iofmtguard
+  {
+  public:
+    explicit iofmtguard(std::basic_ios<char>& stream);
+    ~iofmtguard();
 
-    class iofmtguard {
-    public:
-        explicit iofmtguard(std::basic_ios<char>& stream);
-        ~iofmtguard();
-
-    private:
-        std::basic_ios<char>& stream_;
-        char fill_;
-        std::streamsize precision_;
-        std::ios::fmtflags flags_;
-    };
-
+  private:
+    std::basic_ios<char>& stream_;
+    char fill_;
+    std::streamsize precision_;
+    std::ios::fmtflags flags_;
+  };
 }
 
 #endif
