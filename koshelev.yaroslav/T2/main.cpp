@@ -26,6 +26,6 @@ int main() {
         for (const auto& entry : records) {
             std::cout << entry << '\n';
         }
-    } 
+    }
     return 0;
 }
