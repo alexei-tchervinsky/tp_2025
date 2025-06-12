@@ -41,6 +41,12 @@ namespace solution {
             }
             else if (c == '.' || c == 'e' || c == 'E') {
                 numStr += c;
+                if (c == 'e' || c == 'E') {
+                    if (in.peek() == '+' || in.peek() == '-') {
+                        in.get(c);
+                        numStr += c;
+                    }
+                }
             }
             else {
                 in.unget();
@@ -62,43 +68,40 @@ namespace solution {
         std::string numStr;
         char c;
         in >> std::ws;
-        char first_char = in.peek();
-        if (first_char == '0') {
+        if (in.peek() == '0') {
             in.get(c);
             numStr += c;
             char next = in.peek();
-            if (next == 'x' || next == 'X' || next == 'b' || next == 'B') {
+            if (next == 'x' || next == 'X') {
                 in.get(c);
                 numStr += c;
             }
-        } else if (isdigit(first_char)) {
-            in.get(c);
-            numStr += c;
-        } else {
+            else {
+                h.ref = 0;
+                return in;
+            }
+        }
+        else {
             in.setstate(std::ios::failbit);
             return in;
         }
-
+        bool hasDigit = false;
         while (in.get(c)) {
             if (isxdigit(c)) {
                 numStr += c;
-            } else {
+                hasDigit = true;
+            }
+            else {
                 in.unget();
                 break;
             }
         }
-
-        if (numStr.empty()) {
-             in.setstate(std::ios::failbit);
-             return in;
+        if (!hasDigit) {
+            in.setstate(std::ios::failbit);
+            return in;
         }
-
         try {
-            size_t pos = 0;
-            h.ref = std::stoull(numStr, &pos, 0);
-            if (pos != numStr.length()) {
-                in.setstate(std::ios::failbit);
-            }
+            h.ref = std::stoull(numStr, nullptr, 16);
         } catch (...) {
             in.setstate(std::ios::failbit);
         }

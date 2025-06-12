@@ -11,7 +11,7 @@ namespace solution {
             return key1 < other.key1;
         if (key2 != other.key2)
             return key2 < other.key2;
-        return key3 < other.key3;
+        return key3.size() < other.key3.size();
     }
     std::istream& operator>>(std::istream& in, DataStruct& value) {
         using Delim = DelimiterIO;
@@ -68,7 +68,7 @@ namespace solution {
     }
     std::ostream& operator<<(std::ostream& out, const DataStruct& value) {
         iofmtguard guard(out);
-        out << "(:key1 " << std::fixed << std::setprecision(1) << value.key1
+        out << "(:key1 " << std::scientific << std::uppercase << value.key1
             << ":key2 0x" << std::hex << std::uppercase << value.key2
             << std::dec << ":key3 \"" << value.key3 << "\":)";
         return out;

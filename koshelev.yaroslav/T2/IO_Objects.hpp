@@ -29,4 +29,3 @@ namespace solution {
     std::istream& operator>>(std::istream& in, Key1IO&& k);
 }
 #endif
-
