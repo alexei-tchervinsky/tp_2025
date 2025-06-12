@@ -240,7 +240,8 @@ namespace orlov
         return false;
     }
 
-    bool checkIntersection(Point p1, Point q1, Point p2, Point q2) {
+    bool checkIntersection(Point p1, Point q1, Point p2, Point q2)
+    {
         int o1 = orientation(p1, q1, p2);
         int o2 = orientation(p1, q1, q2);
         int o3 = orientation(p2, q2, p1);
@@ -257,7 +258,8 @@ namespace orlov
         return false;
     }
 
-    bool doPolygonsIntersect(const Polygon& poly1, const Polygon& poly2) {
+    bool doPolygonsIntersect(const Polygon& poly1, const Polygon& poly2)
+    {
         if (poly1.points.empty() || poly2.points.empty()) return false;
 
         for (std::size_t i = 0; i < poly1.points.size(); ++i)
@@ -277,7 +279,8 @@ namespace orlov
         return false;
     }
 
-    void checkIntersection(const std::vector<Polygon>& polygons, std::istream& is, std::ostream& os) {
+    void intersectPolygons(const std::vector<Polygon>& polygons, std::istream& is, std::ostream& os)
+    {
         Polygon target;
         is >> target;
 
