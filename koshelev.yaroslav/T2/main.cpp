@@ -1,23 +1,39 @@
-#include "DataStruct.h"
-#include "IO_Objects.h"
-#include "iofmtguard.h"
 #include <iostream>
 #include <vector>
+#include <algorithm>
+#include <limits>
+#include "DataStruct.h"
 
-int main() {
-    solution::iofmtguard guard(std::cout);
-    std::vector<solution::DataStruct> data;
+int main()
+{
+  std::vector<solution::DataStruct> records;
+  solution::DataStruct temp;
 
-    solution::readData(std::cin, data);
-
-    if (data.empty()) {
-        std::cout << "No valid data found.\n";
-        return 0;
+  while (!std::cin.eof())
+  {
+    if (std::cin >> temp)
+    {
+      records.push_back(temp);
     }
+    else
+    {
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+  }
 
-    solution::sortData(data);
-    solution::writeData(std::cout, data);
-
+  if (records.empty())
+  {
+    std::cout << "No valid data found.\n";
     return 0;
-}
+  }
 
+  std::sort(records.begin(), records.end());
+
+  for (const auto& entry : records)
+  {
+    std::cout << entry << '\n';
+  }
+
+  return 0;
+}
