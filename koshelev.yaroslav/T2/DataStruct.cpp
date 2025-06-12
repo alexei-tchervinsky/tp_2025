@@ -60,7 +60,9 @@ namespace solution {
 
             if (!in) break;
 
-            in >> Delim{':'};
+            if (in.peek() == ':') {
+                in >> Delim{':'};
+            }
         }
 
         if (!key1_set || !key2_set || !key3_set) {

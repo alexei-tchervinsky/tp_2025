@@ -32,10 +32,33 @@ namespace solution {
     std::istream& operator>>(std::istream& in, DoubleIO&& d) {
         std::string numStr;
         char c;
-        while (in.get(c) && (isdigit(c) || c == '.' || c == '-' || c == '+' || c == 'e' || c == 'E' || c == 'd')) {
-            if (c != 'd') numStr += c;
+        bool hasDigit = false;
+
+        // Handle optional sign
+        if (in.peek() == '+' || in.peek() == '-') {
+            in.get(c);
+            numStr += c;
         }
-        in.unget();
+
+        // Read the number
+        while (in.get(c)) {
+            if (isdigit(c)) {
+                numStr += c;
+                hasDigit = true;
+            }
+            else if (c == '.' || c == 'e' || c == 'E') {
+                numStr += c;
+            }
+            else {
+                in.unget();
+                break;
+            }
+        }
+
+        if (!hasDigit) {
+            in.setstate(std::ios::failbit);
+            return in;
+        }
 
         try {
             d.ref = std::stod(numStr);
@@ -48,16 +71,13 @@ namespace solution {
     std::istream& operator>>(std::istream& in, HexUllIO&& h) {
         std::string numStr;
         char c;
-        in >> c;
+        in >> std::ws >> c;
 
         if (c == '0') {
             numStr += c;
             char next = in.peek();
-            if (next == 'x' || next == 'X') {
-                in >> c;
-                numStr += c;
-            } else if (next == 'b' || next == 'B') {
-                in >> c;
+            if (next == 'x' || next == 'X' || next == 'b' || next == 'B') {
+                in.get(c);
                 numStr += c;
             }
         } else if (isdigit(c)) {
@@ -68,8 +88,7 @@ namespace solution {
         }
 
         while (in.get(c)) {
-            if (isxdigit(c) || c == 'u' || c == 'l' || c == 'L') {
-                if (isalpha(c)) continue;
+            if (isxdigit(c)) {
                 numStr += c;
             } else {
                 in.unget();
