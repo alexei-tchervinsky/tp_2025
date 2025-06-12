@@ -4,10 +4,8 @@
 #include <string>
 #include <iostream>
 
-namespace solution
-{
-    struct DataStruct
-    {
+namespace solution {
+    struct DataStruct {
         double key1;
         unsigned long long key2;
         std::string key3;

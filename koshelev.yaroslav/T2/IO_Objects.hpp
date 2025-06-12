@@ -4,30 +4,24 @@
 #include <string>
 #include <iostream>
 
-namespace solution
-{
-    struct DelimiterIO
-    {
+namespace solution {
+    struct DelimiterIO {
         char expected;
     };
 
-    struct LabelIO
-    {
+    struct LabelIO {
         std::string& ref;
     };
 
-    struct DoubleIO
-    {
+    struct DoubleIO {
         double& ref;
     };
 
-    struct HexUllIO
-    {
+    struct HexUllIO {
         unsigned long long& ref;
     };
 
-    struct StringIO
-    {
+    struct StringIO {
         std::string& ref;
     };
 
