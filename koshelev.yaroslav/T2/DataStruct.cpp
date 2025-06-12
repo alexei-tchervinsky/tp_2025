@@ -1,5 +1,5 @@
-#include "DataStruct.hpp"
-#include "iofmtguard.hpp"
+#include "DataStruct.h"
+#include "iofmtguard.h"
 #include <iomanip>
 #include <sstream>
 
