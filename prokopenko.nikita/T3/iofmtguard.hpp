@@ -16,6 +16,6 @@ namespace prokopenko {
     std::basic_ios<char>::fmtflags flags_;
   };
 
-}  // namespace prokopenko
+}
 
 #endif

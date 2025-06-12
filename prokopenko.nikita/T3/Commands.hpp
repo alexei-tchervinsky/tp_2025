@@ -2,7 +2,6 @@
 #define COMMANDS_HPP
 
 #include <vector>
-#include <string>
 #include <istream>
 #include "Polygon.hpp"
 
@@ -15,6 +14,6 @@ namespace prokopenko {
   void echoCommand(std::vector<Polygon>&, std::istream&);
   void rightShapesCommand(const std::vector<Polygon>&, std::istream&);
 
-}  // namespace prokopenko
+}
 
 #endif

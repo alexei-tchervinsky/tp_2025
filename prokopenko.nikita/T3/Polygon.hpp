@@ -18,10 +18,9 @@ namespace prokopenko {
 
   std::istream& operator>>(std::istream& in, Point& pt);
   std::istream& operator>>(std::istream& in, Polygon& pg);
-
   double getArea(const Polygon& pg);
   bool hasRightAngle(const Polygon& pg);
 
-}  // namespace prokopenko
+}
 
 #endif

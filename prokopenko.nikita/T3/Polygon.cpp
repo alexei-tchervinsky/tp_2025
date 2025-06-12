@@ -75,4 +75,4 @@ namespace prokopenko {
     return false;
   }
 
-}  // namespace prokopenko
+}
