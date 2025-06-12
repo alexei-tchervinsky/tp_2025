@@ -1,20 +1,36 @@
-#ifndef DATASTRUCT_HPP
-#define DATASTRUCT_HPP
-
-#include <string>
-#include <iostream>
+#include "DataStruct.hpp"
+#include "IO_Objects.hpp"
+#include <iomanip>
+#include <sstream>
 
 namespace solution {
-    struct DataStruct {
-        double key1;
-        unsigned long long key2;
-        std::string key3;
+    bool DataStruct::operator<(const DataStruct& other) const {
+        if (key1 != other.key1) {
+            return key1 < other.key1;
+        }
+        if (key2 != other.key2) {
+            return key2 < other.key2;
+        }
+        return key3.size() < other.key3.size();
+    }
 
-        bool operator<(const DataStruct& other) const;
-    };
+    std::istream& operator>>(std::istream& in, DataStruct& value) {
+        using Delim = DelimiterIO;
+        using Dbl = DoubleIO;
+        using Hex = HexUllIO;
+        using Str = StringIO;
 
-    std::istream& operator>>(std::istream& in, DataStruct& value);
-    std::ostream& operator<<(std::ostream& out, const DataStruct& value);
+        in >> Delim{'('} >> Dbl{value.key1} >> Delim{';'};
+        in >> Hex{value.key2} >> Delim{';'};
+        in >> Str{value.key3} >> Delim{':'} >> Delim{')'};
+        return in;
+    }
+
+    std::ostream& operator<<(std::ostream& out, const DataStruct& value) {
+        iofmtguard guard(out);
+        out << "(" << std::fixed << std::setprecision(1) << value.key1 << ";";
+        out << std::hex << std::uppercase << "0x" << value.key2 << ";";
+        out << std::dec << "\"" << value.key3 << "\"" << ":)";
+        return out;
+    }
 }
-
-#endif
