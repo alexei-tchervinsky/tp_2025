@@ -45,4 +45,14 @@ namespace solution {
     }
 
     std::istream& operator>>(std::istream& in, StringIO&& s) {
-        in
+        in >> std::ws;
+        char quote;
+        in.get(quote);
+        if (quote != '"') {
+            in.setstate(std::ios::failbit);
+            return in;
+        }
+        std::getline(in, s.ref, '"');
+        return in;
+    }
+}
