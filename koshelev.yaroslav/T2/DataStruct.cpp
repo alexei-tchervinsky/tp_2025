@@ -1,118 +1,95 @@
-#include "DataStruct.h"
+#include "DataStruct.hpp"
+#include "IO_Objects.hpp"
+#include "iofmtguard.hpp"
+
 #include <iomanip>
-#include <sstream>
-#include <algorithm>
+#include <cmath>
 
-namespace solution {
+namespace solution
+{
+  bool DataStruct::operator<(const DataStruct& other) const
+  {
+    if (std::abs(key1) != std::abs(other.key1))
+    {
+      return std::abs(key1) < std::abs(other.key1);
+    }
+    if (key2 != other.key2)
+    {
+      return key2 < other.key2;
+    }
+    return key3.size() < other.key3.size();
+  }
 
-  std::istream& operator>>(std::istream& in, DataStruct& data) {
-    std::string line;
-    std::getline(in, line);
-
-    if (line.empty()) {
-      in.setstate(std::ios::failbit);
+  std::istream& operator>>(std::istream& in, DataStruct& value)
+  {
+    std::istream::sentry s(in);
+    if (!s)
+    {
       return in;
     }
 
-    std::istringstream iss(line);
-    std::string temp;
-    if (!(iss >> temp) || temp != "(:key1") {
-      in.setstate(std::ios::failbit);
-      return in;
+    DataStruct temp;
+    bool hasKey1 = false;
+    bool hasKey2 = false;
+    bool hasKey3 = false;
+
+    in >> DelimiterIO{'('} >> DelimiterIO{':'};
+
+    for (int i = 0; i < 3 && in; ++i)
+    {
+      std::string label;
+      in >> LabelIO{label};
+
+      if (label == "key1")
+      {
+        in >> ComplexIO{temp.key1} >> DelimiterIO{':'};
+        hasKey1 = in.good();
+      }
+      else if (label == "key2")
+      {
+        in >> CharIO{temp.key2} >> DelimiterIO{':'};
+        hasKey2 = in.good();
+      }
+      else if (label == "key3")
+      {
+        in >> StringIO{temp.key3} >> DelimiterIO{':'};
+        hasKey3 = in.good();
+      }
+      else
+      {
+        std::string discard;
+        std::getline(in, discard, ':');
+      }
     }
 
-    if (!(iss >> temp) || temp.substr(0, 2) != "#c") {
+    in >> DelimiterIO{')'};
+
+    if (hasKey1 && hasKey2 && hasKey3)
+    {
+      value = temp;
+    }
+    else
+    {
       in.setstate(std::ios::failbit);
-      return in;
     }
 
-    temp.erase(0, 3);
-    std::string real_str, imag_str;
-    std::istringstream(temp) >> real_str;
-
-    if (!(iss >> imag_str)) {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-
-    imag_str.pop_back();
-    try {
-      data.key1 = std::complex<double>(std::stod(real_str), std::stod(imag_str));
-    } catch (...) {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-
-    if (!(iss >> temp) || temp != ":key2") {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-
-    if (!(iss >> temp) || temp != "(:N") {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-
-    long long numerator;
-    unsigned long long denominator;
-    if (!(iss >> numerator)) {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-
-    if (!(iss >> temp) || temp != ":D") {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-
-    if (!(iss >> std::hex >> denominator)) {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-
-    if (!(iss >> temp) || temp != ":)") {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-
-    data.key2 = {numerator, denominator};
-
-    if (!(iss >> temp) || temp != ":key3") {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-
-    std::string str;
-    if (!(iss >> std::quoted(str))) {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-
-    if (!(iss >> temp) || temp != ":)") {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-
-    data.key3 = str;
     return in;
   }
 
-  std::ostream& operator<<(std::ostream& out, const DataStruct& data) {
-    out << "(:key1 #c(" << std::scientific << data.key1.real() << ' '
-        << data.key1.imag() << ")"
-        << ":key2 (:N " << std::dec << data.key2.first
-        << ":D " << std::uppercase << std::hex << data.key2.second << ":)"
-        << ":key3 " << std::quoted(data.key3) << ":)";
+  std::ostream& operator<<(std::ostream& out, const DataStruct& value)
+  {
+    std::ostream::sentry s(out);
+    if (!s)
+    {
+      return out;
+    }
+
+    iofmtguard guard(out);
+
+    out << "(:key1 #c(" << std::fixed << std::setprecision(1)
+        << value.key1.real() << " " << value.key1.imag()
+        << "):key2 '" << value.key2
+        << "':key3 " << std::quoted(value.key3) << ":)";
     return out;
   }
-
-  bool operator<(const DataStruct& lhs, const DataStruct& rhs) {
-    if (lhs.key1 != rhs.key1)
-      return lhs.key1.real() < rhs.key1.real() ||
-            (lhs.key1.real() == rhs.key1.real() && lhs.key1.imag() < rhs.key1.imag());
-    if (lhs.key2 != rhs.key2)
-      return lhs.key2 < rhs.key2;
-    return lhs.key3.length() < rhs.key3.length();
-  }
-
 }
