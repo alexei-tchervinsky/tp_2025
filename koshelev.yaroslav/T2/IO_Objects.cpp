@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <sstream>
 #include <cctype>
+
 namespace solution {
     std::istream& operator>>(std::istream& in, DelimiterIO&& d) {
         char c;
@@ -11,6 +12,7 @@ namespace solution {
         }
         return in;
     }
+
     std::istream& operator>>(std::istream& in, LabelIO&& l) {
         l.ref.clear();
         char c;
@@ -26,14 +28,17 @@ namespace solution {
         }
         return in;
     }
+
     std::istream& operator>>(std::istream& in, DoubleIO&& d) {
         std::string numStr;
         char c;
         bool hasDigit = false;
+
         if (in.peek() == '+' || in.peek() == '-') {
             in.get(c);
             numStr += c;
         }
+
         while (in.get(c)) {
             if (isdigit(c)) {
                 numStr += c;
@@ -53,10 +58,12 @@ namespace solution {
                 break;
             }
         }
+
         if (!hasDigit) {
             in.setstate(std::ios::failbit);
             return in;
         }
+
         try {
             d.ref = std::stod(numStr);
         } catch (...) {
@@ -64,10 +71,12 @@ namespace solution {
         }
         return in;
     }
+
     std::istream& operator>>(std::istream& in, HexUllIO&& h) {
         std::string numStr;
         char c;
         in >> std::ws;
+
         if (in.peek() == '0') {
             in.get(c);
             numStr += c;
@@ -85,6 +94,7 @@ namespace solution {
             in.setstate(std::ios::failbit);
             return in;
         }
+
         bool hasDigit = false;
         while (in.get(c)) {
             if (isxdigit(c)) {
@@ -96,10 +106,12 @@ namespace solution {
                 break;
             }
         }
+
         if (!hasDigit) {
             in.setstate(std::ios::failbit);
             return in;
         }
+
         try {
             h.ref = std::stoull(numStr, nullptr, 16);
         } catch (...) {
@@ -107,6 +119,7 @@ namespace solution {
         }
         return in;
     }
+
     std::istream& operator>>(std::istream& in, StringIO&& s) {
         in >> std::ws;
         char quote;
@@ -118,6 +131,7 @@ namespace solution {
         std::getline(in, s.ref, '"');
         return in;
     }
+
     std::istream& operator>>(std::istream& in, Key1IO&& k) {
         in >> std::ws;
         char c = in.peek();
@@ -125,6 +139,6 @@ namespace solution {
             in.setstate(std::ios::failbit);
             return in;
         }
-        return in >> solution::DoubleIO{k.ref};
+        return in >> DoubleIO{k.ref};
     }
 }
