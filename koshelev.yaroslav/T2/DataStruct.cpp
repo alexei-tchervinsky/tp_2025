@@ -1,6 +1,6 @@
-#include "DataStruct.hpp"
-#include "IO_Objects.hpp"
-#include "iofmtguard.hpp"
+#include "DataStruct.h"
+#include "IO_Objects.h"
+#include "iofmtguard.h"
 #include <iomanip>
 #include <sstream>
 #include <cctype>
