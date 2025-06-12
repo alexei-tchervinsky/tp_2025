@@ -3,9 +3,7 @@
 
 #include <vector>
 #include <iostream>
-#if 1
 #include "settings.hpp"
-#endif
 
 namespace nspace
 {

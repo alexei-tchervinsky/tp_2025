@@ -212,11 +212,8 @@ void echo(std::vector<Polygon>& polygons, const Polygon& target, const std::stri
 
         if (polygons.empty() || target.points.size() < 3)
         {
-#if 0
-            throw std::invalid_argument("exception 1");
-#else
+
             throw std::invalid_argument(INV_CMD);
-#endif
         }
 
         if (std::adjacent_find(target.points.begin(), target.points.end()) != target.points.end())
@@ -244,11 +241,7 @@ void echo(std::vector<Polygon>& polygons, const Polygon& target, const std::stri
 
         if (max_count == 0)
         {
-#if 0
-            throw std::invalid_argument("exception 2");
-#else
             throw std::invalid_argument(INV_CMD);
-#endif
         }
 
         std::cout << max_count << '\n';
