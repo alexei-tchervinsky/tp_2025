@@ -42,11 +42,26 @@ namespace solution {
             in >> LabelIO{field} >> Delim{':'};
 
             if (field == "key1") {
-                in >> Dbl{value.key1};
+                if (!(in >> Dbl{value.key1})) {
+                    in.clear();
+                    unsigned long long temp;
+                    if (in >> Hex{temp}) {
+                        value.key1 = static_cast<double>(temp);
+                    } else {
+                        in.setstate(std::ios::failbit);
+                        break;
+                    }
+                }
                 key1_set = true;
             }
             else if (field == "key2") {
-                in >> Hex{value.key2};
+                if (!(in >> Hex{value.key2})) {
+                    in.clear();
+                    if (!(in >> value.key2)) {
+                        in.setstate(std::ios::failbit);
+                        break;
+                    }
+                }
                 key2_set = true;
             }
             else if (field == "key3") {

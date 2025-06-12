@@ -29,16 +29,51 @@ namespace solution {
     }
 
     std::istream& operator>>(std::istream& in, DoubleIO&& d) {
-        in >> d.ref;
-        if (!in) {
+        std::string numStr;
+        char c;
+        while (in.get(c) && (isdigit(c) || c == '.' || c == '-' || c == '+' || c == 'e' || c == 'E')) {
+            numStr += c;
+        }
+        in.unget();
+
+        try {
+            d.ref = std::stod(numStr);
+        } catch (...) {
             in.setstate(std::ios::failbit);
         }
         return in;
     }
 
     std::istream& operator>>(std::istream& in, HexUllIO&& h) {
-        in >> std::hex >> h.ref;
-        if (!in) {
+        std::string numStr;
+        char c;
+        in >> c;
+
+        if (c == '0') {
+            numStr += c;
+            if (in.peek() == 'x' || in.peek() == 'X') {
+                in >> c;
+                numStr += c;
+            }
+        } else if (isdigit(c)) {
+            numStr += c;
+        } else {
+            in.setstate(std::ios::failbit);
+            return in;
+        }
+
+        while (in.get(c)) {
+            if (isxdigit(c)) {
+                numStr += c;
+            } else {
+                in.unget();
+                break;
+            }
+        }
+
+        try {
+            h.ref = std::stoull(numStr, nullptr, 0);
+        } catch (...) {
             in.setstate(std::ios::failbit);
         }
         return in;
