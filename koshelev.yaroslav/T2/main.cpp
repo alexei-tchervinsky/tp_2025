@@ -9,17 +9,21 @@ int main() {
     solution::DataStruct temp;
 
     while (std::cin.peek() != EOF) {
-        if (std::cin >> temp) {
-            records.push_back(temp);
-        } else {
-            if (std::cin.eof()) break;
+        try {
+            if (std::cin >> temp) {
+                records.push_back(temp);
+            } else {
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            }
+        } catch (const std::exception& e) {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
     }
 
     if (records.empty()) {
-        std::cout << "Looks like there is no supported record. Cannot determine input. Test skipped\n";
+        std::cout << "Нет корректных данных для обработки.\n";
         return 0;
     }
 
