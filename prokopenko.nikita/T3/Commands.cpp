@@ -7,12 +7,14 @@
 #include <iomanip>
 #include <string>
 #include <cmath>
-#include <cctype>
+#include <set>
 
 void prokopenko::outMessage(std::ostream& out, const std::string& message)
 {
   out << message;
 }
+
+// ===== AREA =====
 
 void prokopenko::Area(const std::vector<Polygon>& polygons, std::ostream& out, std::istream& in)
 {
@@ -28,7 +30,7 @@ void prokopenko::Area(const std::vector<Polygon>& polygons, std::ostream& out, s
     areas.at(parameter)(polygons, out);
   }
   catch (const std::out_of_range&) {
-    if (std::isdigit(parameter[0]) && std::stoi(parameter) > 2) {
+    if (std::all_of(parameter.begin(), parameter.end(), ::isdigit) && std::stoi(parameter) > 2) {
       AreaVersNum(std::stoi(parameter), polygons, out);
     }
     else {
@@ -91,6 +93,8 @@ double prokopenko::getArea(const Polygon& polygon)
   return 0.5 * std::abs(sum - diff);
 }
 
+// ===== MAX =====
+
 void prokopenko::Max(const std::vector<Polygon>& polygons, std::ostream& out, std::istream& in)
 {
   std::map<std::string, std::function<void(const std::vector<Polygon>&, std::ostream&)>> maxes;
@@ -127,6 +131,8 @@ void prokopenko::maxVertexes(const std::vector<Polygon>& polygons, std::ostream&
   out << *std::max_element(vertexes.begin(), vertexes.end()) << '\n';
 }
 
+// ===== MIN =====
+
 void prokopenko::Min(const std::vector<Polygon>& polygons, std::ostream& out, std::istream& in)
 {
   std::map<std::string, std::function<void(const std::vector<Polygon>&, std::ostream&)>> mins;
@@ -162,7 +168,8 @@ void prokopenko::minVertexes(const std::vector<Polygon>& polygons, std::ostream&
   out << *std::min_element(vertexes.begin(), vertexes.end()) << '\n';
 }
 
-// ✅ ИСПРАВЛЕННАЯ Count
+// ===== COUNT =====
+
 void prokopenko::Count(const std::vector<Polygon>& polygons, std::ostream& out, std::istream& in)
 {
   std::string param;
@@ -194,16 +201,62 @@ void prokopenko::Count(const std::vector<Polygon>& polygons, std::ostream& out, 
   }
 }
 
+// ===== PERMS =====
+
+bool prokopenko::equalArea(const Polygon& a, const Polygon& b)
+{
+  return std::fabs(getArea(a) - getArea(b)) < 1e-6;
+}
+
 void prokopenko::Perms(const std::vector<Polygon>& polygons, std::ostream& out, std::istream&)
 {
-  for (const auto& p : polygons) {
-    out << p.points.size() << '\n';
+  for (const auto& polygon : polygons)
+  {
+    std::vector<Point> points = polygon.points;
+    std::sort(points.begin(), points.end(), [](const Point& a, const Point& b) {
+      return std::tie(a.x, a.y) < std::tie(b.x, b.y);
+      });
+
+    std::set<std::vector<Point>> uniquePerms;
+    do {
+      Polygon permuted{ points };
+      if (equalArea(permuted, polygon)) {
+        uniquePerms.insert(points);
+      }
+    } while (std::next_permutation(points.begin(), points.end(), [](const Point& a, const Point& b) {
+      return std::tie(a.x, a.y) < std::tie(b.x, b.y);
+      }));
+
+    out << uniquePerms.size() << '\n';
   }
+}
+
+// ===== RIGHTSHAPES =====
+
+bool isRightAngle(const Point& a, const Point& b, const Point& c)
+{
+  int dx1 = b.x - a.x, dy1 = b.y - a.y;
+  int dx2 = c.x - b.x, dy2 = c.y - b.y;
+  return dx1 * dx2 + dy1 * dy2 == 0;
+}
+
+bool isRectangle(const Polygon& polygon)
+{
+  if (polygon.points.size() != 4) return false;
+  const auto& p = polygon.points;
+
+  return isRightAngle(p[0], p[1], p[2]) &&
+    isRightAngle(p[1], p[2], p[3]) &&
+    isRightAngle(p[2], p[3], p[0]) &&
+    isRightAngle(p[3], p[0], p[1]);
 }
 
 void prokopenko::Rightshapes(const std::vector<Polygon>& polygons, std::ostream& out)
 {
-  for (const auto& p : polygons) {
-    out << ((p.points.size() == 4) ? "YES" : "NO") << '\n'; // Заглушка
+  int count = 0;
+  for (const auto& p : polygons)
+  {
+    if (isRectangle(p)) count++;
   }
+  out << count << '\n';
 }
