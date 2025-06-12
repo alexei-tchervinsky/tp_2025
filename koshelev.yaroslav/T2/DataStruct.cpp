@@ -1,73 +1,66 @@
 #include "DataStruct.hpp"
 #include "IO_Objects.hpp"
 #include "iofmtguard.hpp"
-#include <iostream>
 #include <iomanip>
 #include <sstream>
 #include <cctype>
-#include <algorithm>
-#include <regex>
 
-namespace nspace {
-    std::istream& operator>>(std::istream& is, DataStruct& ds) {
-        std::istream::sentry sentry(is);
-        if (!sentry) return is;
+namespace solution {
 
-        DataStruct temp{0, 0.0, ""};
-        is >> DelimiterIO{ '(' };
-        if (!is) return is;
+    bool DataStruct::operator<(const DataStruct& other) const {
+        if (key1 != other.key1) {
+            return key1 < other.key1;
+        }
+        if (key2 != other.key2) {
+            return key2 < other.key2;
+        }
+        return key3.size() < other.key3.size();
+    }
 
-        for (std::size_t i = 0; i < 3; ++i) {
-            short number = 0;
-            is >> DelimiterIO{ ':' } >> LabelIO{ "key" } >> number;
-            if (is.fail()) return is;
+    std::istream& operator>>(std::istream& in, DataStruct& data) {
+        std::istream::sentry guard(in);
+        if (!guard) return in;
 
-            switch (number) {
-                case 1:
-                    is >> ULLHexIO{ temp.key1 };
-                    break;
-                case 2:
-                    is >> DoubleSciIO{ temp.key2 };
-                    break;
-                case 3:
-                    is >> StringIO{ temp.key3 };
-                    break;
-                default:
-                    is.setstate(std::ios::failbit);
-                    return is;
+        DataStruct temp;
+        bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
+
+        in >> DelimiterIO{'('} >> DelimiterIO{':'};
+        for (int i = 0; i < 3 && in; ++i) {
+            std::string label;
+            in >> LabelIO{label};
+
+            if (label == "key1") {
+                in >> DoubleSciIO{temp.key1} >> DelimiterIO{':'};
+                hasKey1 = in.good();
+            } else if (label == "key2") {
+                in >> ULLHexIO{temp.key2} >> DelimiterIO{':'};
+                hasKey2 = in.good();
+            } else if (label == "key3") {
+                in >> StringIO{temp.key3} >> DelimiterIO{':'};
+                hasKey3 = in.good();
+            } else {
+                std::string skip;
+                std::getline(in, skip, ':');
             }
-            if (!is) return is;
         }
 
-        is >> DelimiterIO{ ':' } >> DelimiterIO{ ')' };
-        if (is) ds = std::move(temp);
-        return is;
+        in >> DelimiterIO{')'};
+        if (hasKey1 && hasKey2 && hasKey3) {
+            data = temp;
+        } else {
+            in.setstate(std::ios::failbit);
+        }
+
+        return in;
     }
 
-    std::ostream& operator<<(std::ostream& os, const DataStruct& ds) {
-        std::ostream::sentry sentry(os);
-        if (!sentry) return os;
-
-        iofmtguard fmtguard(os);
-
-        std::ostringstream oss;
-        oss << std::scientific << std::setprecision(1) << ds.key2;
-        std::string key2_str = oss.str();
-        std::transform(key2_str.begin(), key2_str.end(), key2_str.begin(),
-                      [](unsigned char c) { return std::tolower(c); });
-
-        std::regex exp_regex(R"(e([+-])0(\d))");
-        key2_str = std::regex_replace(key2_str, exp_regex, "e$1$2");
-
-        os << "(:key1 0x" << std::hex << std::uppercase << ds.key1 << std::dec
-           << ":key2 " << key2_str
-           << ":key3 \"" << ds.key3 << "\":)";
-        return os;
+    std::ostream& operator<<(std::ostream& out, const DataStruct& data) {
+        iofmtguard fmt(out);
+        out << "(:";
+        out << "key1 " << std::scientific << std::uppercase << std::setprecision(6) << data.key1 << ":";
+        out << "key2 0X" << std::uppercase << std::hex << data.key2 << ":";
+        out << "key3 " << std::quoted(data.key3) << ":)";
+        return out;
     }
 
-    bool compare(const DataStruct& ds1, const DataStruct& ds2) {
-        if (ds1.key1 != ds2.key1) return ds1.key1 < ds2.key1;
-        if (ds1.key2 != ds2.key2) return ds1.key2 < ds2.key2;
-        return ds1.key3.size() < ds2.key3.size();
-    }
 }
