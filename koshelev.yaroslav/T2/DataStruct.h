@@ -2,20 +2,20 @@
 #define DATASTRUCT_H
 
 #include <string>
+#include <complex>
+#include <utility>
 #include <iostream>
 
 namespace solution {
-
     struct DataStruct {
-        double key1;
-        unsigned long long key2;
+        std::complex<double> key1;
+        std::pair<long long, unsigned long long> key2;
         std::string key3;
     };
 
-    bool operator<(const DataStruct& lhs, const DataStruct& rhs);
     std::istream& operator>>(std::istream& in, DataStruct& data);
     std::ostream& operator<<(std::ostream& out, const DataStruct& data);
+    bool operator<(const DataStruct& lhs, const DataStruct& rhs);
+}
 
-} // namespace solution
-
-#endif // DATASTRUCT_HPP
+#endif
