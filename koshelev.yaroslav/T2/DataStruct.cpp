@@ -2,7 +2,6 @@
 #include "IO_Objects.hpp"
 #include "iofmtguard.hpp"
 #include <iomanip>
-#include <cmath>
 
 namespace solution
 {
