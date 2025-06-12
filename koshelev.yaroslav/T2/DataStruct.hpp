@@ -1,20 +1,28 @@
-#ifndef DATASTRUCT_HPP
-#define DATASTRUCT_HPP
+#pragma once
 
-#include <string>
 #include <iostream>
+#include <iomanip>
+#include <string>
 
 namespace solution {
-    struct DataStruct {
-        double key1;
-        unsigned long long key2;
-        std::string key3;
 
-        bool operator<(const DataStruct& other) const;
+    struct DoubleSciIO {
+        double& ref;
     };
 
-    std::istream& operator>>(std::istream& in, DataStruct& value);
-    std::ostream& operator<<(std::ostream& out, const DataStruct& value);
-}
+    struct HexUllIO {
+        unsigned long long& ref;
+    };
 
-#endif
+    struct StringIO {
+        std::string& ref;
+    };
+
+    std::istream& operator>>(std::istream& in, DoubleSciIO&& d);
+    std::istream& operator>>(std::istream& in, HexUllIO&& h);
+    std::istream& operator>>(std::istream& in, StringIO&& s);
+
+    std::ostream& operator<<(std::ostream& out, const DoubleSciIO& d);
+    std::ostream& operator<<(std::ostream& out, const HexUllIO& h);
+    std::ostream& operator<<(std::ostream& out, const StringIO& s);
+}
