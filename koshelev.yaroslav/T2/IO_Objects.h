@@ -1,13 +1,42 @@
-#ifndef IO_OBJECTS_H
-#define IO_OBJECTS_H
+#ifndef IO_OBJECTS_HPP
+#define IO_OBJECTS_HPP
 
-#include <vector>
-#include "DataStruct.h"
+#include <string>
+#include <complex>
+#include <iostream>
 
-namespace solution {
-    void readData(std::istream& in, std::vector<DataStruct>& data);
-    void sortData(std::vector<DataStruct>& data);
-    void writeData(std::ostream& out, const std::vector<DataStruct>& data);
+namespace solution
+{
+  struct DelimiterIO
+  {
+    char expected;
+  };
+
+  struct LabelIO
+  {
+    std::string& ref;
+  };
+
+  struct ComplexIO
+  {
+    std::complex<double>& ref;
+  };
+
+  struct CharIO
+  {
+    char& ref;
+  };
+
+  struct StringIO
+  {
+    std::string& ref;
+  };
+
+  std::istream& operator>>(std::istream& in, DelimiterIO&&);
+  std::istream& operator>>(std::istream& in, LabelIO&&);
+  std::istream& operator>>(std::istream& in, ComplexIO&&);
+  std::istream& operator>>(std::istream& in, CharIO&&);
+  std::istream& operator>>(std::istream& in, StringIO&&);
 }
 
 #endif
