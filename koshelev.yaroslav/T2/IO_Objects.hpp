@@ -2,7 +2,6 @@
 #define IO_OBJECTS_HPP
 
 #include <string>
-#include <complex>
 #include <iostream>
 
 namespace solution
@@ -17,14 +16,14 @@ namespace solution
         std::string& ref;
     };
 
-    struct ComplexIO
+    struct DoubleIO
     {
-        std::complex<double>& ref;
+        double& ref;
     };
 
-    struct CharIO
+    struct HexUllIO
     {
-        char& ref;
+        unsigned long long& ref;
     };
 
     struct StringIO
@@ -34,8 +33,8 @@ namespace solution
 
     std::istream& operator>>(std::istream& in, DelimiterIO&&);
     std::istream& operator>>(std::istream& in, LabelIO&&);
-    std::istream& operator>>(std::istream& in, ComplexIO&&);
-    std::istream& operator>>(std::istream& in, CharIO&&);
+    std::istream& operator>>(std::istream& in, DoubleIO&&);
+    std::istream& operator>>(std::istream& in, HexUllIO&&);
     std::istream& operator>>(std::istream& in, StringIO&&);
 }
 

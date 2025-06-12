@@ -1,7 +1,6 @@
 #ifndef DATASTRUCT_HPP
 #define DATASTRUCT_HPP
 
-#include <complex>
 #include <string>
 #include <iostream>
 
@@ -9,8 +8,8 @@ namespace solution
 {
     struct DataStruct
     {
-        std::complex<double> key1;
-        char key2;
+        double key1;
+        unsigned long long key2;
         std::string key3;
 
         bool operator<(const DataStruct& other) const;
