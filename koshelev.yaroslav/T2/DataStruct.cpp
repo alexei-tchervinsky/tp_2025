@@ -17,7 +17,7 @@ namespace solution {
 
     std::istream& operator>>(std::istream& in, DataStruct& value) {
         using Delim = DelimiterIO;
-        using Dbl = DoubleIO;
+        using K1 = Key1IO;
         using Hex = HexUllIO;
         using Str = StringIO;
 
@@ -42,7 +42,7 @@ namespace solution {
             in >> LabelIO{field} >> Delim{':'};
 
             if (field == "key1") {
-                in >> Dbl{value.key1};
+                in >> K1{value.key1};
                 key1_set = true;
             }
             else if (field == "key2") {

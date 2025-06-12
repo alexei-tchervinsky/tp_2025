@@ -34,13 +34,11 @@ namespace solution {
         char c;
         bool hasDigit = false;
 
-        // Handle optional sign
         if (in.peek() == '+' || in.peek() == '-') {
             in.get(c);
             numStr += c;
         }
 
-        // Read the number
         while (in.get(c)) {
             if (isdigit(c)) {
                 numStr += c;
@@ -118,5 +116,33 @@ namespace solution {
         }
         std::getline(in, s.ref, '"');
         return in;
+    }
+
+    std::istream& operator>>(std::istream& in, Key1IO&& k) {
+        std::string numStr;
+        char c;
+        in >> std::ws >> c;
+
+        if (c == '"') {
+            std::string dummy;
+            std::getline(in, dummy, '"');
+            k.ref = 0.0;
+            return in;
+        }
+        else if (c == '\'') {
+            in >> c >> c;
+            k.ref = 0.0;
+            return in;
+        }
+        else if (c == '#') {
+            std::string dummy;
+            std::getline(in, dummy, ')');
+            k.ref = 0.0;
+            return in;
+        }
+        else {
+            in.unget();
+            return in >> DoubleIO{k.ref};
+        }
     }
 }

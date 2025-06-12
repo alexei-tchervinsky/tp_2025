@@ -25,11 +25,16 @@ namespace solution {
         std::string& ref;
     };
 
+    struct Key1IO {
+        double& ref;
+    };
+
     std::istream& operator>>(std::istream& in, DelimiterIO&& d);
     std::istream& operator>>(std::istream& in, DoubleIO&& d);
     std::istream& operator>>(std::istream& in, HexUllIO&& h);
     std::istream& operator>>(std::istream& in, StringIO&& s);
     std::istream& operator>>(std::istream& in, LabelIO&& l);
+    std::istream& operator>>(std::istream& in, Key1IO&& k);
 }
 
 #endif
