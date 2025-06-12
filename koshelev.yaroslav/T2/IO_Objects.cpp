@@ -47,16 +47,12 @@ namespace solution {
                 break;
             }
         }
-        if (!hasDigit && numStr.length() <= (bool)(numStr.find('+') != std::string::npos || numStr.find('-') != std::string::npos)) {
+        if (!hasDigit) {
             in.setstate(std::ios::failbit);
             return in;
         }
         try {
-            size_t pos = 0;
-            d.ref = std::stod(numStr, &pos);
-            if (pos != numStr.length()) {
-                 in.setstate(std::ios::failbit);
-            }
+            d.ref = std::stod(numStr);
         } catch (...) {
             in.setstate(std::ios::failbit);
         }
