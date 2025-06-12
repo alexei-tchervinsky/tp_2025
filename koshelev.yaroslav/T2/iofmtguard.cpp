@@ -1,7 +1,6 @@
 #include "iofmtguard.hpp"
 
-namespace solution
-{
+namespace solution {
     iofmtguard::iofmtguard(std::basic_ios<char>& stream)
       : stream_(stream),
         fill_(stream.fill()),
@@ -9,8 +8,7 @@ namespace solution
         flags_(stream.flags())
     {}
 
-    iofmtguard::~iofmtguard()
-    {
+    iofmtguard::~iofmtguard() {
         stream_.fill(fill_);
         stream_.precision(precision_);
         stream_.flags(flags_);
