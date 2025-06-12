@@ -1,25 +1,33 @@
-#pragma once
+#ifndef POLYGON_HPP
+#define POLYGON_HPP
 
 #include <vector>
-#include <ostream>
 #include <string>
+#include <iostream>
 
-namespace prokopenko {
+struct Point {
+  double x;
+  double y;
 
-  struct Point {
-    int x, y;
-    bool operator==(const Point& other) const;
-  };
+  bool operator==(const Point& other) const {
+    return x == other.x && y == other.y;
+  }
+};
 
-  struct Polygon {
-    std::vector<Point> points;
-    bool operator==(const Polygon& other) const;
-  };
+class Polygon {
+public:
+  Polygon() = default;
+  Polygon(const std::vector<Point>& points);
 
-  double computeArea(const Polygon& polygon);
-  bool isRectangle(const Polygon& polygon);
-  bool hasRightAngle(const Polygon& polygon);
-  Polygon parsePolygon(const std::string& input);
-  std::ostream& operator<<(std::ostream& os, const Polygon& poly);
+  double perimeter() const;
+  size_t vertexCount() const;
+  bool operator==(const Polygon& other) const;
 
-} // namespace prokopenko
+  std::string toString() const;
+  void print() const;
+
+private:
+  std::vector<Point> points;
+};
+
+#endif // POLYGON_HPP

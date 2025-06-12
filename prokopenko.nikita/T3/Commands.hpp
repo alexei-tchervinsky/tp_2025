@@ -1,10 +1,10 @@
-#pragma once
-#include "polygon.hpp"
-#include <string>
+#ifndef COMMANDS_HPP
+#define COMMANDS_HPP
+
+#include "Polygon.hpp"
 #include <vector>
+#include <string>
 
-namespace prokopenko {
+void executeCommand(const std::string& line, std::vector<Polygon>& polygons);
 
-  void executeCommand(const std::string& line, std::vector<Polygon>& polygons);
-
-} // namespace prokopenko
+#endif // COMMANDS_HPP

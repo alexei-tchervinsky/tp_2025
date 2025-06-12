@@ -1,10 +1,9 @@
-#pragma once
-#include "polygon.hpp"
-#include <vector>
-#include <istream>
+#ifndef PARSER_HPP
+#define PARSER_HPP
 
-namespace prokopenko {
+#include "Polygon.hpp"
+#include <string>
 
-  std::vector<Polygon> parseFile(std::istream& input);
+Polygon parsePolygon(const std::string& input);
 
-} // namespace prokopenko
+#endif // PARSER_HPP
