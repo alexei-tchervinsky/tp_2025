@@ -1,4 +1,4 @@
-﻿#include "Struct.hpp"
+#include "Struct.hpp"
 #include "Commands.hpp"
 #include <algorithm>
 #include <limits>
