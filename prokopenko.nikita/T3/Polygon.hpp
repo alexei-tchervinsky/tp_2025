@@ -7,7 +7,7 @@
 namespace prokopenko {
 
   struct Point {
-    int x, y;
+    int x = 0, y = 0;
   };
 
   struct Polygon {
