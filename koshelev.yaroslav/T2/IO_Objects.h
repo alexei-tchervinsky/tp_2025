@@ -1,5 +1,5 @@
-#ifndef IO_OBJECTS_HPP
-#define IO_OBJECTS_HPP
+#ifndef IO_OBJECTS_H
+#define IO_OBJECTS_H
 
 #include <string>
 #include <complex>
