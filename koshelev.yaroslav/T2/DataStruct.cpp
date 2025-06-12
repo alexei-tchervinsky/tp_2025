@@ -3,6 +3,8 @@
 #include "iofmtguard.hpp"
 #include <iomanip>
 #include <cmath>
+#include <sstream>
+#include <cctype>
 
 namespace solution {
     bool DataStruct::operator<(const DataStruct& other) const {
@@ -20,27 +22,49 @@ namespace solution {
         using Str = StringIO;
 
         in >> std::ws;
+        if (in.peek() == EOF) {
+            in.setstate(std::ios::failbit);
+            return in;
+        }
+
         char c;
         in.get(c);
         if (c != '(') {
+            in.unget();
             in.setstate(std::ios::failbit);
             return in;
         }
 
         std::string field;
+        bool key1_set = false, key2_set = false, key3_set = false;
+
         while (in >> std::ws && in.peek() != ')') {
             in >> LabelIO{field} >> Delim{':'};
+
             if (field == "key1") {
                 in >> Dbl{value.key1};
-            } else if (field == "key2") {
+                key1_set = true;
+            }
+            else if (field == "key2") {
                 in >> Hex{value.key2};
-            } else if (field == "key3") {
+                key2_set = true;
+            }
+            else if (field == "key3") {
                 in >> Str{value.key3};
-            } else {
+                key3_set = true;
+            }
+            else {
                 in.setstate(std::ios::failbit);
                 break;
             }
+
+            if (!in) break;
+
             in >> Delim{':'};
+        }
+
+        if (!key1_set || !key2_set || !key3_set) {
+            in.setstate(std::ios::failbit);
         }
 
         in >> Delim{')'};

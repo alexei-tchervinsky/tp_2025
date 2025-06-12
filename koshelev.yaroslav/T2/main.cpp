@@ -19,7 +19,7 @@ int main() {
     }
 
     if (records.empty()) {
-        std::cout << "No valid data found.\n";
+        std::cout << "Looks like there is no supported record. Cannot determine input. Test skipped\n";
         return 0;
     }
 
