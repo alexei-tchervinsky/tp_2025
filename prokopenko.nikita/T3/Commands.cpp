@@ -110,14 +110,11 @@ void prokopenko::Max(const std::vector<Polygon>& polygons, std::ostream& out, st
 void prokopenko::maxArea(const std::vector<Polygon>& polygons, std::ostream& out)
 {
   if (polygons.empty()) throw std::out_of_range("");
-  double max = std::max_element(polygons.begin(), polygons.end(),
+  auto maxIt = std::max_element(polygons.begin(), polygons.end(),
     [](const Polygon& a, const Polygon& b) {
       return getArea(a) < getArea(b);
-    })->points.size(); // Incorrect: need to get max area
-  std::vector<double> areas;
-  std::transform(polygons.begin(), polygons.end(), std::back_inserter(areas),
-    [](const Polygon& p) { return getArea(p); });
-  out << std::setprecision(1) << std::fixed << *std::max_element(areas.begin(), areas.end()) << '\n';
+    });
+  out << std::setprecision(1) << std::fixed << getArea(*maxIt) << '\n';
 }
 
 void prokopenko::maxVertexes(const std::vector<Polygon>& polygons, std::ostream& out)
