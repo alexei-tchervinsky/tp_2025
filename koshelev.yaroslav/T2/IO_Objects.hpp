@@ -1,20 +1,35 @@
-#ifndef IOFMTGUARD_HPP
-#define IOFMTGUARD_HPP
+#ifndef IO_OBJECTS_HPP
+#define IO_OBJECTS_HPP
 
+#include <string>
 #include <iostream>
 
 namespace solution {
-    class iofmtguard {
-    public:
-        explicit iofmtguard(std::basic_ios<char>& stream);
-        ~iofmtguard();
-
-    private:
-        std::basic_ios<char>& stream_;
-        char fill_;
-        std::streamsize precision_;
-        std::ios::fmtflags flags_;
+    struct DelimiterIO {
+        char expected;
     };
+
+    struct DoubleIO {
+        double& ref;
+    };
+
+    struct HexUllIO {
+        unsigned long long& ref;
+    };
+
+    struct StringIO {
+        std::string& ref;
+    };
+
+    struct LabelIO {
+        std::string& ref;
+    };
+
+    std::istream& operator>>(std::istream& in, DelimiterIO&& d);
+    std::istream& operator>>(std::istream& in, DoubleIO&& d);
+    std::istream& operator>>(std::istream& in, HexUllIO&& h);
+    std::istream& operator>>(std::istream& in, StringIO&& s);
+    std::istream& operator>>(std::istream& in, LabelIO&& l);
 }
 
 #endif

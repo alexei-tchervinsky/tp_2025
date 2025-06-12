@@ -15,7 +15,7 @@ namespace solution {
     std::istream& operator>>(std::istream& in, LabelIO&& l) {
         l.ref.clear();
         char c;
-        while (in.get(c) {
+        while (in.get(c)) {
             if (c == ' ' || c == ':') {
                 in.unget();
                 break;
@@ -45,14 +45,4 @@ namespace solution {
     }
 
     std::istream& operator>>(std::istream& in, StringIO&& s) {
-        in >> std::ws;
-        char quote;
-        in.get(quote);
-        if (quote != '"') {
-            in.setstate(std::ios::failbit);
-            return in;
-        }
-        std::getline(in, s.ref, '"');
-        return in;
-    }
-}
+        in
