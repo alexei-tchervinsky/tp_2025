@@ -1,67 +1,23 @@
 #include "IO_Objects.h"
-#include <sstream>
-#include <iomanip>
-#include <cctype>
+#include <algorithm>
 
 namespace solution {
 
-  std::istream& operator>>(std::istream& in, DelimiterIO&& d) {
-    char ch;
-    in >> std::ws >> ch;
-    if (!in || ch != d.expected) {
-      in.setstate(std::ios::failbit);
+  void readData(std::istream& in, std::vector<DataStruct>& data) {
+    DataStruct item;
+    while (in >> item) {
+      data.push_back(item);
     }
-    return in;
   }
 
-  std::istream& operator>>(std::istream& in, LabelIO&& l) {
-    char ch;
-    std::string result;
-    while (in.get(ch)) {
-      if (ch == ' ') break;
-      result += ch;
-    }
-    if (in) l.ref = result;
-    else in.setstate(std::ios::failbit);
-    return in;
+  void sortData(std::vector<DataStruct>& data) {
+    std::sort(data.begin(), data.end());
   }
 
-  std::istream& operator>>(std::istream& in, DoubleSciIO&& d) {
-    in >> std::ws;
-    double value;
-    in >> value;
-    if (in) {
-      d.ref = value;
-    } else {
-      in.setstate(std::ios::failbit);
+  void writeData(std::ostream& out, const std::vector<DataStruct>& data) {
+    for (const auto& item : data) {
+      out << item << '\n';
     }
-    return in;
   }
-
-  std::istream& operator>>(std::istream& in, ULLHexIO&& d) {
-    std::string prefix;
-    in >> prefix;
-    if (prefix.size() < 3 || (prefix[0] != '0') || (prefix[1] != 'x' && prefix[1] != 'X')) {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-    std::stringstream hexStream(prefix);
-    hexStream >> std::hex >> d.ref;
-    if (!hexStream) in.setstate(std::ios::failbit);
-    return in;
-  }
-
-  std::istream& operator>>(std::istream& in, StringIO&& s) {
-    char quote;
-    in >> std::ws >> quote;
-    if (quote != '"') {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-    std::getline(in, s.ref, '"');
-    return in;
-  }
-
-}
 
 }
