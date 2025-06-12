@@ -3,15 +3,18 @@
 
 #include <vector>
 #include <string>
+#include <istream>
 #include "Polygon.hpp"
 
 namespace prokopenko {
-    void areaCommand(const std::vector<Polygon>&, std::istream&);
-    void countCommand(const std::vector<Polygon>&, std::istream&);
-    void maxCommand(const std::vector<Polygon>&, std::istream&);
-    void minCommand(const std::vector<Polygon>&, std::istream&);
-    void lessAreaCommand(const std::vector<Polygon>&, std::istream&);
-    void maxSeqCommand(const std::vector<Polygon>&, std::istream&);
-}
+
+  void areaCommand(const std::vector<Polygon>&, std::istream&);
+  void countCommand(const std::vector<Polygon>&, std::istream&);
+  void maxCommand(const std::vector<Polygon>&, std::istream&);
+  void minCommand(const std::vector<Polygon>&, std::istream&);
+  void echoCommand(std::vector<Polygon>&, std::istream&);
+  void rightShapesCommand(const std::vector<Polygon>&, std::istream&);
+
+}  // namespace prokopenko
 
 #endif

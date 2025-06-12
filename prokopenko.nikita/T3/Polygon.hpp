@@ -6,24 +6,22 @@
 
 namespace prokopenko {
 
-    struct Point {
-        int x;
-        int y;
+  struct Point {
+    int x, y;
+    bool operator==(const Point& other) const;
+  };
 
-        bool operator==(const Point& other) const;
-        bool operator<(const Point& other) const;
-    };
+  struct Polygon {
+    std::vector<Point> points;
+    bool operator==(const Polygon& other) const;
+  };
 
-    struct Polygon {
-        std::vector<Point> points;
-        bool operator==(const Polygon& other) const;
-    };
+  std::istream& operator>>(std::istream& in, Point& pt);
+  std::istream& operator>>(std::istream& in, Polygon& pg);
 
-    std::istream& operator>>(std::istream& in, Point& point);
-    std::istream& operator>>(std::istream& in, Polygon& polygon);
-    double getArea(const Polygon& polygon);
-    bool hasRightAngle(const Polygon& polygon);
+  double getArea(const Polygon& pg);
+  bool hasRightAngle(const Polygon& pg);
 
-}
+}  // namespace prokopenko
 
 #endif
