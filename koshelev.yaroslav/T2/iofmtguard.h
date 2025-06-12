@@ -9,11 +9,12 @@ namespace solution {
     public:
         explicit iofmtguard(std::basic_ios<char>& stream);
         ~iofmtguard();
+
     private:
         std::basic_ios<char>& stream_;
         char fill_;
         std::streamsize precision_;
-        std::basic_ios<char>::fmtflags flags_;
+        std::ios::fmtflags flags_;
     };
 
 }
