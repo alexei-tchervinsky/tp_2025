@@ -1,48 +1,69 @@
 #include "polygon.hpp"
-#include <cmath>
-#include <sstream>
+#include <iostream>
 
-namespace prokopenko {
-
-  Polygon::Polygon(const std::vector<Point>& vertices) : points(vertices) {}
-
-  void Polygon::addPoint(const Point& point) {
-    points.push_back(point);
-  }
-
-  double Polygon::distance(const Point& a, const Point& b) const {
-    return std::hypot(b.x - a.x, b.y - a.y);
-  }
-
-  double Polygon::perimeter() const {
-    if (points.size() < 2) return 0.0;
-    double result = 0.0;
-    for (size_t i = 0; i < points.size(); ++i) {
-      const Point& current = points[i];
-      const Point& next = points[(i + 1) % points.size()];
-      result += distance(current, next);
+namespace prokopenko
+{
+  std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
+  {
+    std::istream::sentry sentry(in);
+    if (!sentry)
+    {
+      return in;
     }
-    return result;
-  }
-
-  double Polygon::area() const {
-    if (points.size() < 3) return 0.0;
-    double sum = 0.0;
-    for (size_t i = 0; i < points.size(); ++i) {
-      const Point& p1 = points[i];
-      const Point& p2 = points[(i + 1) % points.size()];
-      sum += (p1.x * p2.y - p2.x * p1.y);
+    char c = '\0';
+    in >> c;
+    if (in && (c != dest.del))
+    {
+      in.setstate(std::ios::failbit);
     }
-    return std::abs(sum) / 2.0;
+    return in;
   }
 
-  std::string Polygon::toString() const {
-    std::ostringstream oss;
-    oss << "Polygon with " << points.size() << " points: ";
-    for (const auto& p : points) {
-      oss << "(" << p.x << ", " << p.y << ") ";
+  std::istream& operator>>(std::istream& in, Point& dest)
+  {
+    std::istream::sentry sentry(in);
+    if (!sentry)
+    {
+      return in;
     }
-    return oss.str();
+    Point point;
+    in >> DelimiterIO{ '(' };
+    in >> point.x;
+    in >> DelimiterIO{ ';' };
+    in >> point.y;
+    in >> DelimiterIO{ ')' };
+    dest = point;
+    return in;
   }
 
-} // namespace prokopenko
+  std::istream& operator>>(std::istream& in, Polygon& dest)
+  {
+    std::istream::sentry sentry(in);
+    if (!sentry)
+    {
+      return in;
+    }
+    Polygon polygon;
+    std::size_t vertexes;
+    if (!(in >> vertexes))
+    {
+      in.setstate(std::ios::failbit);
+    }
+    Point point;
+    for (std::size_t i = 0; i < vertexes; ++i)
+    {
+      in >> point;
+      if (in)
+      {
+        polygon.points.push_back(point);
+      }
+    }
+
+    if (vertexes != polygon.points.size() || polygon.points.size() < 3)
+    {
+      in.setstate(std::ios::failbit);
+    }
+    dest = polygon;
+    return in;
+  }
+}

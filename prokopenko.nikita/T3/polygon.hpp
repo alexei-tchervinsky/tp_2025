@@ -1,29 +1,28 @@
-#pragma once
+#ifndef POLYGON_HPP
+#define POLYGON_HPP
 
 #include <vector>
-#include <string>
-#include <utility>
+#include <iostream>
 
-namespace prokopenko {
-
-  struct Point {
-    double x;
-    double y;
+namespace prokopenko
+{
+  struct Point
+  {
+    int x, y;
   };
 
-  class Polygon {
-  public:
-    Polygon() = default;
-    explicit Polygon(const std::vector<Point>& vertices);
-
-    void addPoint(const Point& point);
-    double area() const;
-    double perimeter() const;
-    std::string toString() const;
-
-  private:
+  struct Polygon
+  {
     std::vector<Point> points;
-    double distance(const Point& a, const Point& b) const;
   };
 
-} // namespace prokopenko
+  struct DelimiterIO
+  {
+    char del;
+  };
+
+  std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
+  std::istream& operator>>(std::istream& in, Point& dest);
+  std::istream& operator>>(std::istream& in, Polygon& dest);
+}
+#endif

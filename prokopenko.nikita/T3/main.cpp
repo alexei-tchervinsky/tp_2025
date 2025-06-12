@@ -1,3 +1,4 @@
+```cpp
 #include <iostream>
 #include <map>
 #include <vector>
@@ -9,7 +10,6 @@
 #include "commands.hpp"
 
 using namespace prokopenko;
-
 int main(int argc, char* argv[])
 {
   if (argc != 2)
@@ -33,8 +33,7 @@ int main(int argc, char* argv[])
     }
   }
 
-  std::map<std::string, std::function<void(
-    std::vector<Polygon>& polygons,
+  std::map<std::string, std::function<void(std::vector<Polygon>& polygons,
     std::ostream& out,
     std::istream& in)>> commands;
   {
@@ -63,3 +62,4 @@ int main(int argc, char* argv[])
   }
   return 0;
 }
+```
