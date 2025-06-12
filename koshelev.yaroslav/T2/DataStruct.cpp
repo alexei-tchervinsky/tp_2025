@@ -1,90 +1,69 @@
 #include "DataStruct.hpp"
 #include "IO_Objects.hpp"
 #include "iofmtguard.hpp"
-#include <iomanip>
+
 #include <cmath>
-#include <sstream>
-#include <cctype>
-#include <iostream>
+#include <iomanip>
 
-namespace solution {
-
+namespace koshelev {
     bool DataStruct::operator<(const DataStruct& other) const {
-        if (std::abs(key1 - other.key1) > 1e-6)
-            return key1 < other.key1;
-        if (key2 != other.key2)
+        double firstAbs = std::abs(key1);
+        double secondAbs = std::abs(other.key1);
+        if (firstAbs != secondAbs) {
+            return firstAbs < secondAbs;
+        }
+        if (key2 != other.key2) {
             return key2 < other.key2;
-        return key3 < other.key3;
+        }
+        return key3.size() < other.key3.size();
     }
 
-    std::istream& operator>>(std::istream& in, DataStruct& value) {
-        value = DataStruct{};
-        char c;
-
-        // Пропускаем пробелы и проверяем начало записи
-        in >> std::ws;
-        if (!in.get(c) || c != '(') {
-            in.setstate(std::ios::failbit);
+    std::istream& operator>>(std::istream& in, DataStruct& data) {
+        std::istream::sentry guard(in);
+        if (!guard) {
             return in;
         }
-
-        // Читаем до закрывающей скобки
-        std::string full_record;
-        while (in.get(c) && c != ')') {
-            full_record += c;
-        }
-        full_record += ')'; // Добавляем закрывающую скобку
-
-        // Разбираем запись вручную
-        std::istringstream record_stream(full_record);
-        std::string part;
-        int fields_found = 0;
-
-        while (std::getline(record_stream, part, ':')) {
-            if (part.find("key1") != std::string::npos) {
-                std::istringstream key_stream(part);
-                std::string key;
-                key_stream >> key; // Пропускаем "key1"
-                if (key_stream >> value.key1) {
-                    fields_found++;
-                }
-            }
-            else if (part.find("key2") != std::string::npos) {
-                std::istringstream key_stream(part);
-                std::string key;
-                key_stream >> key; // Пропускаем "key2"
-                std::string hex_str;
-                if (key_stream >> hex_str) {
-                    if (hex_str.substr(0, 2) == "0x") {
-                        value.key2 = std::stoull(hex_str.substr(2), nullptr, 16);
-                        fields_found++;
-                    }
-                }
-            }
-            else if (part.find("key3") != std::string::npos) {
-                size_t quote_pos = part.find('"');
-                if (quote_pos != std::string::npos) {
-                    size_t end_quote = part.find('"', quote_pos+1);
-                    if (end_quote != std::string::npos) {
-                        value.key3 = part.substr(quote_pos+1, end_quote-quote_pos-1);
-                        fields_found++;
-                    }
-                }
+        DataStruct temp;
+        bool hasKey1 = false;
+        bool hasKey2 = false;
+        bool hasKey3 = false;
+        in >> DelimiterIO{'('} >> DelimiterIO{':'};
+        for (int i = 0; i < 3 && in; ++i) {
+            std::string label;
+            in >> LabelIO{label};
+            if (label == "key1") {
+                in >> ScientificIO{temp.key1} >> DelimiterIO{':'};
+                hasKey1 = in.good();
+            } else if (label == "key2") {
+                in >> HexIO{temp.key2} >> DelimiterIO{':'};
+                hasKey2 = in.good();
+            } else if (label == "key3") {
+                in >> StringIO{temp.key3} >> DelimiterIO{':'};
+                hasKey3 = in.good();
+            } else {
+                std::string skip;
+                std::getline(in, skip, ':');
             }
         }
-
-        if (fields_found != 3) {
+        in >> DelimiterIO{')'};
+        if (hasKey1 && hasKey2 && hasKey3) {
+            data = temp;
+        } else {
             in.setstate(std::ios::failbit);
         }
-
         return in;
     }
 
-    std::ostream& operator<<(std::ostream& out, const DataStruct& value) {
-        iofmtguard guard(out);
-        out << "(:key1 " << std::scientific << std::uppercase << value.key1;
-        out << ":key2 0x" << std::hex << value.key2;
-        out << std::dec << ":key3 \"" << value.key3 << "\":)";
+    std::ostream& operator<<(std::ostream& out, const DataStruct& data) {
+        std::ostream::sentry guard(out);
+        if (!guard) {
+            return out;
+        }
+        iofmtguard fmtguard(out);
+        out << "(:";
+        out << "key1 " << std::scientific << std::setprecision(1) << data.key1 << ":";
+        out << "key2 0X" << std::uppercase << std::hex << data.key2 << ":";
+        out << "key3 " << std::quoted(data.key3) << ":)";
         return out;
     }
 }

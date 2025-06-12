@@ -4,18 +4,32 @@
 #include <string>
 #include <iostream>
 
-namespace solution {
-    struct DelimiterIO { char expected; };
-    struct DoubleIO { double& ref; };
-    struct HexUllIO { unsigned long long& ref; };
-    struct StringIO { std::string& ref; };
-    struct LabelIO { std::string& ref; };
+namespace koshelev {
+    struct DelimiterIO {
+        char expected;
+    };
 
-    std::istream& operator>>(std::istream& in, DelimiterIO&& d);
-    std::istream& operator>>(std::istream& in, DoubleIO&& d);
-    std::istream& operator>>(std::istream& in, HexUllIO&& h);
-    std::istream& operator>>(std::istream& in, StringIO&& s);
-    std::istream& operator>>(std::istream& in, LabelIO&& l);
+    struct LabelIO {
+        std::string& ref;
+    };
+
+    struct StringIO {
+        std::string& ref;
+    };
+
+    struct ScientificIO {
+        double& ref;
+    };
+
+    struct HexIO {
+        unsigned long long& ref;
+    };
+
+    std::istream& operator>>(std::istream& in, DelimiterIO&&);
+    std::istream& operator>>(std::istream& in, LabelIO&&);
+    std::istream& operator>>(std::istream& in, StringIO&&);
+    std::istream& operator>>(std::istream& in, ScientificIO&&);
+    std::istream& operator>>(std::istream& in, HexIO&&);
 }
 
 #endif

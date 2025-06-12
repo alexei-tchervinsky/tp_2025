@@ -1,10 +1,10 @@
-#ifndef DATASTRUCT_HPP
-#define DATASTRUCT_HPP
+#ifndef DATA_STRUCT_HPP
+#define DATA_STRUCT_HPP
 
 #include <string>
 #include <iostream>
 
-namespace solution {
+namespace koshelev {
     struct DataStruct {
         double key1;
         unsigned long long key2;
@@ -13,8 +13,8 @@ namespace solution {
         bool operator<(const DataStruct& other) const;
     };
 
-    std::istream& operator>>(std::istream& in, DataStruct& value);
-    std::ostream& operator<<(std::ostream& out, const DataStruct& value);
+    std::istream& operator>>(std::istream& in, DataStruct& data);
+    std::ostream& operator<<(std::ostream& out, const DataStruct& data);
 }
 
 #endif

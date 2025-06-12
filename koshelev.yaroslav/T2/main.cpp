@@ -5,27 +5,19 @@
 #include "DataStruct.hpp"
 
 int main() {
-    std::vector<solution::DataStruct> records;
-
-    while (true) {
-        solution::DataStruct temp;
+    std::vector<koshelev::DataStruct> data;
+    koshelev::DataStruct temp;
+    while (!std::cin.eof()) {
         if (std::cin >> temp) {
-            records.push_back(temp);
-        }
-        else {
-            if (std::cin.eof()) {
-                break;
-            }
+            data.push_back(temp);
+        } else {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
     }
-
-    if (!records.empty()) {
-        std::sort(records.begin(), records.end());
-        for (const auto& entry : records) {
-            std::cout << entry << '\n';
-        }
+    std::sort(data.begin(), data.end());
+    for (const auto& el : data) {
+        std::cout << el << "\n";
     }
     return 0;
 }

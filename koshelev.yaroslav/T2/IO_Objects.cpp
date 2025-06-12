@@ -1,122 +1,76 @@
 #include "IO_Objects.hpp"
-#include <iomanip>
 #include <sstream>
+#include <iomanip>
 #include <cctype>
+#include <cmath>
 
-namespace solution {
-
+namespace koshelev {
     std::istream& operator>>(std::istream& in, DelimiterIO&& d) {
-        char c;
-        in >> c;
-        if (!in || c != d.expected) {
+        char ch;
+        in >> std::ws >> ch;
+        if (!in || ch != d.expected) {
             in.setstate(std::ios::failbit);
         }
         return in;
     }
 
-    std::istream& operator>>(std::istream& in, LabelIO&& l) {
-        l.ref.clear();
-        char c;
-        while (in.get(c)) {
-            if (c == ' ' || c == ':') {
-                in.unget();
-                break;
-            }
-            l.ref += c;
+    std::istream& operator>>(std::istream& in, LabelIO&& label) {
+        std::string result;
+        char ch;
+        while (in.get(ch)) {
+            if (ch == ' ') break;
+            result += ch;
         }
-        return in;
-    }
-
-    std::istream& operator>>(std::istream& in, DoubleIO&& d) {
-        std::string numStr;
-        char c;
-        bool hasDigit = false;
-
-        if (in.peek() == '+' || in.peek() == '-') {
-            in.get(c);
-            numStr += c;
-        }
-
-        while (in.get(c)) {
-            if (isdigit(c)) {
-                numStr += c;
-                hasDigit = true;
-            }
-            else if (c == '.' || c == 'e' || c == 'E') {
-                numStr += c;
-            }
-            else {
-                in.unget();
-                break;
-            }
-        }
-
-        if (!hasDigit) {
-            in.setstate(std::ios::failbit);
-            return in;
-        }
-
-        try {
-            d.ref = std::stod(numStr);
-        } catch (...) {
-            in.setstate(std::ios::failbit);
-        }
-        return in;
-    }
-
-    std::istream& operator>>(std::istream& in, HexUllIO&& h) {
-        std::string numStr;
-        char c;
-        in >> c;
-
-        if (c == '0') {
-            numStr += c;
-            char next = in.peek();
-            if (next == 'x' || next == 'X') {
-                in.get(c);
-                numStr += c;
-            } else {
-                h.ref = 0;
-                return in;
-            }
+        if (in) {
+            label.ref = result;
         } else {
-            in.setstate(std::ios::failbit);
-            return in;
-        }
-
-        bool hasDigit = false;
-        while (in.get(c)) {
-            if (isxdigit(c)) {
-                numStr += c;
-                hasDigit = true;
-            } else {
-                in.unget();
-                break;
-            }
-        }
-
-        if (!hasDigit) {
-            in.setstate(std::ios::failbit);
-            return in;
-        }
-
-        try {
-            h.ref = std::stoull(numStr, nullptr, 16);
-        } catch (...) {
             in.setstate(std::ios::failbit);
         }
         return in;
     }
 
     std::istream& operator>>(std::istream& in, StringIO&& s) {
-        in >> std::ws;
         char quote;
-        in.get(quote);
+        in >> std::ws >> quote;
         if (quote != '"') {
             in.setstate(std::ios::failbit);
             return in;
         }
         std::getline(in, s.ref, '"');
+        if (!in) {
+            in.setstate(std::ios::failbit);
+        }
+        return in;
+    }
+
+    std::istream& operator>>(std::istream& in, ScientificIO&& sci) {
+        double value;
+        in >> value;
+        if (!in || !(std::isfinite(value))) {
+            in.setstate(std::ios::failbit);
+            return in;
+        }
+        double absValue = std::abs(value);
+        if (absValue == 0.0 || absValue >= 10.0 || absValue < 1.0) {
+            in.setstate(std::ios::failbit);
+            return in;
+        }
+        sci.ref = value;
+        return in;
+    }
+
+    std::istream& operator>>(std::istream& in, HexIO&& hex) {
+        std::string str;
+        in >> str;
+        if (str.size() < 3 || (str.substr(0, 2) != "0x" && str.substr(0, 2) != "0X")) {
+            in.setstate(std::ios::failbit);
+            return in;
+        }
+        try {
+            hex.ref = std::stoull(str, nullptr, 16);
+        } catch (...) {
+            in.setstate(std::ios::failbit);
+        }
         return in;
     }
 }
