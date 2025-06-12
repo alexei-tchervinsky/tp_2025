@@ -1,6 +1,7 @@
 #include "IO_Objects.hpp"
 #include <iomanip>
 #include <sstream>
+#include <cctype>
 
 namespace solution {
     std::istream& operator>>(std::istream& in, DelimiterIO&& d) {
@@ -31,8 +32,8 @@ namespace solution {
     std::istream& operator>>(std::istream& in, DoubleIO&& d) {
         std::string numStr;
         char c;
-        while (in.get(c) && (isdigit(c) || c == '.' || c == '-' || c == '+' || c == 'e' || c == 'E')) {
-            numStr += c;
+        while (in.get(c) && (isdigit(c) || c == '.' || c == '-' || c == '+' || c == 'e' || c == 'E' || c == 'd')) {
+            if (c != 'd') numStr += c;
         }
         in.unget();
 
@@ -51,7 +52,11 @@ namespace solution {
 
         if (c == '0') {
             numStr += c;
-            if (in.peek() == 'x' || in.peek() == 'X') {
+            char next = in.peek();
+            if (next == 'x' || next == 'X') {
+                in >> c;
+                numStr += c;
+            } else if (next == 'b' || next == 'B') {
                 in >> c;
                 numStr += c;
             }
@@ -63,7 +68,8 @@ namespace solution {
         }
 
         while (in.get(c)) {
-            if (isxdigit(c)) {
+            if (isxdigit(c) || c == 'u' || c == 'l' || c == 'L') {
+                if (isalpha(c)) continue;
                 numStr += c;
             } else {
                 in.unget();
@@ -72,7 +78,11 @@ namespace solution {
         }
 
         try {
-            h.ref = std::stoull(numStr, nullptr, 0);
+            size_t pos = 0;
+            h.ref = std::stoull(numStr, &pos, 0);
+            if (pos != numStr.length()) {
+                in.setstate(std::ios::failbit);
+            }
         } catch (...) {
             in.setstate(std::ios::failbit);
         }
