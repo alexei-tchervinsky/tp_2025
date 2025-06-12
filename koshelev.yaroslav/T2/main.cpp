@@ -2,8 +2,8 @@
 #include <vector>
 #include <algorithm>
 #include <iterator>
-#include "iofmtguard.hpp"
-#include "DataStruct.hpp"
+#include "iofmtguard.h"
+#include "DataStruct.h"
 
 int main() {
     using namespace solution;
