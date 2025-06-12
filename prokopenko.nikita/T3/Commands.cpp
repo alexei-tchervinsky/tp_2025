@@ -38,7 +38,7 @@ namespace prokopenko {
       if (!(iss >> ch) || ch != ')') return false;
       p.points.push_back(pt);
     }
-    if (p.points.size() != static_cast<size_t>(count)) return false;
+    if (static_cast<int>(p.points.size()) != count) return false;
     poly = p;
     return true;
   }
@@ -54,7 +54,7 @@ namespace prokopenko {
       if (arg == "EVEN" || arg == "ODD") {
         int parity = (arg == "EVEN") ? 0 : 1;
         int count = std::count_if(polygons.begin(), polygons.end(), [parity](const Polygon& p) {
-          return p.points.size() % 2 == parity;
+          return static_cast<int>(p.points.size()) % 2 == parity;
           });
         std::cout << count << '\n';
       }
@@ -62,7 +62,7 @@ namespace prokopenko {
         try {
           int n = std::stoi(arg);
           int count = std::count_if(polygons.begin(), polygons.end(), [n](const Polygon& p) {
-            return p.points.size() == static_cast<size_t>(n);
+            return static_cast<int>(p.points.size()) == n;
             });
           std::cout << count << '\n';
         }
@@ -82,7 +82,7 @@ namespace prokopenko {
         int parity = (arg == "EVEN") ? 0 : 1;
         double total = 0.0;
         for (const auto& p : polygons) {
-          if (p.points.size() % 2 == parity) {
+          if (static_cast<int>(p.points.size()) % 2 == parity) {
             total += getArea(p);
           }
         }
@@ -93,7 +93,7 @@ namespace prokopenko {
           int n = std::stoi(arg);
           double total = 0.0;
           for (const auto& p : polygons) {
-            if (p.points.size() == static_cast<size_t>(n)) {
+            if (static_cast<int>(p.points.size()) == n) {
               total += getArea(p);
             }
           }
