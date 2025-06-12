@@ -121,6 +121,18 @@ namespace solution {
     std::istream& operator>>(std::istream& in, Key1IO&& k) {
         in >> std::ws;
         if (in.peek() == '"' || in.peek() == '\'' || in.peek() == '#') {
+            std::string dummy;
+            if (in.peek() == '"') {
+                in.get();
+                std::getline(in, dummy, '"');
+            } else if (in.peek() == '\'') {
+                in.get();
+                in.get();
+                in.get();
+            } else if (in.peek() == '#') {
+                in.get();
+                std::getline(in, dummy, ')');
+            }
             in.setstate(std::ios::failbit);
             return in;
         }
