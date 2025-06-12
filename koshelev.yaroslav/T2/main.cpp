@@ -15,10 +15,6 @@ int main() {
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
     }
-    if (records.empty()) {
-        std::cout << "Looks like there is no supported record. Cannot determine input. Test skipped\n";
-        return 0;
-    }
     std::sort(records.begin(), records.end());
     for (const auto& entry : records) {
         std::cout << entry << '\n';
