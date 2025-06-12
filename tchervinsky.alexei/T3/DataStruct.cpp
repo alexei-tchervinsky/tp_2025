@@ -3,9 +3,7 @@
 #include <numeric>
 #include <algorithm>
 #include <iterator>
-#ifdef ALEXEIT
 #include <limits>
-#endif
 
 namespace nspace
 {
@@ -37,9 +35,6 @@ namespace nspace
 
     std::istream& operator>>(std::istream& in, Point& point)
     {
-#ifdef ALEXEIT
-        // std::cin >> std::noskipws;
-#endif
         char ignore;
         if (!(in >> ignore)) return in;
         if (ignore != '(')
@@ -48,24 +43,9 @@ namespace nspace
             LOG(ignore)
 
             LOG("** ошибка со чтением точки ( **\n")
-#ifndef ALEXEIT
-            in.setstate(std::ios::failbit);
-#endif
-#ifdef ALEXEIT
             in.putback(ignore);
-#if 0
-            std::string cmd;
-            std::cin >> cmd;
-            std::cout << __FILE__ << ':' << __LINE__ << ':' << cmd << '\n';
-#endif
-#if 1
             in.setstate(std::ios::failbit);
-#endif
-            // in.clear();
             throw std::logic_error(INV_CMD);
-#endif // ALEXEIT
-
-            return in;
         }
 
         if (!(in >> point.x))
@@ -122,13 +102,7 @@ namespace nspace
 
         // Временный вектор для точек
         std::vector<Point> temp_points;
-#ifdef ALEXEIT
-// temp_points.reserve(numPoints);
-// auto it_start = std::istream_iterator<Point>(in);
-// auto it_start = temp_points.begin();
-// auto it_end = std::copy_n(std::istream_iterator<Point>(in), numPoints, temp_points.begin());
         std::copy_n(std::istream_iterator<Point>(in), numPoints, std::back_inserter(temp_points));
-#if 1
         auto it_start = temp_points.begin();
         auto it_end = temp_points.end();
         if ((static_cast<size_t>(it_end - it_start)) != numPoints)
@@ -141,31 +115,19 @@ namespace nspace
         {
             LOG("** copy_n copy EXACTLY AS expected **")
         }
-#endif
-#else
-        std::copy_n(std::istream_iterator<Point>(in), numPoints, std::back_inserter(temp_points));
-#endif // ALEXEIT
 
         if (in.fail())
         {
             LOG("** ошибка std::copy_n **\n")
-#ifdef ALEXEIT
             std::cin.clear();
-// std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-#endif // ALEXEIT
             return in;
         }
 
-#ifdef ALEXEIT
         std::string tail;
         std::getline(in, tail);
         LOG(tail.size())
         LOG(tail.c_str())
-#if 1
         if (tail.size() > 1)
-#else
-        if (tail.size() != 0)
-#endif
         {
             in.setstate(std::ios::failbit);
             // std::cout << in.get();
@@ -174,8 +136,6 @@ namespace nspace
             LOG("** ошибка, лишние точки: ") LOG(tail) LOG(" **\n")
             return in;
         }
-#endif // ALEXEIT
-
 
         if (temp_points.size() != numPoints)
         {
@@ -197,9 +157,7 @@ namespace nspace
         poly.points = std::move(temp_points);
 
         LOG("** Полигон: ") LOG(poly) LOG(" **\n")
-#ifdef ALEXEIT
         in.clear();
-#endif // ALEXEIT
         return in;
     }
 

@@ -55,12 +55,10 @@ namespace nspace
         else
         {
             size_t num = std::stoul(param);
-#ifdef ALEXEIT
             if (num < 3)
             {
                 throw std::invalid_argument(INV_CMD);
             }
-#endif
             auto pred = [num](const nspace::Polygon& p) { return p.points.size() == num; };
             double sum = std::accumulate(polygons.begin(), polygons.end(), 0.0, makeAreaAccumulator(pred));
             std::cout << sum << '\n';
