@@ -1,7 +1,6 @@
 #include "Polygon.hpp"
 #include <cmath>
 #include <numeric>
-#include <iterator>
 
 namespace prokopenko {
 
@@ -37,11 +36,13 @@ namespace prokopenko {
       return in;
     }
     std::vector<Point> tmp;
-    std::copy_n(std::istream_iterator<Point>(in),
-      n, std::back_inserter(tmp));
-    if (tmp.size() != n || in.fail()) {
-      in.setstate(std::ios::failbit);
-      return in;
+    for (size_t i = 0; i < n; ++i) {
+      Point p;
+      if (!(in >> p)) {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+      tmp.push_back(p);
     }
     pg.points = std::move(tmp);
     return in;
