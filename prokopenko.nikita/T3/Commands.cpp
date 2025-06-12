@@ -11,28 +11,10 @@ namespace prokopenko {
 
   using namespace std;
 
-  std::istream& operator>>(std::istream& in, Point& p) {
-    char c;
-    in >> c >> p.x >> c >> p.y >> c;
-    return in;
-  }
-
-  Polygon parsePolygon(std::istream& in) {
-    int n;
-    in >> n;
-    Polygon poly;
-    poly.points.reserve(n);
-    for (int i = 0; i < n; ++i) {
-      Point p;
-      in >> p;
-      poly.points.push_back(p);
-    }
-    return poly;
-  }
-
   void doCommand(const std::string& command, std::vector<Polygon>& data, std::istream& in) {
     if (command == "ECHO") {
-      Polygon p = parsePolygon(in);
+      Polygon p;
+      in >> p;
       data.push_back(p);
     }
     else if (command == "COUNT") {

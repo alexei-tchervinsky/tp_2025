@@ -14,4 +14,23 @@ namespace prokopenko {
     return std::abs(area) / 2.0;
   }
 
+  std::istream& operator>>(std::istream& in, Point& p) {
+    char c;
+    in >> c >> p.x >> c >> p.y >> c;
+    return in;
+  }
+
+  std::istream& operator>>(std::istream& in, Polygon& p) {
+    int n;
+    in >> n;
+    p.points.clear();
+    p.points.reserve(n);
+    for (int i = 0; i < n; ++i) {
+      Point pt;
+      in >> pt;
+      p.points.push_back(pt);
+    }
+    return in;
+  }
+
 }
