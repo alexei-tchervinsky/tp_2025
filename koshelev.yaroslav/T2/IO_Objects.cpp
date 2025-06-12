@@ -29,82 +29,45 @@ namespace solution {
         return in;
     }
 
-    std::istream& operator>>(std::istream& in, DoubleIO&& d) {
-        std::string numStr;
-        char c;
-        bool hasDigit = false;
+std::istream& operator>>(std::istream& in, DoubleIO&& d) {
+    std::string numStr;
+    char c;
+    bool hasDigit = false;
 
-        if (in.peek() == '+' || in.peek() == '-') {
-            in.get(c);
+    if (in.peek() == '+' || in.peek() == '-') {
+        in.get(c);
+        numStr += c;
+    }
+
+    while (in.get(c)) {
+        if (std::isdigit(c)) {
+            numStr += c;
+            hasDigit = true;
+        }
+        else if (c == '.' || c == 'e' || c == 'E') {
             numStr += c;
         }
-
-        while (in.get(c)) {
-            if (isdigit(c)) {
-                numStr += c;
-                hasDigit = true;
-            }
-            else if (c == '.' || c == 'e' || c == 'E') {
-                numStr += c;
-            }
-            else {
-                in.unget();
-                break;
-            }
+        else if (c == 'd' || c == 'D') {
+            break;
         }
-
-        if (!hasDigit) {
-            in.setstate(std::ios::failbit);
-            return in;
+        else {
+            in.unget();
+            break;
         }
+    }
 
-        try {
-            d.ref = std::stod(numStr);
-        } catch (...) {
-            in.setstate(std::ios::failbit);
-        }
+    if (!hasDigit) {
+        in.setstate(std::ios::failbit);
         return in;
     }
 
-    std::istream& operator>>(std::istream& in, HexUllIO&& h) {
-        std::string numStr;
-        char c;
-        in >> std::ws >> c;
-
-        if (c == '0') {
-            numStr += c;
-            char next = in.peek();
-            if (next == 'x' || next == 'X' || next == 'b' || next == 'B') {
-                in.get(c);
-                numStr += c;
-            }
-        } else if (isdigit(c)) {
-            numStr += c;
-        } else {
-            in.setstate(std::ios::failbit);
-            return in;
-        }
-
-        while (in.get(c)) {
-            if (isxdigit(c)) {
-                numStr += c;
-            } else {
-                in.unget();
-                break;
-            }
-        }
-
-        try {
-            size_t pos = 0;
-            h.ref = std::stoull(numStr, &pos, 0);
-            if (pos != numStr.length()) {
-                in.setstate(std::ios::failbit);
-            }
-        } catch (...) {
-            in.setstate(std::ios::failbit);
-        }
-        return in;
+    try {
+        d.ref = std::stod(numStr);
+    } catch (...) {
+        in.setstate(std::ios::failbit);
     }
+    return in;
+}
 
     std::istream& operator>>(std::istream& in, StringIO&& s) {
         in >> std::ws;
