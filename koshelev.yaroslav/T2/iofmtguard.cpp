@@ -1,10 +1,17 @@
 #include "iofmtguard.h"
 
-iofmtguard::iofmtguard(std::basic_ios<char>& s)
-    : s_(s), fill_(s.fill()), precision_(s.precision()), fmt_(s.flags()) {}
+namespace solution {
 
-iofmtguard::~iofmtguard() {
-    s_.fill(fill_);
-    s_.precision(precision_);
-    s_.flags(fmt_);
+    iofmtguard::iofmtguard(std::basic_ios<char>& stream)
+        : stream_(stream),
+          fill_(stream.fill()),
+          precision_(stream.precision()),
+          flags_(stream.flags()) {}
+
+    iofmtguard::~iofmtguard() {
+        stream_.fill(fill_);
+        stream_.precision(precision_);
+        stream_.flags(flags_);
+    }
+
 }
