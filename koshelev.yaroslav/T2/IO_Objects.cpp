@@ -119,30 +119,11 @@ namespace solution {
     }
 
     std::istream& operator>>(std::istream& in, Key1IO&& k) {
-        std::string numStr;
-        char c;
-        in >> std::ws >> c;
-
-        if (c == '"') {
-            std::string dummy;
-            std::getline(in, dummy, '"');
-            k.ref = 0.0;
+        in >> std::ws;
+        if (in.peek() == '"' || in.peek() == '\'' || in.peek() == '#') {
+            in.setstate(std::ios::failbit);
             return in;
         }
-        else if (c == '\'') {
-            in >> c >> c;
-            k.ref = 0.0;
-            return in;
-        }
-        else if (c == '#') {
-            std::string dummy;
-            std::getline(in, dummy, ')');
-            k.ref = 0.0;
-            return in;
-        }
-        else {
-            in.unget();
-            return in >> DoubleIO{k.ref};
-        }
+        return in >> DoubleIO{k.ref};
     }
 }
