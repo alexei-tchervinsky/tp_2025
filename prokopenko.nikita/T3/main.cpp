@@ -4,6 +4,7 @@
 #include <fstream>
 #include <string>
 #include <limits>
+#include <sstream>
 #include <functional>
 #include "commands.hpp"
 
@@ -25,19 +26,21 @@ int main(int argc, char* argv[])
   }
 
   std::vector<Polygon> polygons;
-  while (!input.eof())
+  std::string line;
+  while (std::getline(input, line))
   {
+    if (line.empty())
+      continue;
+
+    std::istringstream iss(line);
     Polygon poly;
-    std::streampos pos = input.tellg();
-    if (input >> poly)
+    if (iss >> poly)
     {
-      polygons.push_back(poly);
-    }
-    else
-    {
-      input.clear();
-      input.seekg(pos);
-      input.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      char extra;
+      if (!(iss >> extra))
+      {
+        polygons.push_back(poly);
+      }
     }
   }
 
