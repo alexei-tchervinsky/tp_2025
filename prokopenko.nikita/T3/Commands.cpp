@@ -151,6 +151,15 @@ namespace prokopenko {
     }
   }
 
+  void Mean(const std::vector<Polygon>& polys, std::ostream& out) {
+    if (polys.empty()) {
+      out << "<EMPTY DATASET>\n";
+      return;
+    }
+    double s = sumAreas(polys);
+    out << std::fixed << std::setprecision(1) << (s / polys.size()) << '\n';
+  }
+
   void CountOdd(const std::vector<Polygon>& polys, std::ostream& out) {
     size_t cnt = 0;
     for (const auto& p : polys) {
