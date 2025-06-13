@@ -1,14 +1,11 @@
 ﻿#include <iostream>
-#include <fstream>
-#include <vector>
-#include <string>
 #include <map>
-#include <functional>
+#include <vector>
+#include <fstream>
+#include <string>
 #include <limits>
-#include <algorithm>
-#include <cctype>
+#include <functional>
 #include "commands.hpp"
-#include "polygon.hpp"
 
 using namespace prokopenko;
 
@@ -18,26 +15,26 @@ int main(int argc, char* argv[])
     std::cerr << "Error: wrong input\n";
     return 1;
   }
-  std::ifstream infile(argv[1]);
-  if (!infile) {
+  std::ifstream input(argv[1]);
+  if (!input) {
     std::cerr << "Error: file cannot be opened\n";
     return 1;
   }
-
   std::vector<Polygon> polygons;
-  while (!infile.eof()) {
+  while (!input.eof()) {
     Polygon poly;
-    std::streampos pos = infile.tellg();
-    if (infile >> poly) {
-      polygons.push_back(poly);
+    std::streampos pos = input.tellg();
+    if (input >> poly) {
+      if (poly.getArea() > 1e-6) {
+        polygons.push_back(poly);
+      }
     }
     else {
-      infile.clear();
-      infile.seekg(pos);
-      infile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      input.clear();
+      input.seekg(pos);
+      input.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
   }
-
   std::map<std::string, std::function<void(const std::vector<Polygon>&, std::ostream&)>> commands;
   commands["AREA"] = Area;
   commands["MAX"] = Max;
@@ -62,21 +59,18 @@ int main(int argc, char* argv[])
       CountEven(polys, out);
     }
     else if (!param.empty() && std::all_of(param.begin(), param.end(), ::isdigit)) {
-      size_t n = 0;
       try {
-        n = std::stoul(param);
+        size_t n = std::stoul(param);
+        CountN(polys, out, n);
       }
       catch (...) {
         out << "<INVALID COMMAND>\n";
-        return;
       }
-      CountN(polys, out, n);
     }
     else {
       out << "<INVALID COMMAND>\n";
     }
     };
-
   std::string cmd;
   while (std::cin >> cmd) {
     auto it = commands.find(cmd);
