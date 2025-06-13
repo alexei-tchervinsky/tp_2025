@@ -5,7 +5,6 @@
 #include <string>
 #include <limits>
 #include <functional>
-#include <iterator>
 #include "commands.hpp"
 
 using namespace prokopenko;
@@ -19,31 +18,33 @@ int main(int argc, char* argv[])
   }
 
   std::ifstream input(argv[1]);
-  std::vector<Polygon> polygons;
-  while (!input.eof())
+  if (!input)
   {
-    std::copy(
-      std::istream_iterator<Polygon>{input},
-      std::istream_iterator<Polygon>{},
-      std::back_inserter(polygons));
-    if (input.fail())
-    {
-      input.clear();
-      input.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    }
+    std::cerr << "Error: cannot open file\n";
+    return 1;
   }
 
-  std::map<std::string, std::function<void(const std::vector<Polygon>&, std::ostream&)>> commands;
-  commands["AREA"] = prokopenko::Area;
-  commands["MAX"] = prokopenko::Max;
-  commands["MIN"] = prokopenko::Min;
-  commands["MEAN"] = prokopenko::Mean;
-  commands["SAME"] = prokopenko::Same;
-  commands["RIGHT"] = prokopenko::Right;
-  commands["PERMS"] = prokopenko::Perms;
-  commands["LESS"] = prokopenko::Less;
-  commands["MORE"] = prokopenko::More;
-  commands["EQUAL"] = prokopenko::Equal;
+  std::vector<Polygon> polygons;
+  Polygon polygon;
+  while (input >> polygon)
+  {
+    polygons.push_back(polygon);
+  }
+  input.clear();
+  input.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+  std::map<std::string, std::function<void(const std::vector<Polygon>&, std::ostream&)>> commands = {
+    {"AREA", Area},
+    {"MAX", Max},
+    {"MIN", Min},
+    {"MEAN", Mean},
+    {"SAME", Same},
+    {"RIGHT", Right},
+    {"PERMS", Perms},
+    {"LESS", Less},
+    {"MORE", More},
+    {"EQUAL", Equal}
+  };
 
   std::string parameter;
   while (std::cin >> parameter)
