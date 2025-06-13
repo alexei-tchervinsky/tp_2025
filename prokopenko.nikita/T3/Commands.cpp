@@ -10,19 +10,16 @@ namespace prokopenko {
 
   static constexpr double EPS = 1e-6;
 
-  // Сумма площадей
   static double sumAreas(const std::vector<Polygon>& polys) {
     return std::accumulate(polys.begin(), polys.end(), 0.0,
       [](double acc, const Polygon& p) {
         return acc + p.getArea();
       });
   }
-  // Проверка равенства площадей
   static bool equalArea(const Polygon& a, const Polygon& b) {
     return std::fabs(a.getArea() - b.getArea()) < EPS;
   }
 
-  // AREA <param>
   void Area(const std::vector<Polygon>& polys, std::ostream& out) {
     std::string param;
     if (!(std::cin >> param)) {
@@ -81,7 +78,6 @@ namespace prokopenko {
     }
   }
 
-  // MAX <param>
   void Max(const std::vector<Polygon>& polys, std::ostream& out) {
     std::string param;
     if (!(std::cin >> param)) {
@@ -118,7 +114,6 @@ namespace prokopenko {
     }
   }
 
-  // MIN <param>
   void Min(const std::vector<Polygon>& polys, std::ostream& out) {
     std::string param;
     if (!(std::cin >> param)) {
@@ -155,7 +150,6 @@ namespace prokopenko {
     }
   }
 
-  // MEAN
   void Mean(const std::vector<Polygon>& polys, std::ostream& out) {
     if (polys.empty()) {
       out << "<INVALID COMMAND>\n";
@@ -165,7 +159,6 @@ namespace prokopenko {
     out << std::fixed << std::setprecision(1) << (s / polys.size()) << '\n';
   }
 
-  // COUNT ODD
   void CountOdd(const std::vector<Polygon>& polys, std::ostream& out) {
     size_t cnt = 0;
     for (const auto& p : polys) {
@@ -173,7 +166,6 @@ namespace prokopenko {
     }
     out << cnt << '\n';
   }
-  // COUNT EVEN
   void CountEven(const std::vector<Polygon>& polys, std::ostream& out) {
     size_t cnt = 0;
     for (const auto& p : polys) {
@@ -181,7 +173,6 @@ namespace prokopenko {
     }
     out << cnt << '\n';
   }
-  // COUNT N
   void CountN(const std::vector<Polygon>& polys,
     std::ostream& out,
     size_t n) {
@@ -196,7 +187,6 @@ namespace prokopenko {
     out << cnt << '\n';
   }
 
-  // SAME N polygon
   void Same(const std::vector<Polygon>& polys, std::ostream& out) {
     size_t n = 0;
     if (!(std::cin >> n)) {
@@ -215,7 +205,6 @@ namespace prokopenko {
     out << cnt << '\n';
   }
 
-  // RIGHT
   void Right(const std::vector<Polygon>& polys, std::ostream& out) {
     size_t cnt = 0;
     for (const auto& p : polys) {
@@ -224,7 +213,6 @@ namespace prokopenko {
     out << cnt << '\n';
   }
 
-  // PERMS N polygon
   void Perms(const std::vector<Polygon>& polys, std::ostream& out) {
     size_t n = 0;
     if (!(std::cin >> n)) {
@@ -243,7 +231,6 @@ namespace prokopenko {
     out << cnt << '\n';
   }
 
-  // LESS polygon
   void Less(const std::vector<Polygon>& polys, std::ostream& out) {
     Polygon pattern;
     if (!(std::cin >> pattern)) {
@@ -258,7 +245,6 @@ namespace prokopenko {
     out << cnt << '\n';
   }
 
-  // MORE polygon
   void More(const std::vector<Polygon>& polys, std::ostream& out) {
     Polygon pattern;
     if (!(std::cin >> pattern)) {
@@ -273,7 +259,6 @@ namespace prokopenko {
     out << cnt << '\n';
   }
 
-  // EQUAL polygon
   void Equal(const std::vector<Polygon>& polys, std::ostream& out) {
     Polygon pattern;
     if (!(std::cin >> pattern)) {

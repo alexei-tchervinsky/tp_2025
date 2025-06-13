@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <iostream>
+#include <cmath>
 
 namespace prokopenko
 {
@@ -31,8 +32,8 @@ namespace prokopenko
       }
       return std::abs(area) / 2.0;
     }
+
     bool isRight() const {
-      // проверяем, является ли многоугольник «right» (каждые три подряд точки образуют прямой угол)
       size_t n = points.size();
       if (n < 3) return false;
       for (size_t i = 0; i < n; ++i) {
@@ -49,12 +50,12 @@ namespace prokopenko
       }
       return true;
     }
+
     bool isPermOf(const Polygon& other) const {
       if (points.size() != other.points.size()) return false;
       size_t n = points.size();
       for (size_t offset = 0; offset < n; ++offset) {
         bool ok = true;
-        // по часовой
         for (size_t i = 0; i < n; ++i) {
           if (points[i] != other.points[(i + offset) % n]) {
             ok = false;
@@ -62,7 +63,6 @@ namespace prokopenko
           }
         }
         if (ok) return true;
-        // против часовой
         ok = true;
         for (size_t i = 0; i < n; ++i) {
           if (points[i] != other.points[(n + offset - i) % n]) {
@@ -76,7 +76,6 @@ namespace prokopenko
     }
   };
 
-  // Чтение Point из формата "(x;y)"
   std::istream& operator>>(std::istream& in, Point& point) {
     char ch;
     in >> std::ws >> ch;
@@ -105,12 +104,10 @@ namespace prokopenko
     return in;
   }
 
-  // Чтение Polygon: сначала size, затем size точек
   std::istream& operator>>(std::istream& in, Polygon& polygon) {
     size_t sz;
     std::streampos pos = in.tellg();
     if (!(in >> sz)) {
-      // не число: откатываем
       in.clear();
       in.seekg(pos);
       in.setstate(std::ios::failbit);

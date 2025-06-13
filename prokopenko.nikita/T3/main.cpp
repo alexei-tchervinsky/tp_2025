@@ -2,13 +2,55 @@
 #include <fstream>
 #include <vector>
 #include <string>
-#include <functional>
+#include <sstream>
 #include <map>
+#include <functional>
+#include <cctype>
 #include <limits>
+#include <algorithm>
 #include "commands.hpp"
 #include "polygon.hpp"
 
 using namespace prokopenko;
+
+static bool isNumber(const std::string& s) {
+  if (s.empty()) return false;
+  for (char c : s) {
+    if (!std::isdigit(c)) return false;
+  }
+  return true;
+}
+
+static bool parsePolygonFromTokens(const std::vector<std::string>& toks,
+  size_t& idx,
+  Polygon& outPoly)
+{
+  if (idx >= toks.size()) return false;
+  const std::string& ssz = toks[idx];
+  if (!isNumber(ssz)) return false;
+  size_t sz = 0;
+  try {
+    sz = std::stoul(ssz);
+  }
+  catch (...) {
+    return false;
+  }
+  if (sz < 3) return false;
+  if (idx + 1 + sz > toks.size()) return false;
+  std::ostringstream oss;
+  oss << sz;
+  for (size_t i = 0; i < sz; ++i) {
+    oss << ' ' << toks[idx + 1 + i];
+  }
+  std::istringstream iss(oss.str());
+  Polygon p;
+  if (!(iss >> p)) {
+    return false;
+  }
+  outPoly = std::move(p);
+  idx += 1 + sz;
+  return true;
+}
 
 int main(int argc, char* argv[])
 {
@@ -22,86 +64,83 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  // Построчно читаем файл; блоки разделены пустыми строками.
-  // Для каждого блока сразу ожидаем одну команду из stdin и выполняем её на блоке.
-  std::string line;
-  std::vector<std::string> blockLines;
-  // Читаем все команды заранее в очередь
   std::vector<std::string> commandsQueue;
   {
-    std::string cmd;
-    while (std::cin >> cmd) {
-      commandsQueue.push_back(cmd);
+    std::string tok;
+    while (std::cin >> tok) {
+      commandsQueue.push_back(tok);
     }
   }
   size_t cmdIdx = 0;
 
+  std::string line;
+  std::vector<std::string> blockLines;
+
   auto processBlock = [&](const std::vector<std::string>& lines) {
-    // Парсим все валидные полигоны из lines
     std::vector<Polygon> polys;
     for (const auto& ln : lines) {
       std::istringstream iss(ln);
       Polygon p;
       if (iss >> p) {
-        polys.push_back(p);
+        polys.push_back(std::move(p));
       }
-      // иначе пропускаем некорректную строку
     }
-    if (cmdIdx < commandsQueue.size()) {
-      const std::string& cmd = commandsQueue[cmdIdx++];
-      static std::map<std::string, std::function<void(const std::vector<Polygon>&, std::ostream&)>> cmap = {
-          {"AREA", Area},
-          {"MAX", Max},
-          {"MIN", Min},
-          {"MEAN", Mean},
-          {"SAME", Same},
-          {"RIGHT", Right},
-          {"PERMS", Perms},
-          {"LESS", Less},
-          {"MORE", More},
-          {"EQUAL", Equal},
-          {"COUNT", nullptr} // обрабатывается ниже
-      };
-      if (cmd == "COUNT") {
-        // вызываем лямбду из commands.cpp
-        std::string param;
-        if (!(std::cin >> param)) {
+    if (cmdIdx >= commandsQueue.size()) {
+      std::cout << "<INVALID COMMAND>\n";
+      return;
+    }
+    const std::string cmd = commandsQueue[cmdIdx++];
+    if (cmd == "COUNT") {
+      if (cmdIdx >= commandsQueue.size()) {
+        std::cout << "<INVALID COMMAND>\n";
+        return;
+      }
+      const std::string param = commandsQueue[cmdIdx++];
+      if (param == "ODD") {
+        CountOdd(polys, std::cout);
+      }
+      else if (param == "EVEN") {
+        CountEven(polys, std::cout);
+      }
+      else if (isNumber(param)) {
+        size_t n = 0;
+        try {
+          n = std::stoul(param);
+        }
+        catch (...) {
           std::cout << "<INVALID COMMAND>\n";
+          return;
         }
-        else if (param == "ODD") {
-          CountOdd(polys, std::cout);
-        }
-        else if (param == "EVEN") {
-          CountEven(polys, std::cout);
-        }
-        else if (std::all_of(param.begin(), param.end(), ::isdigit)) {
-          try {
-            size_t n = std::stoul(param);
-            CountN(polys, std::cout, n);
-          }
-          catch (...) {
-            std::cout << "<INVALID COMMAND>\n";
-          }
-        }
-        else {
-          std::cout << "<INVALID COMMAND>\n";
-        }
+        CountN(polys, std::cout, n);
       }
       else {
-        auto it = cmap.find(cmd);
-        if (it != cmap.end() && it->second) {
-          it->second(polys, std::cout);
-        }
-        else {
-          std::cout << "<INVALID COMMAND>\n";
-        }
+        std::cout << "<INVALID COMMAND>\n";
       }
+      return;
     }
+    static const std::map<std::string,
+      std::function<void(const std::vector<Polygon>&, std::ostream&)>> cmap = {
+      {"AREA", Area},
+      {"MAX", Max},
+      {"MIN", Min},
+      {"MEAN", Mean},
+      {"SAME", Same},
+      {"RIGHT", Right},
+      {"PERMS", Perms},
+      {"LESS", Less},
+      {"MORE", More},
+      {"EQUAL", Equal}
+    };
+    auto it = cmap.find(cmd);
+    if (it == cmap.end()) {
+      std::cout << "<INVALID COMMAND>\n";
+      return;
+    }
+    it->second(polys, std::cout);
     };
 
   while (std::getline(infile, line)) {
     if (line.empty()) {
-      // конец блока
       processBlock(blockLines);
       blockLines.clear();
     }
@@ -109,11 +148,11 @@ int main(int argc, char* argv[])
       blockLines.push_back(line);
     }
   }
-  // последний блок, если есть
   if (!blockLines.empty()) {
     processBlock(blockLines);
+    blockLines.clear();
   }
-  // если команд осталось, но блоков закончилось, для каждой лишней команды выводим <INVALID COMMAND>
+  // лишние команды
   while (cmdIdx < commandsQueue.size()) {
     std::cout << "<INVALID COMMAND>\n";
     ++cmdIdx;
