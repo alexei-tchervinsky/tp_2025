@@ -48,18 +48,20 @@ namespace prokopenko
     if (!(in >> vertexes))
     {
       in.setstate(std::ios::failbit);
+      return in;
     }
+
     Point point;
     for (std::size_t i = 0; i < vertexes; ++i)
     {
       in >> point;
       if (in)
       {
-        polygon.points.push_back(point);
+        polygon.push_back(point);
       }
     }
 
-    if (vertexes != polygon.points.size() || polygon.points.size() < 3)
+    if (vertexes != polygon.size() || polygon.size() < 3)
     {
       in.setstate(std::ios::failbit);
     }

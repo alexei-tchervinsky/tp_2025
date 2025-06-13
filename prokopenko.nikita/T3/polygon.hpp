@@ -1,8 +1,9 @@
-#ifndef POLYGON_HPP
+﻿#ifndef POLYGON_HPP
 #define POLYGON_HPP
 
 #include <vector>
 #include <cstddef>
+#include <tuple>  // <-- добавлено для std::tie
 
 namespace prokopenko {
 
