@@ -1,74 +1,60 @@
 ﻿#include "polygon.hpp"
 #include <cmath>
+#include <algorithm>
 
 namespace prokopenko {
 
-  // Ввод точки формата "(x;y)"
-  std::istream& operator>>(std::istream& in, Point& point)
-  {
+  // Point
+
+  bool Point::operator==(const Point& other) const {
+    return x == other.x && y == other.y;
+  }
+
+  bool Point::operator!=(const Point& other) const {
+    return !(*this == other);
+  }
+
+  // Polygon parsing
+
+  std::istream& operator>>(std::istream& in, Point& point) {
     char ch = 0;
     in >> std::ws >> ch;
-    if (!in || ch != '(') {
+    if (ch != '(') {
       in.setstate(std::ios::failbit);
       return in;
     }
     in >> point.x >> ch;
-    if (!in || ch != ';') {
+    if (ch != ';') {
       in.setstate(std::ios::failbit);
       return in;
     }
     in >> point.y >> ch;
-    if (!in || ch != ')') {
+    if (ch != ')') {
       in.setstate(std::ios::failbit);
       return in;
     }
     return in;
   }
 
-  // Ввод полигона: сначала число вершин, затем точки
-  std::istream& operator>>(std::istream& in, Polygon& dest)
-  {
+  std::istream& operator>>(std::istream& in, Polygon& polygon) {
     size_t sz = 0;
     in >> sz;
-    if (!in) {
-      return in;
-    }
-    std::vector<Point> temp;
-    temp.reserve(sz);
+    if (!in) return in;
+    std::vector<Point> tmp;
+    tmp.reserve(sz);
     for (size_t i = 0; i < sz; ++i) {
-      Point pt;
-      in >> pt;
+      Point p;
+      in >> p;
       if (!in) {
-        // Ошибка чтения точки
-        in.setstate(std::ios::failbit);
         return in;
       }
-      temp.push_back(pt);
+      tmp.push_back(p);
     }
-    if (sz < 3 || temp.size() != sz) {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-    dest.points = std::move(temp);
+    polygon.points = std::move(tmp);
     return in;
   }
 
-  // Вывод точки
-  std::ostream& operator<<(std::ostream& out, const Point& point)
-  {
-    out << "(" << point.x << ";" << point.y << ")";
-    return out;
-  }
-
-  // Вывод полигона: количество точек + каждую через пробел
-  std::ostream& operator<<(std::ostream& out, const Polygon& polygon)
-  {
-    out << polygon.points.size();
-    for (const auto& pt : polygon.points) {
-      out << " " << pt;
-    }
-    return out;
-  }
+  // Polygon methods
 
   double Polygon::getArea() const {
     double area = 0.0;
@@ -77,53 +63,44 @@ namespace prokopenko {
     for (size_t i = 0; i < n; ++i) {
       const Point& a = points[i];
       const Point& b = points[(i + 1) % n];
-      area += static_cast<double>(a.x) * b.y - static_cast<double>(b.x) * a.y;
+      area += (a.x * b.y - b.x * a.y);
     }
-    return std::abs(area) / 2.0;
+    return std::fabs(area) / 2.0;
   }
 
   bool Polygon::isRight() const {
     size_t n = points.size();
     if (n < 3) return false;
-    // Проверяем, есть ли хотя бы один прямой угол
     for (size_t i = 0; i < n; ++i) {
       const Point& prev = points[(i + n - 1) % n];
       const Point& cur = points[i];
       const Point& next = points[(i + 1) % n];
-      int dx1 = cur.x - prev.x;
-      int dy1 = cur.y - prev.y;
+      int dx1 = prev.x - cur.x;
+      int dy1 = prev.y - cur.y;
       int dx2 = next.x - cur.x;
       int dy2 = next.y - cur.y;
-      if ((dx1 * dx2 + dy1 * dy2) == 0) {
+      if (dx1 * dx2 + dy1 * dy2 == 0) {
         return true;
       }
     }
     return false;
   }
 
-  bool Polygon::operator==(const Polygon& other) const {
-    return points == other.points;
-  }
-
   bool Polygon::isPermOf(const Polygon& other) const {
     if (points.size() != other.points.size()) return false;
     size_t n = points.size();
-    if (n == 0) return true;
-    // Проверяем все циклические сдвиги (CW и CCW)
-    for (size_t offset = 0; offset < n; ++offset) {
+    for (size_t shift = 0; shift < n; ++shift) {
       bool okCW = true;
       for (size_t i = 0; i < n; ++i) {
-        if (points[i] != other.points[(i + offset) % n]) {
+        if (points[i] != other.points[(i + shift) % n]) {
           okCW = false;
           break;
         }
       }
       if (okCW) return true;
-
       bool okCCW = true;
       for (size_t i = 0; i < n; ++i) {
-        size_t idx = (offset + n - i) % n;
-        if (points[i] != other.points[idx]) {
+        if (points[i] != other.points[(n + shift - i) % n]) {
           okCCW = false;
           break;
         }
