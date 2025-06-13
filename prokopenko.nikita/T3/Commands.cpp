@@ -10,14 +10,14 @@ namespace prokopenko {
 
   static constexpr double EPS = 1e-6;
 
-  // Сумма площадей всех полигонов
+  // Сумма площадей
   static double sumAreas(const std::vector<Polygon>& polys) {
     return std::accumulate(polys.begin(), polys.end(), 0.0,
       [](double acc, const Polygon& p) {
         return acc + p.getArea();
       });
   }
-  // Проверка равенства площадей с допуском
+  // Проверка равенства площадей
   static bool equalArea(const Polygon& a, const Polygon& b) {
     return std::fabs(a.getArea() - b.getArea()) < EPS;
   }
@@ -208,7 +208,6 @@ namespace prokopenko {
       out << "<INVALID COMMAND>\n";
       return;
     }
-    // Считаем, сколько в polys совпадает по пермутации
     size_t cnt = 0;
     for (const auto& p : polys) {
       if (p.isPermOf(pattern)) ++cnt;
@@ -216,7 +215,7 @@ namespace prokopenko {
     out << cnt << '\n';
   }
 
-  // RIGHT polygon-less: считаем, сколько прямоугольных (или “right”) среди polys
+  // RIGHT
   void Right(const std::vector<Polygon>& polys, std::ostream& out) {
     size_t cnt = 0;
     for (const auto& p : polys) {
@@ -225,7 +224,7 @@ namespace prokopenko {
     out << cnt << '\n';
   }
 
-  // PERMS N polygon: считаем, сколько в polys пермутаций pattern
+  // PERMS N polygon
   void Perms(const std::vector<Polygon>& polys, std::ostream& out) {
     size_t n = 0;
     if (!(std::cin >> n)) {
@@ -244,7 +243,7 @@ namespace prokopenko {
     out << cnt << '\n';
   }
 
-  // LESS polygon: count areas < area(pattern)
+  // LESS polygon
   void Less(const std::vector<Polygon>& polys, std::ostream& out) {
     Polygon pattern;
     if (!(std::cin >> pattern)) {
@@ -274,7 +273,7 @@ namespace prokopenko {
     out << cnt << '\n';
   }
 
-  // EQUAL polygon: count equal-area
+  // EQUAL polygon
   void Equal(const std::vector<Polygon>& polys, std::ostream& out) {
     Polygon pattern;
     if (!(std::cin >> pattern)) {

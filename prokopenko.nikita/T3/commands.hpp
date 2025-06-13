@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <iostream>
-#include <string>
 #include "polygon.hpp"
 
 namespace prokopenko {
