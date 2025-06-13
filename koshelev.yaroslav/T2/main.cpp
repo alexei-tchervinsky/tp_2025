@@ -1,29 +1,33 @@
-#include "DataStruct.hpp"
-#include <iostream>
-#include <vector>
 #include <algorithm>
+#include <vector>
+#include <iostream>
+#include <iterator>
 #include <limits>
+#include "DataStruct.hpp"
 
 int main() {
     using namespace nspace;
 
-    std::vector<DataStruct> data;
-    DataStruct temp;
-
+    std::vector<DataStruct> ds;
     while (!std::cin.eof()) {
-        if (std::cin >> temp) {
-            data.push_back(temp);
-        } else {
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        }
+        std::copy(
+            std::istream_iterator<DataStruct>(std::cin),
+            std::istream_iterator<DataStruct>(),
+            std::back_inserter(ds)
+        );
+        if (!std::cin.fail())
+            continue;
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
 
-    std::sort(data.begin(), data.end(), compare);
+    std::sort(ds.begin(), ds.end(), compare);
 
-    for (const auto& el : data) {
-        std::cout << el << "\n";
-    }
+    std::copy(
+        ds.begin(),
+        ds.end(),
+        std::ostream_iterator<DataStruct>(std::cout, "\n")
+    );
 
     return 0;
 }
