@@ -33,30 +33,29 @@ int main(int argc, char* argv[])
     }
   }
 
-  std::map<std::string, std::function<void(std::vector<Polygon>& polygons,
-    std::ostream& out,
-    std::istream& in)>> commands;
-  {
-    using namespace std::placeholders;
-    commands["AREA"] = std::bind(prokopenko::Area, _1, _2, _3);
-    commands["MAX"] = std::bind(prokopenko::Max, _1, _2, _3);
-    commands["MIN"] = std::bind(prokopenko::Min, _1, _2, _3);
-    commands["COUNT"] = std::bind(prokopenko::Count, _1, _2, _3);
-    commands["PERMS"] = std::bind(prokopenko::Perms, _1, _2, _3);
-    commands["RIGHTSHAPES"] = std::bind(prokopenko::Rightshapes, _1, _2);
-  }
+  std::map<std::string, std::function<void(const std::vector<Polygon>&, std::ostream&)>> commands;
+  commands["AREA"] = prokopenko::Area;
+  commands["MAX"] = prokopenko::Max;
+  commands["MIN"] = prokopenko::Min;
+  commands["MEAN"] = prokopenko::Mean;
+  commands["SAME"] = prokopenko::Same;
+  commands["RIGHT"] = prokopenko::Right;
+  commands["PERMS"] = prokopenko::Perms;
+  commands["LESS"] = prokopenko::Less;
+  commands["MORE"] = prokopenko::More;
+  commands["EQUAL"] = prokopenko::Equal;
 
-  auto outInvalid = std::bind(outMessage, std::placeholders::_1, "<INVALID COMMAND>\n");
   std::string parameter;
   while (std::cin >> parameter)
   {
-    try
+    auto it = commands.find(parameter);
+    if (it != commands.end())
     {
-      commands.at(parameter)(polygons, std::cout, std::cin);
+      it->second(polygons, std::cout);
     }
-    catch (const std::out_of_range& ex)
+    else
     {
-      outInvalid(std::cout);
+      std::cout << "<INVALID COMMAND>\n";
       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
   }
