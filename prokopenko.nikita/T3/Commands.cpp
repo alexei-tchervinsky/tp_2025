@@ -9,13 +9,6 @@
 namespace prokopenko {
 
   static constexpr double EPS = 1e-6;
-
-  static double sumAreas(const std::vector<Polygon>& polys) {
-    return std::accumulate(polys.begin(), polys.end(), 0.0,
-      [](double acc, const Polygon& p) {
-        return acc + p.getArea();
-      });
-  }
   static bool equalArea(const Polygon& a, const Polygon& b) {
     return std::fabs(a.getArea() - b.getArea()) < EPS;
   }
@@ -49,7 +42,6 @@ namespace prokopenko {
         out << "<INVALID COMMAND>\n";
         return;
       }
-      // среднее по всем ненулевым?
       double s = 0.0;
       size_t cnt = 0;
       for (const auto& p : polys) {
