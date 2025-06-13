@@ -19,9 +19,8 @@ int main(int argc, char* argv[]) {
 
     std::vector<Polygon> polygons;
     for (Polygon poly; file >> poly; ) {
-        if (poly.vertexCount() >= 3) {
+        if (poly.vertexCount() >= 3)
             polygons.push_back(std::move(poly));
-        }
     }
 
     processCommands(polygons);
