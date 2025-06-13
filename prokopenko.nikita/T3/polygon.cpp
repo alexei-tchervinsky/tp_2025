@@ -1,16 +1,9 @@
 ﻿#include "polygon.hpp"
 #include <cmath>
-#include <algorithm>
 
 namespace prokopenko {
 
-  bool Point::operator==(const Point& other) const {
-    return x == other.x && y == other.y;
-  }
-  bool Point::operator!=(const Point& other) const {
-    return !(*this == other);
-  }
-
+  // Ввод точки формата "(x;y)"
   std::istream& operator>>(std::istream& in, Point& point)
   {
     char ch = 0;
@@ -32,6 +25,7 @@ namespace prokopenko {
     return in;
   }
 
+  // Ввод полигона: сначала число вершин, затем точки
   std::istream& operator>>(std::istream& in, Polygon& dest)
   {
     size_t sz = 0;
@@ -45,16 +39,13 @@ namespace prokopenko {
       Point pt;
       in >> pt;
       if (!in) {
-        // чтение точки не удалось — установить fail и вернуть
-        dest.clear();
+        // Ошибка чтения точки
         in.setstate(std::ios::failbit);
         return in;
       }
       temp.push_back(pt);
     }
-    // проверяем: если меньше 3 вершин или некорректное число прочитано
-    if (temp.size() != sz || sz < 3) {
-      dest.clear();
+    if (sz < 3 || temp.size() != sz) {
       in.setstate(std::ios::failbit);
       return in;
     }
@@ -62,12 +53,14 @@ namespace prokopenko {
     return in;
   }
 
+  // Вывод точки
   std::ostream& operator<<(std::ostream& out, const Point& point)
   {
     out << "(" << point.x << ";" << point.y << ")";
     return out;
   }
 
+  // Вывод полигона: количество точек + каждую через пробел
   std::ostream& operator<<(std::ostream& out, const Polygon& polygon)
   {
     out << polygon.points.size();
@@ -92,7 +85,7 @@ namespace prokopenko {
   bool Polygon::isRight() const {
     size_t n = points.size();
     if (n < 3) return false;
-    // Проверяем, есть ли хотя бы один угол прямой.
+    // Проверяем, есть ли хотя бы один прямой угол
     for (size_t i = 0; i < n; ++i) {
       const Point& prev = points[(i + n - 1) % n];
       const Point& cur = points[i];
@@ -116,7 +109,7 @@ namespace prokopenko {
     if (points.size() != other.points.size()) return false;
     size_t n = points.size();
     if (n == 0) return true;
-    // Пробуем все смещения по часовой и против часовой
+    // Проверяем все циклические сдвиги (CW и CCW)
     for (size_t offset = 0; offset < n; ++offset) {
       bool okCW = true;
       for (size_t i = 0; i < n; ++i) {
@@ -129,7 +122,6 @@ namespace prokopenko {
 
       bool okCCW = true;
       for (size_t i = 0; i < n; ++i) {
-        // (offset - i) может быть отрицательным, берем по модулю n:
         size_t idx = (offset + n - i) % n;
         if (points[i] != other.points[idx]) {
           okCCW = false;

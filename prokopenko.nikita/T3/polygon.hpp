@@ -3,6 +3,8 @@
 
 #include <vector>
 #include <iostream>
+#include <cmath>    // для возможных вычислений
+#include <algorithm>
 
 namespace prokopenko
 {
@@ -28,6 +30,7 @@ namespace prokopenko
     bool isPermOf(const Polygon& other) const;
   };
 
+  // Ввод/вывод
   std::istream& operator>>(std::istream& in, Point& point);
   std::istream& operator>>(std::istream& in, Polygon& polygon);
   std::ostream& operator<<(std::ostream& out, const Point& point);
