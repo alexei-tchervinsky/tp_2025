@@ -1,187 +1,101 @@
-﻿#include <iostream>
-#include <map>
-#include <vector>
-#include <fstream>
-#include <string>
-#include <limits>
-#include <sstream>
-#include <functional>
-#include "commands.hpp"
+﻿#include "polygon.hpp"
+#include <cmath>
+#include <algorithm>
+#include <numeric>
 
-using namespace prokopenko;
-
-int main(int argc, char* argv[])
+namespace prokopenko
 {
-  if (argc != 2)
+  bool Point::operator==(const Point& other) const
   {
-    std::cerr << "Error: wrong input\n";
-    return 1;
+    return x == other.x && y == other.y;
   }
 
-  std::ifstream input(argv[1]);
-  if (!input)
+  std::istream& operator>>(std::istream& in, Point& point)
   {
-    std::cerr << "Error: file cannot be opened\n";
-    return 1;
+    in >> point.x >> point.y;
+    return in;
   }
 
-  std::vector<Polygon> polygons;
-  std::string line;
-  while (std::getline(input, line))
+  std::istream& operator>>(std::istream& in, Polygon& polygon)
   {
-    if (line.empty()) continue;
-
-    std::istringstream iss(line);
-    Polygon poly;
-    if (iss >> poly)
+    size_t n;
+    in >> n;
+    polygon.points.resize(n);
+    for (size_t i = 0; i < n; ++i)
     {
-      char extra;
-      if (!(iss >> extra)) // make sure full line is valid
-        polygons.push_back(poly);
+      in >> polygon.points[i];
     }
+    return in;
   }
 
-  std::string cmd;
-  while (std::cin >> cmd)
+  double Polygon::getArea() const
   {
-    if (cmd == "COUNT")
-    {
-      std::string arg;
-      if (!(std::cin >> arg))
-      {
-        std::cout << "<INVALID COMMAND>\n";
-        continue;
-      }
+    if (points.size() < 3) return 0.0;
 
-      if (arg == "ODD")
-        CountOdd(polygons, std::cout);
-      else if (arg == "EVEN")
-        CountEven(polygons, std::cout);
-      else
-      {
-        try
-        {
-          size_t n = std::stoul(arg);
-          if (n < 3)
-            std::cout << "<INVALID COMMAND>\n";
-          else
-            CountN(polygons, std::cout, n);
-        }
-        catch (...)
-        {
-          std::cout << "<INVALID COMMAND>\n";
-        }
-      }
-    }
-    else if (cmd == "AREA")
+    double area = 0.0;
+    for (size_t i = 0; i < points.size(); ++i)
     {
-      std::string arg;
-      if (!(std::cin >> arg))
-      {
-        Area(polygons, std::cout);
-        continue;
-      }
-
-      if (arg == "ODD")
-        AreaOdd(polygons, std::cout);
-      else if (arg == "EVEN")
-        AreaEven(polygons, std::cout);
-      else if (arg == "MEAN")
-        MeanArea(polygons, std::cout);
-      else
-      {
-        try
-        {
-          size_t n = std::stoul(arg);
-          AreaN(polygons, std::cout, n);
-        }
-        catch (...)
-        {
-          std::cout << "<INVALID COMMAND>\n";
-        }
-      }
+      size_t j = (i + 1) % points.size();
+      area += static_cast<double>(points[i].x) * points[j].y;
+      area -= static_cast<double>(points[j].x) * points[i].y;
     }
-    else if (cmd == "MAX")
-    {
-      std::string arg;
-      if (!(std::cin >> arg))
-      {
-        std::cout << "<INVALID COMMAND>\n";
-        continue;
-      }
-
-      if (arg == "AREA")
-        MaxArea(polygons, std::cout);
-      else if (arg == "VERTEXES")
-        MaxVertexes(polygons, std::cout);
-      else
-        std::cout << "<INVALID COMMAND>\n";
-    }
-    else if (cmd == "MIN")
-    {
-      std::string arg;
-      if (!(std::cin >> arg))
-      {
-        std::cout << "<INVALID COMMAND>\n";
-        continue;
-      }
-
-      if (arg == "AREA")
-        MinArea(polygons, std::cout);
-      else if (arg == "VERTEXES")
-        MinVertexes(polygons, std::cout);
-      else
-        std::cout << "<INVALID COMMAND>\n";
-    }
-    else if (cmd == "MEAN")
-    {
-      std::string arg;
-      if (!(std::cin >> arg) || arg != "AREA")
-      {
-        std::cout << "<INVALID COMMAND>\n";
-        continue;
-      }
-      MeanArea(polygons, std::cout);
-    }
-    else if (cmd == "SAME")
-    {
-      std::string maybeNext;
-      std::getline(std::cin, maybeNext);
-      if (!maybeNext.empty() && maybeNext.find_first_not_of(" \t\n") != std::string::npos)
-      {
-        std::cout << "<INVALID COMMAND>\n";
-      }
-      else
-      {
-        Same(polygons, std::cout);
-      }
-    }
-    else if (cmd == "RIGHT")
-    {
-      Right(polygons, std::cout);
-    }
-    else if (cmd == "PERMS")
-    {
-      Perms(polygons, std::cout);
-    }
-    else if (cmd == "LESS")
-    {
-      Less(polygons, std::cout);
-    }
-    else if (cmd == "MORE")
-    {
-      More(polygons, std::cout);
-    }
-    else if (cmd == "EQUAL")
-    {
-      Equal(polygons, std::cout);
-    }
-    else
-    {
-      std::cout << "<INVALID COMMAND>\n";
-      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    }
+    return std::abs(area) / 2.0;
   }
 
-  return 0;
+  bool Polygon::isRight() const
+  {
+    for (size_t i = 0; i < points.size(); ++i)
+    {
+      const Point& a = points[i];
+      const Point& b = points[(i + 1) % points.size()];
+      const Point& c = points[(i + 2) % points.size()];
+
+      int dx1 = b.x - a.x;
+      int dy1 = b.y - a.y;
+      int dx2 = c.x - b.x;
+      int dy2 = c.y - b.y;
+
+      int dot = dx1 * dx2 + dy1 * dy2;
+      if (dot == 0) return true; // угол 90°
+    }
+    return false;
+  }
+
+  bool Polygon::operator==(const Polygon& other) const
+  {
+    return points == other.points;
+  }
+
+  bool Polygon::isPermOf(const Polygon& other) const
+  {
+    if (points.size() != other.points.size()) return false;
+
+    for (size_t offset = 0; offset < points.size(); ++offset)
+    {
+      bool match = true;
+      for (size_t i = 0; i < points.size(); ++i)
+      {
+        if (points[i] != other.points[(i + offset) % points.size()])
+        {
+          match = false;
+          break;
+        }
+      }
+      if (match) return true;
+
+      // проверить в обратном порядке
+      match = true;
+      for (size_t i = 0; i < points.size(); ++i)
+      {
+        if (points[i] != other.points[(points.size() + offset - i) % points.size()])
+        {
+          match = false;
+          break;
+        }
+      }
+      if (match) return true;
+    }
+
+    return false;
+  }
 }

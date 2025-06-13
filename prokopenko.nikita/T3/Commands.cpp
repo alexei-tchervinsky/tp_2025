@@ -1,110 +1,91 @@
 ﻿#include "commands.hpp"
-#include <algorithm>
-#include <numeric>
+#include <iomanip>
 #include <cmath>
+#include <algorithm>
 
 namespace prokopenko
 {
-  void CountEven(const std::vector<Polygon>& polygons, std::ostream& out)
+  void CountOdd(const std::vector<Polygon>& polygons, std::ostream& out)
   {
-    size_t count = std::count_if(polygons.begin(), polygons.end(),
-      [](const Polygon& p) { return p.points.size() % 2 == 0; });
+    size_t count = std::count_if(polygons.begin(), polygons.end(), [](const Polygon& p) {
+      return p.getPoints().size() % 2 != 0;
+      });
     out << count << '\n';
   }
 
-  void CountOdd(const std::vector<Polygon>& polygons, std::ostream& out)
+  void CountEven(const std::vector<Polygon>& polygons, std::ostream& out)
   {
-    size_t count = std::count_if(polygons.begin(), polygons.end(),
-      [](const Polygon& p) { return p.points.size() % 2 == 1; });
+    size_t count = std::count_if(polygons.begin(), polygons.end(), [](const Polygon& p) {
+      return p.getPoints().size() % 2 == 0;
+      });
     out << count << '\n';
   }
 
   void CountN(const std::vector<Polygon>& polygons, std::ostream& out, size_t n)
   {
-    size_t count = std::count_if(polygons.begin(), polygons.end(),
-      [n](const Polygon& p) { return p.points.size() == n; });
+    size_t count = std::count_if(polygons.begin(), polygons.end(), [n](const Polygon& p) {
+      return p.getPoints().size() == n;
+      });
     out << count << '\n';
   }
 
   void Area(const std::vector<Polygon>& polygons, std::ostream& out)
   {
+    double total = 0.0;
     for (const auto& p : polygons)
     {
-      out << p.getArea() << '\n';
+      total += p.getArea();
     }
-  }
-
-  void AreaEven(const std::vector<Polygon>& polygons, std::ostream& out)
-  {
-    for (const auto& p : polygons)
-    {
-      if (p.points.size() % 2 == 0)
-        out << p.getArea() << '\n';
-    }
+    out << std::fixed << std::setprecision(1) << total << '\n';
   }
 
   void AreaOdd(const std::vector<Polygon>& polygons, std::ostream& out)
   {
+    double total = 0.0;
     for (const auto& p : polygons)
     {
-      if (p.points.size() % 2 == 1)
-        out << p.getArea() << '\n';
+      if (p.getPoints().size() % 2 != 0)
+      {
+        total += p.getArea();
+      }
     }
+    out << std::fixed << std::setprecision(1) << total << '\n';
+  }
+
+  void AreaEven(const std::vector<Polygon>& polygons, std::ostream& out)
+  {
+    double total = 0.0;
+    for (const auto& p : polygons)
+    {
+      if (p.getPoints().size() % 2 == 0)
+      {
+        total += p.getArea();
+      }
+    }
+    out << std::fixed << std::setprecision(1) << total << '\n';
   }
 
   void AreaN(const std::vector<Polygon>& polygons, std::ostream& out, size_t n)
   {
+    double total = 0.0;
     for (const auto& p : polygons)
     {
-      if (p.points.size() == n)
-        out << p.getArea() << '\n';
+      if (p.getPoints().size() == n)
+      {
+        total += p.getArea();
+      }
     }
-  }
-
-  void MeanArea(const std::vector<Polygon>& polygons, std::ostream& out)
-  {
-    if (polygons.empty())
-    {
-      out << "0.0\n";
-      return;
-    }
-
-    double total = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-      [](double sum, const Polygon& p) {
-        return sum + p.getArea();
-      });
-    double mean = total / polygons.size();
-    out << std::fixed << std::setprecision(1) << mean << '\n';
+    out << std::fixed << std::setprecision(1) << total << '\n';
   }
 
   void MaxArea(const std::vector<Polygon>& polygons, std::ostream& out)
   {
-    if (polygons.empty())
+    double maxArea = 0.0;
+    for (const auto& p : polygons)
     {
-      out << "0.0\n";
-      return;
+      maxArea = std::max(maxArea, p.getArea());
     }
-
-    double maxArea = std::max_element(polygons.begin(), polygons.end(),
-      [](const Polygon& a, const Polygon& b) {
-        return a.getArea() < b.getArea();
-      })->getArea();
     out << std::fixed << std::setprecision(1) << maxArea << '\n';
-  }
-
-  void MaxVertexes(const std::vector<Polygon>& polygons, std::ostream& out)
-  {
-    if (polygons.empty())
-    {
-      out << "0\n";
-      return;
-    }
-
-    size_t maxVerts = std::max_element(polygons.begin(), polygons.end(),
-      [](const Polygon& a, const Polygon& b) {
-        return a.points.size() < b.points.size();
-      })->points.size();
-    out << maxVerts << '\n';
   }
 
   void MinArea(const std::vector<Polygon>& polygons, std::ostream& out)
@@ -114,12 +95,22 @@ namespace prokopenko
       out << "0.0\n";
       return;
     }
-
-    double minArea = std::min_element(polygons.begin(), polygons.end(),
-      [](const Polygon& a, const Polygon& b) {
-        return a.getArea() < b.getArea();
-      })->getArea();
+    double minArea = polygons[0].getArea();
+    for (const auto& p : polygons)
+    {
+      minArea = std::min(minArea, p.getArea());
+    }
     out << std::fixed << std::setprecision(1) << minArea << '\n';
+  }
+
+  void MaxVertexes(const std::vector<Polygon>& polygons, std::ostream& out)
+  {
+    size_t maxV = 0;
+    for (const auto& p : polygons)
+    {
+      maxV = std::max(maxV, p.getPoints().size());
+    }
+    out << maxV << '\n';
   }
 
   void MinVertexes(const std::vector<Polygon>& polygons, std::ostream& out)
@@ -129,23 +120,40 @@ namespace prokopenko
       out << "0\n";
       return;
     }
+    size_t minV = polygons[0].getPoints().size();
+    for (const auto& p : polygons)
+    {
+      minV = std::min(minV, p.getPoints().size());
+    }
+    out << minV << '\n';
+  }
 
-    size_t minVerts = std::min_element(polygons.begin(), polygons.end(),
-      [](const Polygon& a, const Polygon& b) {
-        return a.points.size() < b.points.size();
-      })->points.size();
-    out << minVerts << '\n';
+  void MeanArea(const std::vector<Polygon>& polygons, std::ostream& out)
+  {
+    if (polygons.empty())
+    {
+      out << "0.0\n";
+      return;
+    }
+    double total = 0.0;
+    for (const auto& p : polygons)
+    {
+      total += p.getArea();
+    }
+    out << std::fixed << std::setprecision(1) << (total / polygons.size()) << '\n';
   }
 
   void Same(const std::vector<Polygon>& polygons, std::ostream& out)
   {
     size_t count = 0;
-    for (size_t i = 0; i < polygons.size(); ++i)
+    for (size_t i = 0; i + 1 < polygons.size(); ++i)
     {
       for (size_t j = i + 1; j < polygons.size(); ++j)
       {
         if (polygons[i] == polygons[j])
+        {
           ++count;
+        }
       }
     }
     out << count << '\n';
@@ -153,20 +161,23 @@ namespace prokopenko
 
   void Right(const std::vector<Polygon>& polygons, std::ostream& out)
   {
-    size_t count = std::count_if(polygons.begin(), polygons.end(),
-      [](const Polygon& p) { return p.isRight(); });
+    size_t count = std::count_if(polygons.begin(), polygons.end(), [](const Polygon& p) {
+      return p.isRight();
+      });
     out << count << '\n';
   }
 
   void Perms(const std::vector<Polygon>& polygons, std::ostream& out)
   {
     size_t count = 0;
-    for (size_t i = 0; i < polygons.size(); ++i)
+    for (size_t i = 0; i + 1 < polygons.size(); ++i)
     {
       for (size_t j = i + 1; j < polygons.size(); ++j)
       {
         if (polygons[i].isPermOf(polygons[j]))
+        {
           ++count;
+        }
       }
     }
     out << count << '\n';
@@ -175,12 +186,14 @@ namespace prokopenko
   void Less(const std::vector<Polygon>& polygons, std::ostream& out)
   {
     size_t count = 0;
-    for (size_t i = 0; i < polygons.size(); ++i)
+    for (size_t i = 0; i + 1 < polygons.size(); ++i)
     {
       for (size_t j = i + 1; j < polygons.size(); ++j)
       {
         if (polygons[i].getArea() < polygons[j].getArea())
+        {
           ++count;
+        }
       }
     }
     out << count << '\n';
@@ -189,12 +202,14 @@ namespace prokopenko
   void More(const std::vector<Polygon>& polygons, std::ostream& out)
   {
     size_t count = 0;
-    for (size_t i = 0; i < polygons.size(); ++i)
+    for (size_t i = 0; i + 1 < polygons.size(); ++i)
     {
       for (size_t j = i + 1; j < polygons.size(); ++j)
       {
         if (polygons[i].getArea() > polygons[j].getArea())
+        {
           ++count;
+        }
       }
     }
     out << count << '\n';
@@ -203,12 +218,14 @@ namespace prokopenko
   void Equal(const std::vector<Polygon>& polygons, std::ostream& out)
   {
     size_t count = 0;
-    for (size_t i = 0; i < polygons.size(); ++i)
+    for (size_t i = 0; i + 1 < polygons.size(); ++i)
     {
       for (size_t j = i + 1; j < polygons.size(); ++j)
       {
         if (std::abs(polygons[i].getArea() - polygons[j].getArea()) < 1e-6)
+        {
           ++count;
+        }
       }
     }
     out << count << '\n';
