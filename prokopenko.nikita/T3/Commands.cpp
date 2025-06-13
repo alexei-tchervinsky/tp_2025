@@ -25,7 +25,8 @@ namespace prokopenko
 
   // ===== AREA =====
   void Area(const std::vector<Polygon>& polys, std::ostream& out) {
-    out << std::fixed << std::setprecision(1) << sumAreas(polys) << '\n';
+    double total = sumAreas(polys);
+    out << std::fixed << std::setprecision(1) << total << '\n';
   }
 
   void AreaEven(const std::vector<Polygon>& polys, std::ostream& out) {
@@ -54,10 +55,14 @@ namespace prokopenko
       return;
     }
     double s = sumAreas(polys);
-    out << std::fixed << std::setprecision(1) << (s / polys.size()) << '\n';
+    double mean = s / polys.size();
+    out << std::fixed << std::setprecision(1) << mean << '\n';
   }
 
-  void AreaN(const std::vector<Polygon>& polys, std::ostream& out, size_t n) {
+  void AreaN(const std::vector<Polygon>& polys,
+    std::ostream& out,
+    size_t n)
+  {
     if (n < 3) {
       out << "<INVALID COMMAND>\n";
       return;
@@ -133,38 +138,44 @@ namespace prokopenko
   void CountOdd(const std::vector<Polygon>& polys, std::ostream& out) {
     size_t cnt = 0;
     for (const auto& p : polys) {
-      if (p.points.size() % 2 == 1) ++cnt;
+      if (p.points.size() % 2 == 1) {
+        ++cnt;
+      }
     }
     out << cnt << '\n';
   }
+
   void CountEven(const std::vector<Polygon>& polys, std::ostream& out) {
     size_t cnt = 0;
     for (const auto& p : polys) {
-      if (p.points.size() % 2 == 0) ++cnt;
+      if (p.points.size() % 2 == 0) {
+        ++cnt;
+      }
     }
     out << cnt << '\n';
   }
-  void CountN(const std::vector<Polygon>& polys, std::ostream& out, size_t n) {
+
+  void CountN(const std::vector<Polygon>& polys,
+    std::ostream& out,
+    size_t n)
+  {
     if (n < 3) {
       out << "<INVALID COMMAND>\n";
       return;
     }
     size_t cnt = 0;
     for (const auto& p : polys) {
-      if (p.points.size() == n) ++cnt;
+      if (p.points.size() == n) {
+        ++cnt;
+      }
     }
     out << cnt << '\n';
   }
 
   // ===== SAME =====
-  void Same(const std::vector<Polygon>& polys, std::ostream& out) {
-    // Для каждого запроса SAME вызывается из main с переданным аргументом-полигоном?
-    // Здесь реализуем логику: при вызове SAME параметры считываются в main, и само Same
-    // получает весь набор данных и уже извлекает аргумент внутри main.
-    // Но для корректного построения: предполагаем, что main передаёт в Same полный вектор,
-    // а в main при чтении команды SAME сначала считывают требуемый шаблонный полигон, и
-    // передают его в отдельную функцию, например SamePattern.
-    // Здесь заготовка: просто выводим "<INVALID COMMAND>\n" — детали реализуются в main.
+  // ЗДЕСЬ: реализация в main: main читает параметр(ы) после "SAME" и вызывает
+  // соответствующую функцию, например SamePattern(data, pattern, out).
+  void Same(const std::vector<Polygon>&, std::ostream& out) {
     out << "<INVALID COMMAND>\n";
   }
 
@@ -172,25 +183,27 @@ namespace prokopenko
   void Right(const std::vector<Polygon>& polys, std::ostream& out) {
     size_t cnt = 0;
     for (const auto& p : polys) {
-      if (p.isRight()) ++cnt;
+      if (p.isRight()) {
+        ++cnt;
+      }
     }
     out << cnt << '\n';
   }
 
   // ===== PERMS =====
-  void Perms(const std::vector<Polygon>& polys, std::ostream& out) {
-    // По аналогии с Same: main должен сначала считать базовый полигон и передать сюда
+  void Perms(const std::vector<Polygon>&, std::ostream& out) {
     out << "<INVALID COMMAND>\n";
   }
 
   // ===== LESS / MORE / EQUAL =====
-  void Less(const std::vector<Polygon>& polys, std::ostream& out) {
+  void Less(const std::vector<Polygon>&, std::ostream& out) {
     out << "<INVALID COMMAND>\n";
   }
-  void More(const std::vector<Polygon>& polys, std::ostream& out) {
+  void More(const std::vector<Polygon>&, std::ostream& out) {
     out << "<INVALID COMMAND>\n";
   }
-  void Equal(const std::vector<Polygon>& polys, std::ostream& out) {
+  void Equal(const std::vector<Polygon>&, std::ostream& out) {
     out << "<INVALID COMMAND>\n";
   }
-}
+
+} // namespace prokopenko
