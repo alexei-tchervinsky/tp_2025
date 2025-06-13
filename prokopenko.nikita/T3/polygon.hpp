@@ -2,27 +2,27 @@
 #define POLYGON_HPP
 
 #include <vector>
-#include <iostream>
+#include <cstddef>
 
-namespace prokopenko
-{
-  struct Point
-  {
-    int x, y;
+namespace prokopenko {
+
+  struct Point {
+    int x;
+    int y;
+
+    bool operator<(const Point& other) const {
+      return std::tie(x, y) < std::tie(other.x, other.y);
+    }
+
+    bool operator==(const Point& other) const {
+      return x == other.x && y == other.y;
+    }
   };
 
-  struct Polygon
-  {
-    std::vector<Point> points;
-  };
+  using Polygon = std::vector<Point>;
 
-  struct DelimiterIO
-  {
-    char del;
-  };
+  double getArea(const Polygon& polygon);
 
-  std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
-  std::istream& operator>>(std::istream& in, Point& dest);
-  std::istream& operator>>(std::istream& in, Polygon& dest);
-}
-#endif
+} // namespace prokopenko
+
+#endif // POLYGON_HPP
