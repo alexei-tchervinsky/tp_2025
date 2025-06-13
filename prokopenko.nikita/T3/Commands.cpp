@@ -1,163 +1,155 @@
 ﻿#include "commands.hpp"
 #include <algorithm>
-#include <numeric>
-#include <iomanip>
 #include <cmath>
-#include <set>
+#include <functional>
+#include <iterator>
+#include <limits>
+#include <stdexcept>
 
 namespace prokopenko {
 
-  constexpr double EPSILON = 1e-6;
+  bool isRightTriangle(const Point& a, const Point& b, const Point& c) {
+    auto square = [](const Point& p1, const Point& p2) {
+      int dx = p2.x - p1.x;
+      int dy = p2.y - p1.y;
+      return dx * dx + dy * dy;
+      };
 
-  double sumAreas(const std::vector<Polygon>& polygons) {
-    return std::accumulate(polygons.begin(), polygons.end(), 0.0,
-      [](double acc, const Polygon& p) {
-        return acc + getArea(p);
-      });
-  }
+    int ab2 = square(a, b);
+    int bc2 = square(b, c);
+    int ca2 = square(c, a);
 
-  bool equalArea(const Polygon& a, const Polygon& b) {
-    return std::fabs(getArea(a) - getArea(b)) < EPSILON;
+    return ab2 + bc2 == ca2 || ab2 + ca2 == bc2 || bc2 + ca2 == ab2;
   }
 
   void Area(const std::vector<Polygon>& polygons, std::ostream& out) {
-    out << std::fixed << std::setprecision(1) << sumAreas(polygons) << '\n';
+    double total = 0.0;
+    for (const Polygon& p : polygons) {
+      total += p.getArea();
+    }
+    out << total << '\n';
   }
 
   void Max(const std::vector<Polygon>& polygons, std::ostream& out) {
     if (polygons.empty()) {
-      out << "<EMPTY DATASET>\n";
+      out << 0 << '\n';
       return;
     }
-    auto max_it = std::max_element(polygons.begin(), polygons.end(),
-      [](const Polygon& a, const Polygon& b) {
-        return getArea(a) < getArea(b);
-      });
-    out << std::fixed << std::setprecision(1) << getArea(*max_it) << '\n';
+    size_t maxSize = 0;
+    for (const Polygon& p : polygons) {
+      maxSize = std::max(maxSize, p.size());
+    }
+    out << maxSize << '\n';
   }
 
   void Min(const std::vector<Polygon>& polygons, std::ostream& out) {
     if (polygons.empty()) {
-      out << "<EMPTY DATASET>\n";
+      out << 0 << '\n';
       return;
     }
-    auto min_it = std::min_element(polygons.begin(), polygons.end(),
-      [](const Polygon& a, const Polygon& b) {
-        return getArea(a) < getArea(b);
-      });
-    out << std::fixed << std::setprecision(1) << getArea(*min_it) << '\n';
+    size_t minSize = polygons.front().size();
+    for (const Polygon& p : polygons) {
+      minSize = std::min(minSize, p.size());
+    }
+    out << minSize << '\n';
   }
 
   void Mean(const std::vector<Polygon>& polygons, std::ostream& out) {
     if (polygons.empty()) {
-      out << "<EMPTY DATASET>\n";
+      out << 0 << '\n';
       return;
     }
-    double mean = sumAreas(polygons) / polygons.size();
-    out << std::fixed << std::setprecision(1) << mean << '\n';
+    size_t total = 0;
+    for (const Polygon& p : polygons) {
+      total += p.size();
+    }
+    double avg = static_cast<double>(total) / polygons.size();
+    out << avg << '\n';
   }
 
   void Same(const std::vector<Polygon>& polygons, std::ostream& out) {
-    if (polygons.empty()) {
-      out << "0\n";
-      return;
+    for (size_t i = 0; i < polygons.size(); ++i) {
+      for (size_t j = i + 1; j < polygons.size(); ++j) {
+        if (polygons[i] == polygons[j]) {
+          out << polygons[i] << '\n';
+        }
+      }
     }
-    const Polygon& first = polygons.front();
-    std::size_t count = std::count_if(polygons.begin(), polygons.end(),
-      [&first](const Polygon& p) {
-        return equalArea(first, p);
-      });
-    out << count << '\n';
-  }
-
-  double dot(const Point& a, const Point& b) {
-    return a.x * b.x + a.y * b.y;
-  }
-
-  Point vectorBetween(const Point& from, const Point& to) {
-    return { to.x - from.x, to.y - from.y };
-  }
-
-  bool isRightAngle(const Point& a, const Point& b, const Point& c) {
-    Point ab = vectorBetween(b, a);
-    Point cb = vectorBetween(b, c);
-    return std::fabs(dot(ab, cb)) < EPSILON;
-  }
-
-  bool isRectangle(const Polygon& polygon) {
-    if (polygon.size() != 4) return false;
-    const Point& p0 = polygon[0];
-    const Point& p1 = polygon[1];
-    const Point& p2 = polygon[2];
-    const Point& p3 = polygon[3];
-    return isRightAngle(p0, p1, p2) &&
-      isRightAngle(p1, p2, p3) &&
-      isRightAngle(p2, p3, p0) &&
-      isRightAngle(p3, p0, p1);
   }
 
   void Right(const std::vector<Polygon>& polygons, std::ostream& out) {
-    std::size_t count = std::count_if(polygons.begin(), polygons.end(), isRectangle);
-    out << count << '\n';
-  }
-
-  bool arePermutations(const Polygon& a, const Polygon& b) {
-    if (a.size() != b.size()) return false;
-    auto a_sorted = a;
-    auto b_sorted = b;
-    std::sort(a_sorted.begin(), a_sorted.end());
-    std::sort(b_sorted.begin(), b_sorted.end());
-    return a_sorted == b_sorted;
+    for (const Polygon& p : polygons) {
+      for (size_t i = 0; i + 2 < p.size(); ++i) {
+        if (isRightTriangle(p[i], p[i + 1], p[i + 2])) {
+          out << p << '\n';
+          break;
+        }
+      }
+    }
   }
 
   void Perms(const std::vector<Polygon>& polygons, std::ostream& out) {
-    if (polygons.empty()) {
-      out << "0\n";
-      return;
+    for (size_t i = 0; i < polygons.size(); ++i) {
+      for (size_t j = i + 1; j < polygons.size(); ++j) {
+        if (polygons[i].isPermutation(polygons[j])) {
+          out << polygons[i] << '\n';
+        }
+      }
     }
-    const Polygon& first = polygons.front();
-    std::size_t count = std::count_if(polygons.begin(), polygons.end(),
-      [&first](const Polygon& p) {
-        return arePermutations(first, p);
-      });
-    out << count << '\n';
   }
 
   void Less(const std::vector<Polygon>& polygons, std::ostream& out) {
-    if (polygons.empty()) {
-      out << "0\n";
-      return;
+    size_t n;
+    std::cin >> n;
+    for (const Polygon& p : polygons) {
+      if (p.size() < n) {
+        out << p << '\n';
+      }
     }
-    const Polygon& first = polygons.front();
-    std::size_t count = std::count_if(polygons.begin(), polygons.end(),
-      [&first](const Polygon& p) {
-        return getArea(p) < getArea(first);
-      });
-    out << count << '\n';
   }
 
   void More(const std::vector<Polygon>& polygons, std::ostream& out) {
-    if (polygons.empty()) {
-      out << "0\n";
-      return;
+    size_t n;
+    std::cin >> n;
+    for (const Polygon& p : polygons) {
+      if (p.size() > n) {
+        out << p << '\n';
+      }
     }
-    const Polygon& first = polygons.front();
+  }
+
+  void Equal(const std::vector<Polygon>& polygons, std::ostream& out) {
+    size_t n;
+    std::cin >> n;
+    for (const Polygon& p : polygons) {
+      if (p.size() == n) {
+        out << p << '\n';
+      }
+    }
+  }
+
+  // 🔽 🔽 🔽 Новые команды COUNT добавлены ниже 🔽 🔽 🔽
+
+  void CountOdd(const std::vector<Polygon>& polygons, std::ostream& out) {
     std::size_t count = std::count_if(polygons.begin(), polygons.end(),
-      [&first](const Polygon& p) {
-        return getArea(p) > getArea(first);
+      [](const Polygon& p) {
+        return p.size() % 2 == 1;
       });
     out << count << '\n';
   }
 
-  void Equal(const std::vector<Polygon>& polygons, std::ostream& out) {
-    if (polygons.empty()) {
-      out << "0\n";
-      return;
-    }
-    const Polygon& first = polygons.front();
+  void CountEven(const std::vector<Polygon>& polygons, std::ostream& out) {
     std::size_t count = std::count_if(polygons.begin(), polygons.end(),
-      [&first](const Polygon& p) {
-        return equalArea(p, first);
+      [](const Polygon& p) {
+        return p.size() % 2 == 0;
+      });
+    out << count << '\n';
+  }
+
+  void CountN(const std::vector<Polygon>& polygons, std::ostream& out, std::size_t n) {
+    std::size_t count = std::count_if(polygons.begin(), polygons.end(),
+      [n](const Polygon& p) {
+        return p.size() == n;
       });
     out << count << '\n';
   }

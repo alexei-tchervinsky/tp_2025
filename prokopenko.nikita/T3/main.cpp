@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
   while (!input.eof())
   {
     Polygon poly;
-    std::streampos pos = input.tellg(); // запоминаем текущую позицию
+    std::streampos pos = input.tellg();
     if (input >> poly)
     {
       polygons.push_back(poly);
@@ -36,27 +36,52 @@ int main(int argc, char* argv[])
     else
     {
       input.clear();
-      input.seekg(pos); // возвращаемся к началу ошибочной фигуры
-      input.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // пропускаем строку
+      input.seekg(pos);
+      input.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
   }
 
   std::map<std::string, std::function<void(const std::vector<Polygon>&, std::ostream&)>> commands;
-  commands["AREA"] = prokopenko::Area;
-  commands["MAX"] = prokopenko::Max;
-  commands["MIN"] = prokopenko::Min;
-  commands["MEAN"] = prokopenko::Mean;
-  commands["SAME"] = prokopenko::Same;
-  commands["RIGHT"] = prokopenko::Right;
-  commands["PERMS"] = prokopenko::Perms;
-  commands["LESS"] = prokopenko::Less;
-  commands["MORE"] = prokopenko::More;
-  commands["EQUAL"] = prokopenko::Equal;
+  commands["AREA"] = Area;
+  commands["MAX"] = Max;
+  commands["MIN"] = Min;
+  commands["MEAN"] = Mean;
+  commands["SAME"] = Same;
+  commands["RIGHT"] = Right;
+  commands["PERMS"] = Perms;
+  commands["LESS"] = Less;
+  commands["MORE"] = More;
+  commands["EQUAL"] = Equal;
+  commands["COUNT"] = [](const std::vector<Polygon>& polys, std::ostream& out)
+    {
+      std::string param;
+      std::cin >> param;
+      if (param == "ODD")
+      {
+        CountOdd(polys, out);
+      }
+      else if (param == "EVEN")
+      {
+        CountEven(polys, out);
+      }
+      else
+      {
+        try
+        {
+          size_t n = std::stoul(param);
+          CountN(polys, out, n);
+        }
+        catch (...)
+        {
+          out << "<INVALID COMMAND>\n";
+        }
+      }
+    };
 
-  std::string parameter;
-  while (std::cin >> parameter)
+  std::string cmd;
+  while (std::cin >> cmd)
   {
-    auto it = commands.find(parameter);
+    auto it = commands.find(cmd);
     if (it != commands.end())
     {
       it->second(polygons, std::cout);
