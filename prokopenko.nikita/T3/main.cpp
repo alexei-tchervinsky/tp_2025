@@ -29,71 +29,152 @@ int main(int argc, char* argv[])
   std::string line;
   while (std::getline(input, line))
   {
-    if (line.empty())
-      continue;
+    if (line.empty()) continue;
 
     std::istringstream iss(line);
     Polygon poly;
     if (iss >> poly)
     {
       char extra;
-      if (!(iss >> extra)) // проверка: не должно быть ничего лишнего
-      {
+      if (!(iss >> extra)) // make sure full line is valid
         polygons.push_back(poly);
-      }
     }
   }
-
-  std::map<std::string, std::function<void(const std::vector<Polygon>&, std::ostream&)>> commands;
-  commands["AREA"] = [](const std::vector<Polygon>& polys, std::ostream& out)
-    {
-      std::string arg;
-      if (std::cin.peek() != '\n' && std::cin >> arg)
-      {
-        out << "<INVALID COMMAND>\n";
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        return;
-      }
-      Area(polys, out);
-    };
-  commands["MAX"] = commands["MIN"] = commands["MEAN"] = commands["SAME"] =
-    commands["RIGHT"] = commands["PERMS"] = commands["LESS"] =
-    commands["MORE"] = commands["EQUAL"] = commands["AREA"];
-
-  commands["COUNT"] = [](const std::vector<Polygon>& polys, std::ostream& out)
-    {
-      std::string param;
-      std::cin >> param;
-      if (param == "ODD")
-      {
-        CountOdd(polys, out);
-      }
-      else if (param == "EVEN")
-      {
-        CountEven(polys, out);
-      }
-      else
-      {
-        try
-        {
-          size_t n = std::stoul(param);
-          CountN(polys, out, n);
-        }
-        catch (...)
-        {
-          out << "<INVALID COMMAND>\n";
-          std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        }
-      }
-    };
 
   std::string cmd;
   while (std::cin >> cmd)
   {
-    auto it = commands.find(cmd);
-    if (it != commands.end())
+    if (cmd == "COUNT")
     {
-      it->second(polygons, std::cout);
+      std::string arg;
+      if (!(std::cin >> arg))
+      {
+        std::cout << "<INVALID COMMAND>\n";
+        continue;
+      }
+
+      if (arg == "ODD")
+        CountOdd(polygons, std::cout);
+      else if (arg == "EVEN")
+        CountEven(polygons, std::cout);
+      else
+      {
+        try
+        {
+          size_t n = std::stoul(arg);
+          if (n < 3)
+            std::cout << "<INVALID COMMAND>\n";
+          else
+            CountN(polygons, std::cout, n);
+        }
+        catch (...)
+        {
+          std::cout << "<INVALID COMMAND>\n";
+        }
+      }
+    }
+    else if (cmd == "AREA")
+    {
+      std::string arg;
+      if (!(std::cin >> arg))
+      {
+        Area(polygons, std::cout);
+        continue;
+      }
+
+      if (arg == "ODD")
+        AreaOdd(polygons, std::cout);
+      else if (arg == "EVEN")
+        AreaEven(polygons, std::cout);
+      else if (arg == "MEAN")
+        MeanArea(polygons, std::cout);
+      else
+      {
+        try
+        {
+          size_t n = std::stoul(arg);
+          AreaN(polygons, std::cout, n);
+        }
+        catch (...)
+        {
+          std::cout << "<INVALID COMMAND>\n";
+        }
+      }
+    }
+    else if (cmd == "MAX")
+    {
+      std::string arg;
+      if (!(std::cin >> arg))
+      {
+        std::cout << "<INVALID COMMAND>\n";
+        continue;
+      }
+
+      if (arg == "AREA")
+        MaxArea(polygons, std::cout);
+      else if (arg == "VERTEXES")
+        MaxVertexes(polygons, std::cout);
+      else
+        std::cout << "<INVALID COMMAND>\n";
+    }
+    else if (cmd == "MIN")
+    {
+      std::string arg;
+      if (!(std::cin >> arg))
+      {
+        std::cout << "<INVALID COMMAND>\n";
+        continue;
+      }
+
+      if (arg == "AREA")
+        MinArea(polygons, std::cout);
+      else if (arg == "VERTEXES")
+        MinVertexes(polygons, std::cout);
+      else
+        std::cout << "<INVALID COMMAND>\n";
+    }
+    else if (cmd == "MEAN")
+    {
+      std::string arg;
+      if (!(std::cin >> arg) || arg != "AREA")
+      {
+        std::cout << "<INVALID COMMAND>\n";
+        continue;
+      }
+      MeanArea(polygons, std::cout);
+    }
+    else if (cmd == "SAME")
+    {
+      std::string maybeNext;
+      std::getline(std::cin, maybeNext);
+      if (!maybeNext.empty() && maybeNext.find_first_not_of(" \t\n") != std::string::npos)
+      {
+        std::cout << "<INVALID COMMAND>\n";
+      }
+      else
+      {
+        Same(polygons, std::cout);
+      }
+    }
+    else if (cmd == "RIGHT")
+    {
+      Right(polygons, std::cout);
+    }
+    else if (cmd == "PERMS")
+    {
+      Perms(polygons, std::cout);
+    }
+    else if (cmd == "LESS")
+    {
+      Less(polygons, std::cout);
+    }
+    else if (cmd == "MORE")
+    {
+      More(polygons, std::cout);
+    }
+    else if (cmd == "EQUAL")
+    {
+      Equal(polygons, std::cout);
     }
     else
     {

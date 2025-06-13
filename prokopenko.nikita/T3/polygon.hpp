@@ -12,17 +12,18 @@ namespace prokopenko
     bool operator==(const Point& other) const;
   };
 
-  inline bool operator!=(const Point& lhs, const Point& rhs)
+  struct Polygon
   {
-    return !(lhs == rhs);
-  }
+    std::vector<Point> points;
 
-  using Polygon = std::vector<Point>;
+    double getArea() const;
+    bool isRight() const;
+    bool operator==(const Polygon& other) const;
+    bool isPermOf(const Polygon& other) const;
+  };
 
   std::istream& operator>>(std::istream& in, Point& point);
   std::istream& operator>>(std::istream& in, Polygon& polygon);
-  std::ostream& operator<<(std::ostream& out, const Point& point);
-  std::ostream& operator<<(std::ostream& out, const Polygon& polygon);
 }
 
 #endif

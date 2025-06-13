@@ -1,6 +1,7 @@
-#include "polygon.hpp"
-#include <cctype>
-#include <limits>
+﻿#include "polygon.hpp"
+#include <cmath>
+#include <algorithm>
+#include <numeric>
 
 namespace prokopenko
 {
@@ -11,63 +12,90 @@ namespace prokopenko
 
   std::istream& operator>>(std::istream& in, Point& point)
   {
-    char ch = 0;
-    in >> std::ws >> ch;
-    if (ch != '(')
-    {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-    in >> point.x >> ch;
-    if (ch != ';')
-    {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
-    in >> point.y >> ch;
-    if (ch != ')')
-    {
-      in.setstate(std::ios::failbit);
-      return in;
-    }
+    in >> point.x >> point.y;
     return in;
   }
 
   std::istream& operator>>(std::istream& in, Polygon& polygon)
   {
-    size_t size = 0;
-    in >> size;
-    if (!in)
+    size_t n;
+    in >> n;
+    polygon.points.resize(n);
+    for (size_t i = 0; i < n; ++i)
     {
-      return in;
+      in >> polygon.points[i];
     }
-    Polygon temp;
-    for (size_t i = 0; i < size; ++i)
-    {
-      Point point;
-      in >> point;
-      if (!in)
-      {
-        return in;
-      }
-      temp.push_back(point);
-    }
-    polygon = std::move(temp);
     return in;
   }
 
-  std::ostream& operator<<(std::ostream& out, const Point& point)
+  double Polygon::getArea() const
   {
-    return out << "(" << point.x << ";" << point.y << ")";
+    if (points.size() < 3) return 0.0;
+
+    double area = 0.0;
+    for (size_t i = 0; i < points.size(); ++i)
+    {
+      size_t j = (i + 1) % points.size();
+      area += static_cast<double>(points[i].x) * points[j].y;
+      area -= static_cast<double>(points[j].x) * points[i].y;
+    }
+    return std::abs(area) / 2.0;
   }
 
-  std::ostream& operator<<(std::ostream& out, const Polygon& polygon)
+  bool Polygon::isRight() const
   {
-    out << polygon.size();
-    for (const Point& pt : polygon)
+    for (size_t i = 0; i < points.size(); ++i)
     {
-      out << " " << pt;
+      const Point& a = points[i];
+      const Point& b = points[(i + 1) % points.size()];
+      const Point& c = points[(i + 2) % points.size()];
+
+      int dx1 = b.x - a.x;
+      int dy1 = b.y - a.y;
+      int dx2 = c.x - b.x;
+      int dy2 = c.y - b.y;
+
+      int dot = dx1 * dx2 + dy1 * dy2;
+      if (dot == 0) return true; // угол 90°
     }
-    return out;
+    return false;
+  }
+
+  bool Polygon::operator==(const Polygon& other) const
+  {
+    return points == other.points;
+  }
+
+  bool Polygon::isPermOf(const Polygon& other) const
+  {
+    if (points.size() != other.points.size()) return false;
+
+    for (size_t offset = 0; offset < points.size(); ++offset)
+    {
+      bool match = true;
+      for (size_t i = 0; i < points.size(); ++i)
+      {
+        if (points[i] != other.points[(i + offset) % points.size()])
+        {
+          match = false;
+          break;
+        }
+      }
+      if (match) return true;
+
+      // проверить в обратном порядке
+      match = true;
+      for (size_t i = 0; i < points.size(); ++i)
+      {
+        if (points[i] != other.points[(points.size() + offset - i) % points.size()])
+        {
+          match = false;
+          break;
+        }
+      }
+      if (match) return true;
+    }
+
+    return false;
   }
 }
