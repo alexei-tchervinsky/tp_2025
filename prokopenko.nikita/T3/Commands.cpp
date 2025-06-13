@@ -1,92 +1,65 @@
 ﻿#include "commands.hpp"
-#include "Polygon.hpp"
-#include "Point.hpp"
-#include <vector>
-#include <cmath>
 #include <iostream>
+#include <cmath>
+#include <algorithm>
 
-// Порог для сравнения площадей (исключение вырожденных полигонов)
-static const double EPS = 1e-9;
-
-// Функция сравнения двух полигонов: совпадение всех вершин
-static bool polygonsEqual(const Polygon& p1, const Polygon& p2) {
-  if (p1.getNumVertices() != p2.getNumVertices()) return false;
-  int n = p1.getNumVertices();
-  for (int i = 0; i < n; ++i) {
-    const Point& a = p1.getVertex(i);
-    const Point& b = p2.getVertex(i);
-    if (std::fabs(a.x - b.x) > EPS || std::fabs(a.y - b.y) > EPS) {
-      return false;
+// SAME: подсчёт фигур, совпадающих по точному порядку вершин
+void doSAME(const Polygon& poly, const std::vector<Polygon>& shapes) {
+  int count = 0;
+  for (const auto& shp : shapes) {
+    if (shp == poly) {
+      count++;
     }
   }
-  return true;
+  std::cout << "SAME " << poly << " " << count << std::endl;
 }
 
-void ODD() {
-  // Собираем уникальные непустые полигоны
-  std::vector<Polygon*> uniquePolys;
-  for (auto shape : shapes) {
-    Polygon* poly = dynamic_cast<Polygon*>(shape);
-    if (!poly) continue;
-    if (poly->area() <= EPS) continue;
-    bool isDup = false;
-    for (auto u : uniquePolys) {
-      if (polygonsEqual(*u, *poly)) { isDup = true; break; }
-    }
-    if (!isDup) uniquePolys.push_back(poly);
+// PERMS: подсчёт фигур, имеющих ту же совокупность вершин (порядок не важен)
+void doPERMS(const Polygon& poly, const std::vector<Polygon>& shapes) {
+  // Собираем упорядоченный список точек переданной фигуры
+  std::vector<std::pair<int, int>> pts1;
+  for (const auto& p : poly.points) {
+    pts1.emplace_back(p.x, p.y);
   }
-  // Подсчитываем полигоны с нечётным числом вершин
+  std::sort(pts1.begin(), pts1.end());
   int count = 0;
-  for (auto poly : uniquePolys) {
-    if (poly->getNumVertices() % 2 == 1) {
-      ++count;
+  for (const auto& shp : shapes) {
+    if (shp.points.size() != poly.points.size()) {
+      continue;
+    }
+    std::vector<std::pair<int, int>> pts2;
+    for (const auto& p : shp.points) {
+      pts2.emplace_back(p.x, p.y);
+    }
+    std::sort(pts2.begin(), pts2.end());
+    if (pts1 == pts2) {
+      count++;
     }
   }
-  std::cout << count << std::endl;
+  std::cout << "PERMS " << poly << " " << count << std::endl;
 }
 
-void EVEN() {
-  // Собираем уникальные непустые полигоны
-  std::vector<Polygon*> uniquePolys;
-  for (auto shape : shapes) {
-    Polygon* poly = dynamic_cast<Polygon*>(shape);
-    if (!poly) continue;
-    if (poly->area() <= EPS) continue;
-    bool isDup = false;
-    for (auto u : uniquePolys) {
-      if (polygonsEqual(*u, *poly)) { isDup = true; break; }
-    }
-    if (!isDup) uniquePolys.push_back(poly);
-  }
-  // Подсчитываем полигоны с чётным числом вершин
+// EQUAL: подсчёт фигур с одинаковой площадью (с учётом погрешности)
+void doEQUAL(const Polygon& poly, const std::vector<Polygon>& shapes) {
+  double area = poly.getArea();
   int count = 0;
-  for (auto poly : uniquePolys) {
-    if (poly->getNumVertices() % 2 == 0) {
-      ++count;
+  for (const auto& shp : shapes) {
+    double a = shp.getArea();
+    if (std::fabs(a - area) <= 1e-6) {
+      count++;
     }
   }
-  std::cout << count << std::endl;
+  std::cout << "EQUAL " << poly << " " << count << std::endl;
 }
 
-void N(int N) {
-  // Собираем уникальные непустые полигоны
-  std::vector<Polygon*> uniquePolys;
-  for (auto shape : shapes) {
-    Polygon* poly = dynamic_cast<Polygon*>(shape);
-    if (!poly) continue;
-    if (poly->area() <= EPS) continue;
-    bool isDup = false;
-    for (auto u : uniquePolys) {
-      if (polygonsEqual(*u, *poly)) { isDup = true; break; }
-    }
-    if (!isDup) uniquePolys.push_back(poly);
-  }
-  // Подсчитываем полигоны с числом вершин == N
+// COUNT: подсчёт фигур с тем же количеством вершин
+void doCOUNT(const Polygon& poly, const std::vector<Polygon>& shapes) {
+  int n = poly.points.size();
   int count = 0;
-  for (auto poly : uniquePolys) {
-    if (poly->getNumVertices() == N) {
-      ++count;
+  for (const auto& shp : shapes) {
+    if ((int)shp.points.size() == n) {
+      count++;
     }
   }
-  std::cout << count << std::endl;
+  std::cout << "COUNT " << poly << " " << count << std::endl;
 }

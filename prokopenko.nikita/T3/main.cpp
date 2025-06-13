@@ -1,86 +1,71 @@
-﻿#include <iostream>
-#include <map>
-#include <vector>
+﻿#include "commands.hpp"
+#include "polygon.hpp"
 #include <fstream>
-#include <string>
-#include <limits>
-#include <functional>
+#include <iostream>
+#include <sstream>
+#include <vector>
 #include <algorithm>
-#include "commands.hpp"
+#include <iterator>
 
-using namespace prokopenko;
-
-int main(int argc, char* argv[])
-{
-  if (argc != 2) {
-    std::cerr << "Error: wrong input\n";
+int main(int argc, char* argv[]) {
+  // Проверка аргументов командной строки
+  if (argc < 2) {
+    std::cerr << "Error: missing input file" << std::endl;
     return 1;
   }
-  std::ifstream input(argv[1]);
-  if (!input) {
-    std::cerr << "Error: file cannot be opened\n";
+  std::ifstream file(argv[1]);
+  if (!file.is_open()) {
+    std::cerr << "Error: cannot open file" << std::endl;
     return 1;
   }
-  std::vector<Polygon> polygons;
-  while (!input.eof()) {
+  // Чтение фигур из файла
+  std::vector<Polygon> shapes;
+  std::string line;
+  while (std::getline(file, line)) {
+    if (line.empty()) continue;
+    std::istringstream iss(line);
     Polygon poly;
-    std::streampos pos = input.tellg();
-    if (input >> poly) {
-      if (poly.getArea() > 1e-6) {
-        polygons.push_back(poly);
-      }
+    if (!(iss >> poly)) {
+      // Некорректная строка, игнорируем
+      continue;
     }
-    else {
-      input.clear();
-      input.seekg(pos);
-      input.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    if (poly.getArea() > 1e-6) {
+      shapes.push_back(poly);
     }
   }
-  std::map<std::string, std::function<void(const std::vector<Polygon>&, std::ostream&)>> commands;
-  commands["AREA"] = Area;
-  commands["MAX"] = Max;
-  commands["MIN"] = Min;
-  commands["MEAN"] = Mean;
-  commands["SAME"] = Same;
-  commands["RIGHT"] = Right;
-  commands["PERMS"] = Perms;
-  commands["LESS"] = Less;
-  commands["MORE"] = More;
-  commands["EQUAL"] = Equal;
-  commands["COUNT"] = [](const std::vector<Polygon>& polys, std::ostream& out) {
-    std::string param;
-    if (!(std::cin >> param)) {
-      out << "<INVALID COMMAND>\n";
-      return;
-    }
-    if (param == "ODD") {
-      CountOdd(polys, out);
-    }
-    else if (param == "EVEN") {
-      CountEven(polys, out);
-    }
-    else if (!param.empty() && std::all_of(param.begin(), param.end(), ::isdigit)) {
-      try {
-        size_t n = std::stoul(param);
-        CountN(polys, out, n);
+  file.close();
+
+  // Удаление дубликатов фигур
+  std::sort(shapes.begin(), shapes.end());
+  shapes.erase(std::unique(shapes.begin(), shapes.end()), shapes.end());
+
+  // Обработка команд из стандартного ввода
+  while (std::getline(std::cin, line)) {
+    if (line.empty()) continue;
+    std::istringstream iss(line);
+    std::string cmd;
+    iss >> cmd;
+    if (cmd == "SAME" || cmd == "PERMS" || cmd == "EQUAL" || cmd == "COUNT") {
+      Polygon param;
+      if (!(iss >> param)) {
+        std::cout << "<INVALID COMMAND>" << std::endl;
+        continue;
       }
-      catch (...) {
-        out << "<INVALID COMMAND>\n";
+      if (cmd == "SAME") {
+        doSAME(param, shapes);
+      }
+      else if (cmd == "PERMS") {
+        doPERMS(param, shapes);
+      }
+      else if (cmd == "EQUAL") {
+        doEQUAL(param, shapes);
+      }
+      else if (cmd == "COUNT") {
+        doCOUNT(param, shapes);
       }
     }
     else {
-      out << "<INVALID COMMAND>\n";
-    }
-    };
-  std::string cmd;
-  while (std::cin >> cmd) {
-    auto it = commands.find(cmd);
-    if (it != commands.end()) {
-      it->second(polygons, std::cout);
-    }
-    else {
-      std::cout << "<INVALID COMMAND>\n";
-      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      std::cout << "<INVALID COMMAND>" << std::endl;
     }
   }
   return 0;
