@@ -47,7 +47,7 @@ namespace prokopenko {
     }
     else if (param == "MEAN") {
       if (polys.empty()) {
-        out << "<EMPTY DATASET>\n";
+        out << "<INVALID COMMAND>\n";
         return;
       }
       double s = sumAreas(polys);
@@ -87,7 +87,7 @@ namespace prokopenko {
     }
     if (param == "AREA") {
       if (polys.empty()) {
-        out << "<EMPTY DATASET>\n";
+        out << "<INVALID COMMAND>\n";
         return;
       }
       double mval = polys.front().getArea();
@@ -101,7 +101,7 @@ namespace prokopenko {
     }
     else if (param == "VERTEXES") {
       if (polys.empty()) {
-        out << "<EMPTY DATASET>\n";
+        out << "<INVALID COMMAND>\n";
         return;
       }
       size_t mv = polys.front().points.size();
@@ -123,7 +123,7 @@ namespace prokopenko {
     }
     if (param == "AREA") {
       if (polys.empty()) {
-        out << "<EMPTY DATASET>\n";
+        out << "<INVALID COMMAND>\n";
         return;
       }
       double mval = polys.front().getArea();
@@ -137,7 +137,7 @@ namespace prokopenko {
     }
     else if (param == "VERTEXES") {
       if (polys.empty()) {
-        out << "<EMPTY DATASET>\n";
+        out << "<INVALID COMMAND>\n";
         return;
       }
       size_t mv = polys.front().points.size();
@@ -153,7 +153,7 @@ namespace prokopenko {
 
   void Mean(const std::vector<Polygon>& polys, std::ostream& out) {
     if (polys.empty()) {
-      out << "<EMPTY DATASET>\n";
+      out << "<INVALID COMMAND>\n";
       return;
     }
     double s = sumAreas(polys);
