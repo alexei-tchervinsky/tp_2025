@@ -1,61 +1,73 @@
 #include "polygon.hpp"
-#include <cmath>
+#include <cctype>
+#include <limits>
 
-namespace prokopenko {
-
-  std::istream& operator>>(std::istream& in, DelimiterIO&& dest) {
-    std::istream::sentry sentry(in);
-    if (!sentry) return in;
-    char c = '\0';
-    in >> c;
-    if (in && c != dest.del) {
-      in.setstate(std::ios::failbit);
-    }
-    return in;
+namespace prokopenko
+{
+  bool Point::operator==(const Point& other) const
+  {
+    return x == other.x && y == other.y;
   }
 
-  std::istream& operator>>(std::istream& in, Point& dest) {
-    std::istream::sentry sentry(in);
-    if (!sentry) return in;
-    Point point;
-    in >> DelimiterIO{ '(' };
-    in >> point.x;
-    in >> DelimiterIO{ ';' };
-    in >> point.y;
-    in >> DelimiterIO{ ')' };
-    dest = point;
-    return in;
-  }
-
-  std::istream& operator>>(std::istream& in, Polygon& dest) {
-    std::istream::sentry sentry(in);
-    if (!sentry) return in;
-    Polygon polygon;
-    std::size_t vertexes = 0;
-    if (!(in >> vertexes)) {
+  std::istream& operator>>(std::istream& in, Point& point)
+  {
+    char ch = 0;
+    in >> std::ws >> ch;
+    if (ch != '(')
+    {
       in.setstate(std::ios::failbit);
       return in;
     }
-    Point pt;
-    for (std::size_t i = 0; i < vertexes; ++i) {
-      in >> pt;
-      if (in) polygon.push_back(pt);
-    }
-    if (polygon.size() != vertexes || vertexes < 3) {
+    in >> point.x >> ch;
+    if (ch != ';')
+    {
       in.setstate(std::ios::failbit);
+      return in;
     }
-    dest = polygon;
+    in >> point.y >> ch;
+    if (ch != ')')
+    {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
     return in;
   }
 
-  double getArea(const Polygon& polygon) {
-    double area = 0.0;
-    for (std::size_t i = 0; i < polygon.size(); ++i) {
-      const Point& a = polygon[i];
-      const Point& b = polygon[(i + 1) % polygon.size()];
-      area += (a.x * b.y - b.x * a.y);
+  std::istream& operator>>(std::istream& in, Polygon& polygon)
+  {
+    size_t size = 0;
+    in >> size;
+    if (!in)
+    {
+      return in;
     }
-    return std::fabs(area) / 2.0;
+    Polygon temp;
+    for (size_t i = 0; i < size; ++i)
+    {
+      Point point;
+      in >> point;
+      if (!in)
+      {
+        return in;
+      }
+      temp.push_back(point);
+    }
+    polygon = std::move(temp);
+    return in;
   }
 
+  std::ostream& operator<<(std::ostream& out, const Point& point)
+  {
+    return out << "(" << point.x << ";" << point.y << ")";
+  }
+
+  std::ostream& operator<<(std::ostream& out, const Polygon& polygon)
+  {
+    out << polygon.size();
+    for (const Point& pt : polygon)
+    {
+      out << " " << pt;
+    }
+    return out;
+  }
 }
