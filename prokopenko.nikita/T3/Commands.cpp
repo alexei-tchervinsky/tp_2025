@@ -10,12 +10,9 @@ namespace prokopenko {
 
   static constexpr double EPS = 1e-6;
 
-  // Helper: check area equality
   static bool equalArea(const Polygon& a, const Polygon& b) {
     return std::fabs(a.getArea() - b.getArea()) < EPS;
   }
-
-  // Helper: determine if polygon p is already seen in list via permutation
   static bool isDuplicate(const std::vector<Polygon>& seen, const Polygon& p) {
     for (const auto& q : seen) {
       if (p.isPermOf(q)) return true;
@@ -32,8 +29,9 @@ namespace prokopenko {
     if (param == "EVEN") {
       double s = 0.0;
       for (const auto& p : polys) {
-        if (p.getArea() > EPS && (p.points.size() % 2 == 0)) {
-          s += p.getArea();
+        double a = p.getArea();
+        if (a > EPS && (p.points.size() % 2 == 0)) {
+          s += a;
         }
       }
       out << std::fixed << std::setprecision(1) << s << '\n';
@@ -41,8 +39,9 @@ namespace prokopenko {
     else if (param == "ODD") {
       double s = 0.0;
       for (const auto& p : polys) {
-        if (p.getArea() > EPS && (p.points.size() % 2 == 1)) {
-          s += p.getArea();
+        double a = p.getArea();
+        if (a > EPS && (p.points.size() % 2 == 1)) {
+          s += a;
         }
       }
       out << std::fixed << std::setprecision(1) << s << '\n';
@@ -55,8 +54,9 @@ namespace prokopenko {
       double s = 0.0;
       size_t cnt = 0;
       for (const auto& p : polys) {
-        if (p.getArea() > EPS) {
-          s += p.getArea();
+        double a = p.getArea();
+        if (a > EPS) {
+          s += a;
           ++cnt;
         }
       }
@@ -82,8 +82,9 @@ namespace prokopenko {
       }
       double s = 0.0;
       for (const auto& p : polys) {
-        if (p.getArea() > EPS && p.points.size() == n) {
-          s += p.getArea();
+        double a = p.getArea();
+        if (a > EPS && p.points.size() == n) {
+          s += a;
         }
       }
       out << std::fixed << std::setprecision(1) << s << '\n';
@@ -122,7 +123,8 @@ namespace prokopenko {
       size_t mv = 0;
       bool found = false;
       for (const auto& p : polys) {
-        if (p.getArea() > EPS) {
+        double a = p.getArea();
+        if (a > EPS) {
           if (!found || p.points.size() > mv) {
             mv = p.points.size();
             found = true;
@@ -170,7 +172,8 @@ namespace prokopenko {
       size_t mv = 0;
       bool found = false;
       for (const auto& p : polys) {
-        if (p.getArea() > EPS) {
+        double a = p.getArea();
+        if (a > EPS) {
           if (!found || p.points.size() < mv) {
             mv = p.points.size();
             found = true;
@@ -197,8 +200,9 @@ namespace prokopenko {
     double s = 0.0;
     size_t cnt = 0;
     for (const auto& p : polys) {
-      if (p.getArea() > EPS) {
-        s += p.getArea();
+      double a = p.getArea();
+      if (a > EPS) {
+        s += a;
         ++cnt;
       }
     }
@@ -259,7 +263,7 @@ namespace prokopenko {
   }
 
   void Same(const std::vector<Polygon>& polys, std::ostream& out) {
-    size_t n = 0;
+    size_t n;
     if (!(std::cin >> n)) {
       out << "<INVALID COMMAND>\n";
       return;
@@ -287,7 +291,7 @@ namespace prokopenko {
   }
 
   void Perms(const std::vector<Polygon>& polys, std::ostream& out) {
-    size_t n = 0;
+    size_t n;
     if (!(std::cin >> n)) {
       out << "<INVALID COMMAND>\n";
       return;
@@ -319,7 +323,8 @@ namespace prokopenko {
     }
     size_t cnt = 0;
     for (const auto& p : polys) {
-      if (p.getArea() > EPS && p.getArea() < a0) ++cnt;
+      double a = p.getArea();
+      if (a > EPS && a < a0) ++cnt;
     }
     out << cnt << '\n';
   }
@@ -337,7 +342,8 @@ namespace prokopenko {
     }
     size_t cnt = 0;
     for (const auto& p : polys) {
-      if (p.getArea() > EPS && p.getArea() > a0) ++cnt;
+      double a = p.getArea();
+      if (a > EPS && a > a0) ++cnt;
     }
     out << cnt << '\n';
   }

@@ -5,6 +5,7 @@
 #include <string>
 #include <limits>
 #include <functional>
+#include <algorithm>
 #include "commands.hpp"
 
 using namespace prokopenko;
