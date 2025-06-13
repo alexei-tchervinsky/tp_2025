@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <map>
 #include <vector>
 #include <fstream>
@@ -20,31 +20,38 @@ int main(int argc, char* argv[])
   std::ifstream input(argv[1]);
   if (!input)
   {
-    std::cerr << "Error: cannot open file\n";
+    std::cerr << "Error: file cannot be opened\n";
     return 1;
   }
 
   std::vector<Polygon> polygons;
-  Polygon polygon;
-  while (input >> polygon)
+  while (!input.eof())
   {
-    polygons.push_back(polygon);
+    Polygon poly;
+    std::streampos pos = input.tellg(); // запоминаем текущую позицию
+    if (input >> poly)
+    {
+      polygons.push_back(poly);
+    }
+    else
+    {
+      input.clear();
+      input.seekg(pos); // возвращаемся к началу ошибочной фигуры
+      input.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // пропускаем строку
+    }
   }
-  input.clear();
-  input.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-  std::map<std::string, std::function<void(const std::vector<Polygon>&, std::ostream&)>> commands = {
-    {"AREA", Area},
-    {"MAX", Max},
-    {"MIN", Min},
-    {"MEAN", Mean},
-    {"SAME", Same},
-    {"RIGHT", Right},
-    {"PERMS", Perms},
-    {"LESS", Less},
-    {"MORE", More},
-    {"EQUAL", Equal}
-  };
+  std::map<std::string, std::function<void(const std::vector<Polygon>&, std::ostream&)>> commands;
+  commands["AREA"] = prokopenko::Area;
+  commands["MAX"] = prokopenko::Max;
+  commands["MIN"] = prokopenko::Min;
+  commands["MEAN"] = prokopenko::Mean;
+  commands["SAME"] = prokopenko::Same;
+  commands["RIGHT"] = prokopenko::Right;
+  commands["PERMS"] = prokopenko::Perms;
+  commands["LESS"] = prokopenko::Less;
+  commands["MORE"] = prokopenko::More;
+  commands["EQUAL"] = prokopenko::Equal;
 
   std::string parameter;
   while (std::cin >> parameter)
