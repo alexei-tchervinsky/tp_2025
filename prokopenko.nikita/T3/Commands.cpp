@@ -156,3 +156,39 @@ namespace prokopenko
     {
       if (isRightPolygon(p))
       {
+        out << p.size();
+        for (const auto& pt : p)
+        {
+          out << " " << pt;
+        }
+        out << '\n';
+      }
+    }
+  }
+
+  void Perms(const std::vector<Polygon>&, std::ostream&) {}
+  void Less(const std::vector<Polygon>&, std::ostream&) {}
+  void More(const std::vector<Polygon>&, std::ostream&) {}
+  void Equal(const std::vector<Polygon>&, std::ostream&) {}
+
+  void CountOdd(const std::vector<Polygon>& polygons, std::ostream& out)
+  {
+    size_t count = std::count_if(polygons.begin(), polygons.end(),
+      [](const Polygon& p) { return p.size() % 2 == 1; });
+    out << count << '\n';
+  }
+
+  void CountEven(const std::vector<Polygon>& polygons, std::ostream& out)
+  {
+    size_t count = std::count_if(polygons.begin(), polygons.end(),
+      [](const Polygon& p) { return p.size() % 2 == 0; });
+    out << count << '\n';
+  }
+
+  void CountN(const std::vector<Polygon>& polygons, std::ostream& out, size_t n)
+  {
+    size_t count = std::count_if(polygons.begin(), polygons.end(),
+      [n](const Polygon& p) { return p.size() == n; });
+    out << count << '\n';
+  }
+}

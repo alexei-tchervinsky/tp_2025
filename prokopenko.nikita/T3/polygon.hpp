@@ -12,6 +12,11 @@ namespace prokopenko
     bool operator==(const Point& other) const;
   };
 
+  inline bool operator!=(const Point& lhs, const Point& rhs)
+  {
+    return !(lhs == rhs);
+  }
+
   using Polygon = std::vector<Point>;
 
   std::istream& operator>>(std::istream& in, Point& point);

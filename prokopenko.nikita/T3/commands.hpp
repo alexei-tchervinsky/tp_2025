@@ -17,7 +17,6 @@ namespace prokopenko
   void Less(const std::vector<Polygon>&, std::ostream&);
   void More(const std::vector<Polygon>&, std::ostream&);
   void Equal(const std::vector<Polygon>&, std::ostream&);
-
   void CountOdd(const std::vector<Polygon>&, std::ostream&);
   void CountEven(const std::vector<Polygon>&, std::ostream&);
   void CountN(const std::vector<Polygon>&, std::ostream&, size_t n);
