@@ -9,7 +9,13 @@ namespace prokopenko
   struct Point
   {
     int x, y;
-    bool operator==(const Point& other) const;
+
+    bool operator==(const Point& other) const {
+      return x == other.x && y == other.y;
+    }
+    bool operator!=(const Point& other) const {
+      return !(*this == other);
+    }
   };
 
   struct Polygon
@@ -24,6 +30,8 @@ namespace prokopenko
 
   std::istream& operator>>(std::istream& in, Point& point);
   std::istream& operator>>(std::istream& in, Polygon& polygon);
+  std::ostream& operator<<(std::ostream& out, const Point& point);
+  std::ostream& operator<<(std::ostream& out, const Polygon& polygon);
 }
 
-#endif
+#endif // POLYGON_HPP
