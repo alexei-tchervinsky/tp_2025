@@ -1,101 +1,84 @@
-﻿#include "polygon.hpp"
-#include <cmath>
-#include <algorithm>
-#include <numeric>
+﻿#include <iostream>
+#include <map>
+#include <vector>
+#include <fstream>
+#include <string>
+#include <limits>
+#include <functional>
+#include "commands.hpp"
+#include "polygon.hpp"
 
-namespace prokopenko
-{
-  bool Point::operator==(const Point& other) const
-  {
-    return x == other.x && y == other.y;
+using namespace prokopenko;
+
+int main(int argc, char* argv[]) {
+  if (argc != 2) {
+    std::cerr << "Error: wrong input\n";
+    return 1;
   }
-
-  std::istream& operator>>(std::istream& in, Point& point)
-  {
-    in >> point.x >> point.y;
-    return in;
+  std::ifstream input(argv[1]);
+  if (!input) {
+    std::cerr << "Error: file cannot be opened\n";
+    return 1;
   }
-
-  std::istream& operator>>(std::istream& in, Polygon& polygon)
-  {
-    size_t n;
-    in >> n;
-    polygon.points.resize(n);
-    for (size_t i = 0; i < n; ++i)
-    {
-      in >> polygon.points[i];
+  std::vector<Polygon> polygons;
+  while (!input.eof()) {
+    Polygon poly;
+    std::streampos pos = input.tellg();
+    if (input >> poly) {
+      polygons.push_back(poly);
     }
-    return in;
-  }
-
-  double Polygon::getArea() const
-  {
-    if (points.size() < 3) return 0.0;
-
-    double area = 0.0;
-    for (size_t i = 0; i < points.size(); ++i)
-    {
-      size_t j = (i + 1) % points.size();
-      area += static_cast<double>(points[i].x) * points[j].y;
-      area -= static_cast<double>(points[j].x) * points[i].y;
+    else {
+      input.clear();
+      input.seekg(pos);
+      input.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
-    return std::abs(area) / 2.0;
   }
-
-  bool Polygon::isRight() const
-  {
-    for (size_t i = 0; i < points.size(); ++i)
-    {
-      const Point& a = points[i];
-      const Point& b = points[(i + 1) % points.size()];
-      const Point& c = points[(i + 2) % points.size()];
-
-      int dx1 = b.x - a.x;
-      int dy1 = b.y - a.y;
-      int dx2 = c.x - b.x;
-      int dy2 = c.y - b.y;
-
-      int dot = dx1 * dx2 + dy1 * dy2;
-      if (dot == 0) return true; // угол 90°
-    }
-    return false;
-  }
-
-  bool Polygon::operator==(const Polygon& other) const
-  {
-    return points == other.points;
-  }
-
-  bool Polygon::isPermOf(const Polygon& other) const
-  {
-    if (points.size() != other.points.size()) return false;
-
-    for (size_t offset = 0; offset < points.size(); ++offset)
-    {
-      bool match = true;
-      for (size_t i = 0; i < points.size(); ++i)
-      {
-        if (points[i] != other.points[(i + offset) % points.size()])
-        {
-          match = false;
-          break;
+  std::map<std::string,
+    std::function<void(const std::vector<Polygon>&, std::ostream&)>>
+    commands;
+  commands["AREA"] = Area;
+  commands["MAX"] = Max;
+  commands["MIN"] = Min;
+  commands["MEAN"] = Mean;
+  commands["SAME"] = Same;
+  commands["RIGHT"] = Right;
+  commands["PERMS"] = Perms;
+  commands["LESS"] = Less;
+  commands["MORE"] = More;
+  commands["EQUAL"] = Equal;
+  commands["COUNT"] = [](const std::vector<Polygon>& polys,
+    std::ostream& out) {
+      std::string param;
+      if (!(std::cin >> param)) {
+        out << "<INVALID COMMAND>\n";
+        return;
+      }
+      if (param == "ODD") {
+        CountOdd(polys, out);
+      }
+      else if (param == "EVEN") {
+        CountEven(polys, out);
+      }
+      else {
+        try {
+          size_t n = std::stoul(param);
+          CountN(polys, out, n);
+        }
+        catch (...) {
+          out << "<INVALID COMMAND>\n";
         }
       }
-      if (match) return true;
-
-      // проверить в обратном порядке
-      match = true;
-      for (size_t i = 0; i < points.size(); ++i)
-      {
-        if (points[i] != other.points[(points.size() + offset - i) % points.size()])
-        {
-          match = false;
-          break;
-        }
-      }
-      if (match) return true;
+    };
+  std::string cmd;
+  while (std::cin >> cmd) {
+    auto it = commands.find(cmd);
+    if (it != commands.end()) {
+      it->second(polygons, std::cout);
     }
-
-    return false;
+    else {
+      std::cout << "<INVALID COMMAND>\n";
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
   }
+  return 0;
 }
