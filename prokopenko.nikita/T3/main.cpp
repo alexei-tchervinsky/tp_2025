@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
     if (iss >> poly)
     {
       char extra;
-      if (!(iss >> extra))
+      if (!(iss >> extra)) // проверка: не должно быть ничего лишнего
       {
         polygons.push_back(poly);
       }
@@ -45,16 +45,21 @@ int main(int argc, char* argv[])
   }
 
   std::map<std::string, std::function<void(const std::vector<Polygon>&, std::ostream&)>> commands;
-  commands["AREA"] = Area;
-  commands["MAX"] = Max;
-  commands["MIN"] = Min;
-  commands["MEAN"] = Mean;
-  commands["SAME"] = Same;
-  commands["RIGHT"] = Right;
-  commands["PERMS"] = Perms;
-  commands["LESS"] = Less;
-  commands["MORE"] = More;
-  commands["EQUAL"] = Equal;
+  commands["AREA"] = [](const std::vector<Polygon>& polys, std::ostream& out)
+    {
+      std::string arg;
+      if (std::cin.peek() != '\n' && std::cin >> arg)
+      {
+        out << "<INVALID COMMAND>\n";
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        return;
+      }
+      Area(polys, out);
+    };
+  commands["MAX"] = commands["MIN"] = commands["MEAN"] = commands["SAME"] =
+    commands["RIGHT"] = commands["PERMS"] = commands["LESS"] =
+    commands["MORE"] = commands["EQUAL"] = commands["AREA"];
+
   commands["COUNT"] = [](const std::vector<Polygon>& polys, std::ostream& out)
     {
       std::string param;
@@ -77,6 +82,7 @@ int main(int argc, char* argv[])
         catch (...)
         {
           out << "<INVALID COMMAND>\n";
+          std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
       }
     };
