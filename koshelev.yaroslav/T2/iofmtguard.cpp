@@ -1,15 +1,20 @@
 #include "iofmtguard.hpp"
 
-namespace koshelev {
-    iofmtguard::iofmtguard(std::basic_ios<char>& stream)
-        : stream_(stream),
-          fill_(stream.fill()),
-          precision_(stream.precision()),
-          flags_(stream.flags()) {}
+namespace nspace {
 
-    iofmtguard::~iofmtguard() {
-        stream_.fill(fill_);
-        stream_.precision(precision_);
-        stream_.flags(flags_);
-    }
+iofmtguard::iofmtguard(std::basic_ios<char>& s)
+  : s_(s),
+    width_(s.width()),
+    fill_(s.fill()),
+    precision_(s.precision()),
+    flags_(s.flags())
+{}
+
+iofmtguard::~iofmtguard() {
+    s_.width(width_);
+    s_.fill(fill_);
+    s_.precision(precision_);
+    s_.flags(flags_);
+}
+
 }

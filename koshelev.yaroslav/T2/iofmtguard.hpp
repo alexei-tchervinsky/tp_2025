@@ -1,19 +1,22 @@
-#ifndef IOFMTGUARD_HPP
-#define IOFMTGUARD_HPP
+#ifndef IO_FMT_GUARD_HPP
+#define IO_FMT_GUARD_HPP
 
 #include <iostream>
 
-namespace koshelev {
-    class iofmtguard {
-    public:
-        iofmtguard(std::basic_ios<char>& stream);
-        ~iofmtguard();
-    private:
-        std::basic_ios<char>& stream_;
-        char fill_;
-        std::streamsize precision_;
-        std::basic_ios<char>::fmtflags flags_;
-    };
+namespace nspace {
+
+class iofmtguard {
+public:
+    iofmtguard(std::basic_ios<char>& s);
+    ~iofmtguard();
+private:
+    std::basic_ios<char>&            s_;
+    std::streamsize                  width_;
+    char                             fill_;
+    std::streamsize                  precision_;
+    std::basic_ios<char>::fmtflags   flags_;
+};
+
 }
 
 #endif

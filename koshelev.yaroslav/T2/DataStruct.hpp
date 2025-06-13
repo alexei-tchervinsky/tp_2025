@@ -4,17 +4,19 @@
 #include <string>
 #include <iostream>
 
-namespace koshelev {
-    struct DataStruct {
-        double key1;
-        unsigned long long key2;
-        std::string key3;
+namespace nspace {
 
-        bool operator<(const DataStruct& other) const;
-    };
+struct DataStruct {
+    double               key1;
+    unsigned long long   key2;
+    std::string          key3;
 
-    std::istream& operator>>(std::istream& in, DataStruct& data);
-    std::ostream& operator<<(std::ostream& out, const DataStruct& data);
+    friend std::istream& operator>>(std::istream&, DataStruct&);
+    friend std::ostream& operator<<(std::ostream&, const DataStruct&);
+};
+
+bool compare(const DataStruct&, const DataStruct&);
+
 }
 
 #endif
