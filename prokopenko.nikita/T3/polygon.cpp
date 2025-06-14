@@ -27,7 +27,7 @@ namespace prokopenko {
   bool Polygon::isRight() const {
     size_t n = points.size();
     if (n < 3) return false;
-    // проверяем, есть ли подряд три вершины, образующие прямой угол в середине
+    // считаем, что нужно найти хотя бы один угол 90°? (по исходным примерам так)
     for (size_t i = 0; i < n; ++i) {
       const Point& a = points[i];
       const Point& b = points[(i + 1) % n];
