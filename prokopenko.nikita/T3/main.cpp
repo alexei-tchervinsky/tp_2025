@@ -11,7 +11,7 @@
 
 using namespace prokopenko;
 
-// проверка, что внутри полигона нет дублирующихся точек
+// Проверка, что внутри полигона нет дублирующихся точек
 static bool allPointsDistinct(const Polygon& poly) {
   std::set<std::pair<int, int>> st;
   for (const auto& pt : poly.points) {

@@ -18,6 +18,7 @@ namespace prokopenko {
 
   struct Polygon {
     std::vector<Point> points;
+
     double getArea() const {
       double area = 0.0;
       size_t n = points.size();
@@ -29,10 +30,10 @@ namespace prokopenko {
       }
       return std::fabs(area) / 2.0;
     }
+
     bool isRight() const {
       size_t n = points.size();
       if (n < 3) return false;
-      // считаем, что если среди последовательных углов хотя бы один прямой
       for (size_t i = 0; i < n; ++i) {
         const Point& a = points[i];
         const Point& b = points[(i + 1) % n];
@@ -47,6 +48,7 @@ namespace prokopenko {
       }
       return false;
     }
+
     bool isPermOf(const Polygon& other) const {
       if (points.size() != other.points.size()) return false;
       size_t n = points.size();
@@ -63,7 +65,6 @@ namespace prokopenko {
         if (ok) return true;
         ok = true;
         for (size_t i = 0; i < n; ++i) {
-          // CCW: зеркальное
           if (points[i] != other.points[(n + shift - i) % n]) {
             ok = false;
             break;

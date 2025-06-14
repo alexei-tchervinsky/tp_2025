@@ -10,12 +10,11 @@ namespace prokopenko {
 
   static constexpr double EPS = 1e-6;
 
-  // проверка равенства площадей с EPS
+  // равенство площадей с EPS
   static bool equalArea(const Polygon& a, const Polygon& b) {
     return std::fabs(a.getArea() - b.getArea()) < EPS;
   }
-
-  // вспомогательная: фильтрация уникальных по перестановке
+  // проверка: p уже есть в seen (по перестановке)
   static bool isDuplicate(const std::vector<Polygon>& seen, const Polygon& p) {
     for (const auto& q : seen) {
       if (p.isPermOf(q)) return true;
@@ -23,18 +22,16 @@ namespace prokopenko {
     return false;
   }
 
-  // AREA <param>
+  // AREA <EVEN|ODD|MEAN|n>
   void Area(const std::vector<Polygon>& polys, std::ostream& out) {
     std::string param;
     if (!(std::cin >> param)) {
       out << "<INVALID COMMAND>\n";
       return;
     }
-    // EVEN / ODD
     if (param == "EVEN" || param == "ODD") {
       bool wantEven = (param == "EVEN");
       double sum = 0.0;
-      // учитываем только уникальные с площадью>0 и корректные (в main уже отфильтрованы)
       std::vector<Polygon> uniq;
       for (const auto& p : polys) {
         double a = p.getArea();
@@ -48,7 +45,6 @@ namespace prokopenko {
       out << std::fixed << std::setprecision(1) << sum << '\n';
     }
     else if (param == "MEAN") {
-      // MEAN: если нет уникальных с area>0 → INVALID
       std::vector<Polygon> uniq;
       for (const auto& p : polys) {
         double a = p.getArea();
@@ -61,14 +57,11 @@ namespace prokopenko {
         return;
       }
       double sum = 0.0;
-      for (const auto& p : uniq) {
-        sum += p.getArea();
-      }
+      for (const auto& p : uniq) sum += p.getArea();
       double mean = sum / uniq.size();
       out << std::fixed << std::setprecision(1) << mean << '\n';
     }
     else if (!param.empty() && std::all_of(param.begin(), param.end(), ::isdigit)) {
-      // AREA <n>
       size_t n;
       try {
         n = std::stoul(param);
@@ -97,7 +90,7 @@ namespace prokopenko {
     }
   }
 
-  // MAX <param>
+  // MAX <AREA|VERTEXES>
   void Max(const std::vector<Polygon>& polys, std::ostream& out) {
     std::string param;
     if (!(std::cin >> param)) {
@@ -151,7 +144,7 @@ namespace prokopenko {
     }
   }
 
-  // MIN <param>
+  // MIN <AREA|VERTEXES>
   void Min(const std::vector<Polygon>& polys, std::ostream& out) {
     std::string param;
     if (!(std::cin >> param)) {
@@ -205,9 +198,8 @@ namespace prokopenko {
     }
   }
 
-  // MEAN (как отдельная команда, без параметра после слова MEAN в main)
+  // MEAN (без параметра) эквивалент AREA MEAN
   void Mean(const std::vector<Polygon>& polys, std::ostream& out) {
-    // эквивалент AREA MEAN
     std::vector<Polygon> uniq;
     for (const auto& p : polys) {
       double a = p.getArea();
@@ -239,7 +231,6 @@ namespace prokopenko {
     }
     out << cnt << '\n';
   }
-
   // COUNT EVEN
   void CountEven(const std::vector<Polygon>& polys, std::ostream& out) {
     std::vector<Polygon> uniq;
@@ -255,7 +246,6 @@ namespace prokopenko {
     }
     out << cnt << '\n';
   }
-
   // COUNT <n>
   void CountN(const std::vector<Polygon>& polys,
     std::ostream& out,
@@ -300,12 +290,11 @@ namespace prokopenko {
       return;
     }
     size_t cnt = 0;
-    std::vector<Polygon> uniq; // уникальные из polys
+    std::vector<Polygon> uniq;
     for (const auto& p : polys) {
       double a = p.getArea();
       if (a > EPS && !isDuplicate(uniq, p)) {
         uniq.push_back(p);
-        // сравнить с pattern: равенство по перестановке
         if (p.isPermOf(pattern)) ++cnt;
       }
     }
