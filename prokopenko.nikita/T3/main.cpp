@@ -11,7 +11,7 @@
 
 using namespace prokopenko;
 
-// проверка, все ли точки в полигоне различны
+// проверка, что внутри полигона нет дублирующихся точек
 static bool allPointsDistinct(const Polygon& poly) {
   std::set<std::pair<int, int>> st;
   for (const auto& pt : poly.points) {
@@ -20,8 +20,7 @@ static bool allPointsDistinct(const Polygon& poly) {
   return st.size() == poly.points.size();
 }
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
   if (argc != 2) {
     std::cerr << "Error: wrong input\n";
     return 1;

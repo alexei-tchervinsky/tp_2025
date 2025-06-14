@@ -10,59 +10,65 @@ namespace prokopenko {
 
   static constexpr double EPS = 1e-6;
 
-  // сравнение площадей с допуском
+  // проверка равенства площадей с EPS
   static bool equalArea(const Polygon& a, const Polygon& b) {
     return std::fabs(a.getArea() - b.getArea()) < EPS;
   }
 
+  // вспомогательная: фильтрация уникальных по перестановке
+  static bool isDuplicate(const std::vector<Polygon>& seen, const Polygon& p) {
+    for (const auto& q : seen) {
+      if (p.isPermOf(q)) return true;
+    }
+    return false;
+  }
+
+  // AREA <param>
   void Area(const std::vector<Polygon>& polys, std::ostream& out) {
     std::string param;
     if (!(std::cin >> param)) {
       out << "<INVALID COMMAND>\n";
       return;
     }
-    if (param == "EVEN") {
+    // EVEN / ODD
+    if (param == "EVEN" || param == "ODD") {
+      bool wantEven = (param == "EVEN");
       double sum = 0.0;
+      // учитываем только уникальные с площадью>0 и корректные (в main уже отфильтрованы)
+      std::vector<Polygon> uniq;
       for (const auto& p : polys) {
         double a = p.getArea();
-        if (a > EPS && (p.points.size() % 2 == 0)) {
-          sum += a;
-        }
-      }
-      out << std::fixed << std::setprecision(1) << sum << '\n';
-    }
-    else if (param == "ODD") {
-      double sum = 0.0;
-      for (const auto& p : polys) {
-        double a = p.getArea();
-        if (a > EPS && (p.points.size() % 2 == 1)) {
-          sum += a;
+        if (a > EPS && !isDuplicate(uniq, p)) {
+          uniq.push_back(p);
+          if ((p.points.size() % 2 == 0) == wantEven) {
+            sum += a;
+          }
         }
       }
       out << std::fixed << std::setprecision(1) << sum << '\n';
     }
     else if (param == "MEAN") {
-      if (polys.empty()) {
+      // MEAN: если нет уникальных с area>0 → INVALID
+      std::vector<Polygon> uniq;
+      for (const auto& p : polys) {
+        double a = p.getArea();
+        if (a > EPS && !isDuplicate(uniq, p)) {
+          uniq.push_back(p);
+        }
+      }
+      if (uniq.empty()) {
         out << "<INVALID COMMAND>\n";
         return;
       }
       double sum = 0.0;
-      size_t cnt = 0;
-      for (const auto& p : polys) {
-        double a = p.getArea();
-        if (a > EPS) {
-          sum += a;
-          ++cnt;
-        }
+      for (const auto& p : uniq) {
+        sum += p.getArea();
       }
-      if (cnt == 0) {
-        out << "0.0\n";
-      }
-      else {
-        out << std::fixed << std::setprecision(1) << (sum / cnt) << '\n';
-      }
+      double mean = sum / uniq.size();
+      out << std::fixed << std::setprecision(1) << mean << '\n';
     }
-    else if (std::all_of(param.begin(), param.end(), ::isdigit)) {
+    else if (!param.empty() && std::all_of(param.begin(), param.end(), ::isdigit)) {
+      // AREA <n>
       size_t n;
       try {
         n = std::stoul(param);
@@ -76,9 +82,11 @@ namespace prokopenko {
         return;
       }
       double sum = 0.0;
+      std::vector<Polygon> uniq;
       for (const auto& p : polys) {
         double a = p.getArea();
-        if (a > EPS && p.points.size() == n) {
+        if (a > EPS && p.points.size() == n && !isDuplicate(uniq, p)) {
+          uniq.push_back(p);
           sum += a;
         }
       }
@@ -89,6 +97,7 @@ namespace prokopenko {
     }
   }
 
+  // MAX <param>
   void Max(const std::vector<Polygon>& polys, std::ostream& out) {
     std::string param;
     if (!(std::cin >> param)) {
@@ -96,13 +105,15 @@ namespace prokopenko {
       return;
     }
     if (param == "AREA") {
-      double maxA = -1.0;
+      double best = -1.0;
       bool found = false;
+      std::vector<Polygon> uniq;
       for (const auto& p : polys) {
         double a = p.getArea();
-        if (a > EPS) {
-          if (!found || a > maxA) {
-            maxA = a;
+        if (a > EPS && !isDuplicate(uniq, p)) {
+          uniq.push_back(p);
+          if (!found || a > best) {
+            best = a;
             found = true;
           }
         }
@@ -111,17 +122,19 @@ namespace prokopenko {
         out << "<INVALID COMMAND>\n";
       }
       else {
-        out << std::fixed << std::setprecision(1) << maxA << '\n';
+        out << std::fixed << std::setprecision(1) << best << '\n';
       }
     }
     else if (param == "VERTEXES") {
-      size_t maxV = 0;
+      size_t best = 0;
       bool found = false;
+      std::vector<Polygon> uniq;
       for (const auto& p : polys) {
         double a = p.getArea();
-        if (a > EPS) {
-          if (!found || p.points.size() > maxV) {
-            maxV = p.points.size();
+        if (a > EPS && !isDuplicate(uniq, p)) {
+          uniq.push_back(p);
+          if (!found || p.points.size() > best) {
+            best = p.points.size();
             found = true;
           }
         }
@@ -130,7 +143,7 @@ namespace prokopenko {
         out << "<INVALID COMMAND>\n";
       }
       else {
-        out << maxV << '\n';
+        out << best << '\n';
       }
     }
     else {
@@ -138,6 +151,7 @@ namespace prokopenko {
     }
   }
 
+  // MIN <param>
   void Min(const std::vector<Polygon>& polys, std::ostream& out) {
     std::string param;
     if (!(std::cin >> param)) {
@@ -145,13 +159,15 @@ namespace prokopenko {
       return;
     }
     if (param == "AREA") {
-      double minA = 0.0;
+      double best = 0.0;
       bool found = false;
+      std::vector<Polygon> uniq;
       for (const auto& p : polys) {
         double a = p.getArea();
-        if (a > EPS) {
-          if (!found || a < minA) {
-            minA = a;
+        if (a > EPS && !isDuplicate(uniq, p)) {
+          uniq.push_back(p);
+          if (!found || a < best) {
+            best = a;
             found = true;
           }
         }
@@ -160,17 +176,19 @@ namespace prokopenko {
         out << "<INVALID COMMAND>\n";
       }
       else {
-        out << std::fixed << std::setprecision(1) << minA << '\n';
+        out << std::fixed << std::setprecision(1) << best << '\n';
       }
     }
     else if (param == "VERTEXES") {
-      size_t minV = 0;
+      size_t best = 0;
       bool found = false;
+      std::vector<Polygon> uniq;
       for (const auto& p : polys) {
         double a = p.getArea();
-        if (a > EPS) {
-          if (!found || p.points.size() < minV) {
-            minV = p.points.size();
+        if (a > EPS && !isDuplicate(uniq, p)) {
+          uniq.push_back(p);
+          if (!found || p.points.size() < best) {
+            best = p.points.size();
             found = true;
           }
         }
@@ -179,7 +197,7 @@ namespace prokopenko {
         out << "<INVALID COMMAND>\n";
       }
       else {
-        out << minV << '\n';
+        out << best << '\n';
       }
     }
     else {
@@ -187,50 +205,58 @@ namespace prokopenko {
     }
   }
 
+  // MEAN (как отдельная команда, без параметра после слова MEAN в main)
   void Mean(const std::vector<Polygon>& polys, std::ostream& out) {
-    if (polys.empty()) {
+    // эквивалент AREA MEAN
+    std::vector<Polygon> uniq;
+    for (const auto& p : polys) {
+      double a = p.getArea();
+      if (a > EPS && !isDuplicate(uniq, p)) {
+        uniq.push_back(p);
+      }
+    }
+    if (uniq.empty()) {
       out << "<INVALID COMMAND>\n";
       return;
     }
     double sum = 0.0;
-    size_t cnt = 0;
-    for (const auto& p : polys) {
-      double a = p.getArea();
-      if (a > EPS) {
-        sum += a;
-        ++cnt;
-      }
-    }
-    if (cnt == 0) {
-      out << "<INVALID COMMAND>\n";
-    }
-    else {
-      out << std::fixed << std::setprecision(1) << (sum / cnt) << '\n';
-    }
+    for (const auto& p : uniq) sum += p.getArea();
+    out << std::fixed << std::setprecision(1) << (sum / uniq.size()) << '\n';
   }
 
+  // COUNT ODD
   void CountOdd(const std::vector<Polygon>& polys, std::ostream& out) {
-    size_t cnt = 0;
+    std::vector<Polygon> uniq;
     for (const auto& p : polys) {
       double a = p.getArea();
-      if (a > EPS && (p.points.size() % 2 == 1)) {
-        ++cnt;
+      if (a > EPS && !isDuplicate(uniq, p)) {
+        uniq.push_back(p);
       }
+    }
+    size_t cnt = 0;
+    for (const auto& p : uniq) {
+      if (p.points.size() % 2 == 1) ++cnt;
     }
     out << cnt << '\n';
   }
 
+  // COUNT EVEN
   void CountEven(const std::vector<Polygon>& polys, std::ostream& out) {
-    size_t cnt = 0;
+    std::vector<Polygon> uniq;
     for (const auto& p : polys) {
       double a = p.getArea();
-      if (a > EPS && (p.points.size() % 2 == 0)) {
-        ++cnt;
+      if (a > EPS && !isDuplicate(uniq, p)) {
+        uniq.push_back(p);
       }
+    }
+    size_t cnt = 0;
+    for (const auto& p : uniq) {
+      if (p.points.size() % 2 == 0) ++cnt;
     }
     out << cnt << '\n';
   }
 
+  // COUNT <n>
   void CountN(const std::vector<Polygon>& polys,
     std::ostream& out,
     size_t n) {
@@ -238,16 +264,21 @@ namespace prokopenko {
       out << "<INVALID COMMAND>\n";
       return;
     }
-    size_t cnt = 0;
+    std::vector<Polygon> uniq;
     for (const auto& p : polys) {
       double a = p.getArea();
-      if (a > EPS && p.points.size() == n) {
-        ++cnt;
+      if (a > EPS && !isDuplicate(uniq, p)) {
+        uniq.push_back(p);
       }
+    }
+    size_t cnt = 0;
+    for (const auto& p : uniq) {
+      if (p.points.size() == n) ++cnt;
     }
     out << cnt << '\n';
   }
 
+  // SAME <n> <polygon>
   void Same(const std::vector<Polygon>& polys, std::ostream& out) {
     size_t n;
     if (!(std::cin >> n)) {
@@ -259,25 +290,43 @@ namespace prokopenko {
       out << "<INVALID COMMAND>\n";
       return;
     }
+    if (pattern.points.size() != n) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
+    double a0 = pattern.getArea();
+    if (a0 <= EPS) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
     size_t cnt = 0;
-    double A0 = pattern.getArea();
-    if (A0 > EPS) {
-      for (const auto& p : polys) {
+    std::vector<Polygon> uniq; // уникальные из polys
+    for (const auto& p : polys) {
+      double a = p.getArea();
+      if (a > EPS && !isDuplicate(uniq, p)) {
+        uniq.push_back(p);
+        // сравнить с pattern: равенство по перестановке
         if (p.isPermOf(pattern)) ++cnt;
       }
     }
     out << cnt << '\n';
   }
 
+  // RIGHT
   void Right(const std::vector<Polygon>& polys, std::ostream& out) {
     size_t cnt = 0;
+    std::vector<Polygon> uniq;
     for (const auto& p : polys) {
       double a = p.getArea();
-      if (a > EPS && p.isRight()) ++cnt;
+      if (a > EPS && !isDuplicate(uniq, p)) {
+        uniq.push_back(p);
+        if (p.isRight()) ++cnt;
+      }
     }
     out << cnt << '\n';
   }
 
+  // PERMS <n> <polygon>
   void Perms(const std::vector<Polygon>& polys, std::ostream& out) {
     size_t n;
     if (!(std::cin >> n)) {
@@ -289,64 +338,93 @@ namespace prokopenko {
       out << "<INVALID COMMAND>\n";
       return;
     }
+    if (pattern.points.size() != n) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
+    double a0 = pattern.getArea();
+    if (a0 <= EPS) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
     size_t cnt = 0;
-    double A0 = pattern.getArea();
-    if (A0 > EPS) {
-      for (const auto& p : polys) {
+    std::vector<Polygon> uniq;
+    for (const auto& p : polys) {
+      double a = p.getArea();
+      if (a > EPS && !isDuplicate(uniq, p)) {
+        uniq.push_back(p);
         if (p.isPermOf(pattern)) ++cnt;
       }
     }
     out << cnt << '\n';
   }
 
+  // LESS <polygon>
   void Less(const std::vector<Polygon>& polys, std::ostream& out) {
     Polygon pattern;
     if (!(std::cin >> pattern)) {
       out << "<INVALID COMMAND>\n";
       return;
     }
-    double A0 = pattern.getArea();
-    if (A0 <= EPS) {
+    double a0 = pattern.getArea();
+    if (a0 <= EPS) {
       out << "<INVALID COMMAND>\n";
       return;
     }
     size_t cnt = 0;
+    std::vector<Polygon> uniq;
     for (const auto& p : polys) {
       double a = p.getArea();
-      if (a > EPS && a < A0) ++cnt;
+      if (a > EPS && !isDuplicate(uniq, p)) {
+        uniq.push_back(p);
+        if (a < a0) ++cnt;
+      }
     }
     out << cnt << '\n';
   }
 
+  // MORE <polygon>
   void More(const std::vector<Polygon>& polys, std::ostream& out) {
     Polygon pattern;
     if (!(std::cin >> pattern)) {
       out << "<INVALID COMMAND>\n";
       return;
     }
-    double A0 = pattern.getArea();
-    if (A0 <= EPS) {
+    double a0 = pattern.getArea();
+    if (a0 <= EPS) {
       out << "<INVALID COMMAND>\n";
       return;
     }
     size_t cnt = 0;
+    std::vector<Polygon> uniq;
     for (const auto& p : polys) {
       double a = p.getArea();
-      if (a > EPS && a > A0) ++cnt;
+      if (a > EPS && !isDuplicate(uniq, p)) {
+        uniq.push_back(p);
+        if (a > a0) ++cnt;
+      }
     }
     out << cnt << '\n';
   }
 
+  // EQUAL <polygon>
   void Equal(const std::vector<Polygon>& polys, std::ostream& out) {
     Polygon pattern;
     if (!(std::cin >> pattern)) {
       out << "<INVALID COMMAND>\n";
       return;
     }
+    double a0 = pattern.getArea();
+    if (a0 <= EPS) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
     size_t cnt = 0;
-    double A0 = pattern.getArea();
-    if (A0 > EPS) {
-      for (const auto& p : polys) {
+    std::vector<Polygon> uniq;
+    for (const auto& p : polys) {
+      double a = p.getArea();
+      if (a > EPS && !isDuplicate(uniq, p)) {
+        uniq.push_back(p);
         if (equalArea(p, pattern)) ++cnt;
       }
     }
