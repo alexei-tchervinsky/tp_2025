@@ -13,12 +13,6 @@ namespace prokopenko {
   static bool equalArea(const Polygon& a, const Polygon& b) {
     return std::fabs(a.getArea() - b.getArea()) < EPS;
   }
-  static bool isDuplicate(const std::vector<Polygon>& seen, const Polygon& p) {
-    for (const auto& q : seen) {
-      if (p.isPermOf(q)) return true;
-    }
-    return false;
-  }
 
   void Area(const std::vector<Polygon>& polys, std::ostream& out) {
     std::string param;
@@ -215,29 +209,23 @@ namespace prokopenko {
   }
 
   void CountOdd(const std::vector<Polygon>& polys, std::ostream& out) {
-    std::vector<Polygon> unique;
-    for (const auto& p : polys) {
-      if (p.getArea() > EPS && !isDuplicate(unique, p)) {
-        unique.push_back(p);
-      }
-    }
     size_t cnt = 0;
-    for (const auto& p : unique) {
-      if (p.points.size() % 2 == 1) ++cnt;
+    for (const auto& p : polys) {
+      double a = p.getArea();
+      if (a > EPS && (p.points.size() % 2 == 1)) {
+        ++cnt;
+      }
     }
     out << cnt << '\n';
   }
 
   void CountEven(const std::vector<Polygon>& polys, std::ostream& out) {
-    std::vector<Polygon> unique;
-    for (const auto& p : polys) {
-      if (p.getArea() > EPS && !isDuplicate(unique, p)) {
-        unique.push_back(p);
-      }
-    }
     size_t cnt = 0;
-    for (const auto& p : unique) {
-      if (p.points.size() % 2 == 0) ++cnt;
+    for (const auto& p : polys) {
+      double a = p.getArea();
+      if (a > EPS && (p.points.size() % 2 == 0)) {
+        ++cnt;
+      }
     }
     out << cnt << '\n';
   }
@@ -249,15 +237,12 @@ namespace prokopenko {
       out << "<INVALID COMMAND>\n";
       return;
     }
-    std::vector<Polygon> unique;
-    for (const auto& p : polys) {
-      if (p.getArea() > EPS && !isDuplicate(unique, p)) {
-        unique.push_back(p);
-      }
-    }
     size_t cnt = 0;
-    for (const auto& p : unique) {
-      if (p.points.size() == n) ++cnt;
+    for (const auto& p : polys) {
+      double a = p.getArea();
+      if (a > EPS && p.points.size() == n) {
+        ++cnt;
+      }
     }
     out << cnt << '\n';
   }
