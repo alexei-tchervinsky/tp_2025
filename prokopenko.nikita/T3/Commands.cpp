@@ -9,7 +9,6 @@
 namespace prokopenko {
 
   static constexpr double EPS = 1e-6;
-
   static bool equalArea(const Polygon& a, const Polygon& b) {
     return std::fabs(a.getArea() - b.getArea()) < EPS;
   }
