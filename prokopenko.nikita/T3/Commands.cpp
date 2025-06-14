@@ -10,9 +10,11 @@ namespace prokopenko {
 
   static constexpr double EPS = 1e-6;
 
+  // Проверка равенства площадей с допуском EPS
   static bool equalArea(const Polygon& a, const Polygon& b) {
     return std::fabs(a.getArea() - b.getArea()) < EPS;
   }
+  // Проверка-дубликат: есть ли полигон q в списке seen, такой что p.isPermOf(q)
   static bool isDuplicate(const std::vector<Polygon>& seen, const Polygon& p) {
     for (const auto& q : seen) {
       if (p.isPermOf(q)) return true;
@@ -20,9 +22,10 @@ namespace prokopenko {
     return false;
   }
 
-  void Area(const std::vector<Polygon>& polys, std::ostream& out) {
+  // AREA <param>
+  void Area(const std::vector<Polygon>& polys, std::istream& in, std::ostream& out) {
     std::string param;
-    if (!(std::cin >> param)) {
+    if (!(in >> param)) {
       out << "<INVALID COMMAND>\n";
       return;
     }
@@ -67,7 +70,7 @@ namespace prokopenko {
         out << std::fixed << std::setprecision(1) << (s / cnt) << '\n';
       }
     }
-    else if (std::all_of(param.begin(), param.end(), ::isdigit)) {
+    else if (!param.empty() && std::all_of(param.begin(), param.end(), ::isdigit)) {
       size_t n = 0;
       try {
         n = std::stoul(param);
@@ -94,9 +97,10 @@ namespace prokopenko {
     }
   }
 
-  void Max(const std::vector<Polygon>& polys, std::ostream& out) {
+  // MAX <param>
+  void Max(const std::vector<Polygon>& polys, std::istream& in, std::ostream& out) {
     std::string param;
-    if (!(std::cin >> param)) {
+    if (!(in >> param)) {
       out << "<INVALID COMMAND>\n";
       return;
     }
@@ -143,9 +147,10 @@ namespace prokopenko {
     }
   }
 
-  void Min(const std::vector<Polygon>& polys, std::ostream& out) {
+  // MIN <param>
+  void Min(const std::vector<Polygon>& polys, std::istream& in, std::ostream& out) {
     std::string param;
-    if (!(std::cin >> param)) {
+    if (!(in >> param)) {
       out << "<INVALID COMMAND>\n";
       return;
     }
@@ -192,6 +197,7 @@ namespace prokopenko {
     }
   }
 
+  // MEAN без параметра
   void Mean(const std::vector<Polygon>& polys, std::ostream& out) {
     if (polys.empty()) {
       out << "<INVALID COMMAND>\n";
@@ -214,105 +220,69 @@ namespace prokopenko {
     }
   }
 
-  void CountOdd(const std::vector<Polygon>& polys, std::ostream& out) {
-    std::vector<Polygon> unique;
-    for (const auto& p : polys) {
-      if (p.getArea() > EPS && !isDuplicate(unique, p)) {
-        unique.push_back(p);
-      }
-    }
-    size_t cnt = 0;
-    for (const auto& p : unique) {
-      if (p.points.size() % 2 == 1) ++cnt;
-    }
-    out << cnt << '\n';
-  }
-
-  void CountEven(const std::vector<Polygon>& polys, std::ostream& out) {
-    std::vector<Polygon> unique;
-    for (const auto& p : polys) {
-      if (p.getArea() > EPS && !isDuplicate(unique, p)) {
-        unique.push_back(p);
-      }
-    }
-    size_t cnt = 0;
-    for (const auto& p : unique) {
-      if (p.points.size() % 2 == 0) ++cnt;
-    }
-    out << cnt << '\n';
-  }
-
-  void CountN(const std::vector<Polygon>& polys,
-    std::ostream& out,
-    size_t n) {
-    if (n < 3) {
-      out << "<INVALID COMMAND>\n";
-      return;
-    }
-    std::vector<Polygon> unique;
-    for (const auto& p : polys) {
-      if (p.getArea() > EPS && !isDuplicate(unique, p)) {
-        unique.push_back(p);
-      }
-    }
-    size_t cnt = 0;
-    for (const auto& p : unique) {
-      if (p.points.size() == n) ++cnt;
-    }
-    out << cnt << '\n';
-  }
-
-  void Same(const std::vector<Polygon>& polys, std::ostream& out) {
+  // SAME <n> <polygon>
+  void Same(const std::vector<Polygon>& polys, std::istream& in, std::ostream& out) {
     size_t n;
-    if (!(std::cin >> n)) {
+    if (!(in >> n)) {
       out << "<INVALID COMMAND>\n";
       return;
     }
     Polygon pattern;
-    if (!(std::cin >> pattern)) {
+    if (!(in >> pattern)) {
       out << "<INVALID COMMAND>\n";
       return;
     }
+    // проверяем площадь паттерна
+    double a0 = pattern.getArea();
+    if (a0 <= EPS) {
+      out << "0\n";
+      return;
+    }
     size_t cnt = 0;
-    if (pattern.getArea() > EPS) {
-      for (const auto& p : polys) {
-        if (p.isPermOf(pattern)) ++cnt;
-      }
+    for (const auto& p : polys) {
+      if (p.isPermOf(pattern)) ++cnt;
     }
     out << cnt << '\n';
   }
 
+  // RIGHT без параметра
   void Right(const std::vector<Polygon>& polys, std::ostream& out) {
     size_t cnt = 0;
     for (const auto& p : polys) {
-      if (p.getArea() > EPS && p.isRight()) ++cnt;
+      double a = p.getArea();
+      if (a > EPS && p.isRight()) ++cnt;
     }
     out << cnt << '\n';
   }
 
-  void Perms(const std::vector<Polygon>& polys, std::ostream& out) {
+  // PERMS <n> <polygon>
+  void Perms(const std::vector<Polygon>& polys, std::istream& in, std::ostream& out) {
     size_t n;
-    if (!(std::cin >> n)) {
+    if (!(in >> n)) {
       out << "<INVALID COMMAND>\n";
       return;
     }
     Polygon pattern;
-    if (!(std::cin >> pattern)) {
+    if (!(in >> pattern)) {
       out << "<INVALID COMMAND>\n";
+      return;
+    }
+    double a0 = pattern.getArea();
+    if (a0 <= EPS) {
+      out << "0\n";
       return;
     }
     size_t cnt = 0;
-    if (pattern.getArea() > EPS) {
-      for (const auto& p : polys) {
-        if (p.isPermOf(pattern)) ++cnt;
-      }
+    for (const auto& p : polys) {
+      if (p.isPermOf(pattern)) ++cnt;
     }
     out << cnt << '\n';
   }
 
-  void Less(const std::vector<Polygon>& polys, std::ostream& out) {
+  // LESS <polygon>
+  void Less(const std::vector<Polygon>& polys, std::istream& in, std::ostream& out) {
     Polygon pattern;
-    if (!(std::cin >> pattern)) {
+    if (!(in >> pattern)) {
       out << "<INVALID COMMAND>\n";
       return;
     }
@@ -329,9 +299,10 @@ namespace prokopenko {
     out << cnt << '\n';
   }
 
-  void More(const std::vector<Polygon>& polys, std::ostream& out) {
+  // MORE <polygon>
+  void More(const std::vector<Polygon>& polys, std::istream& in, std::ostream& out) {
     Polygon pattern;
-    if (!(std::cin >> pattern)) {
+    if (!(in >> pattern)) {
       out << "<INVALID COMMAND>\n";
       return;
     }
@@ -348,17 +319,100 @@ namespace prokopenko {
     out << cnt << '\n';
   }
 
-  void Equal(const std::vector<Polygon>& polys, std::ostream& out) {
+  // EQUAL <polygon>
+  void Equal(const std::vector<Polygon>& polys, std::istream& in, std::ostream& out) {
     Polygon pattern;
-    if (!(std::cin >> pattern)) {
+    if (!(in >> pattern)) {
       out << "<INVALID COMMAND>\n";
       return;
     }
+    double a0 = pattern.getArea();
+    if (a0 <= EPS) {
+      out << "0\n";
+      return;
+    }
     size_t cnt = 0;
-    if (pattern.getArea() > EPS) {
-      for (const auto& p : polys) {
-        if (equalArea(p, pattern)) ++cnt;
+    for (const auto& p : polys) {
+      if (equalArea(p, pattern)) ++cnt;
+    }
+    out << cnt << '\n';
+  }
+
+  // COUNT <ODD|EVEN|n>
+  void Count(const std::vector<Polygon>& polys, std::istream& in, std::ostream& out) {
+    std::string param;
+    if (!(in >> param)) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
+    if (param == "ODD") {
+      CountOdd(polys, out);
+    }
+    else if (param == "EVEN") {
+      CountEven(polys, out);
+    }
+    else if (!param.empty() && std::all_of(param.begin(), param.end(), ::isdigit)) {
+      try {
+        size_t n = std::stoul(param);
+        CountN(polys, out, n);
       }
+      catch (...) {
+        out << "<INVALID COMMAND>\n";
+      }
+    }
+    else {
+      out << "<INVALID COMMAND>\n";
+    }
+  }
+
+  // COUNT ODD: только неповторяющиеся (по пермутации) полигональные формы с a>EPS
+  void CountOdd(const std::vector<Polygon>& polys, std::ostream& out) {
+    std::vector<Polygon> unique;
+    for (const auto& p : polys) {
+      double a = p.getArea();
+      if (a > EPS && !isDuplicate(unique, p)) {
+        unique.push_back(p);
+      }
+    }
+    size_t cnt = 0;
+    for (const auto& p : unique) {
+      if (p.points.size() % 2 == 1) ++cnt;
+    }
+    out << cnt << '\n';
+  }
+
+  // COUNT EVEN
+  void CountEven(const std::vector<Polygon>& polys, std::ostream& out) {
+    std::vector<Polygon> unique;
+    for (const auto& p : polys) {
+      double a = p.getArea();
+      if (a > EPS && !isDuplicate(unique, p)) {
+        unique.push_back(p);
+      }
+    }
+    size_t cnt = 0;
+    for (const auto& p : unique) {
+      if (p.points.size() % 2 == 0) ++cnt;
+    }
+    out << cnt << '\n';
+  }
+
+  // COUNT n
+  void CountN(const std::vector<Polygon>& polys, std::ostream& out, size_t n) {
+    if (n < 3) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
+    std::vector<Polygon> unique;
+    for (const auto& p : polys) {
+      double a = p.getArea();
+      if (a > EPS && !isDuplicate(unique, p)) {
+        unique.push_back(p);
+      }
+    }
+    size_t cnt = 0;
+    for (const auto& p : unique) {
+      if (p.points.size() == n) ++cnt;
     }
     out << cnt << '\n';
   }
