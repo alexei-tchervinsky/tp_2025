@@ -15,7 +15,6 @@ namespace prokopenko {
   double Polygon::getArea() const {
     double area = 0.0;
     size_t n = points.size();
-    if (n < 3) return 0.0;
     for (size_t i = 0; i < n; ++i) {
       const Point& a = points[i];
       const Point& b = points[(i + 1) % n];
@@ -45,7 +44,6 @@ namespace prokopenko {
   bool Polygon::isPermOf(const Polygon& other) const {
     if (points.size() != other.points.size()) return false;
     size_t n = points.size();
-    if (n == 0) return false;
     for (size_t shift = 0; shift < n; ++shift) {
       bool ok = true;
       for (size_t i = 0; i < n; ++i) {
