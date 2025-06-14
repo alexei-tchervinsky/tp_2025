@@ -6,9 +6,19 @@
 #include <limits>
 #include <functional>
 #include <algorithm>
+#include <set>
 #include "commands.hpp"
 
 using namespace prokopenko;
+
+// проверка, все ли точки в полигоне различны
+static bool allPointsDistinct(const Polygon& poly) {
+  std::set<std::pair<int, int>> st;
+  for (const auto& pt : poly.points) {
+    st.insert({ pt.x, pt.y });
+  }
+  return st.size() == poly.points.size();
+}
 
 int main(int argc, char* argv[])
 {
@@ -22,25 +32,21 @@ int main(int argc, char* argv[])
     return 1;
   }
   std::vector<Polygon> polygons;
-  bool hadInvalidLine = false;
   while (!input.eof()) {
     Polygon poly;
     std::streampos pos = input.tellg();
     if (input >> poly) {
-      double a = poly.getArea();
-      if (a > 1e-6) {
+      double area = poly.getArea();
+      if (area > 1e-6 && allPointsDistinct(poly)) {
         polygons.push_back(poly);
       }
     }
     else {
-      hadInvalidLine = true;
       input.clear();
       input.seekg(pos);
       input.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
   }
-  // установка глобального флага для COUNT-функций
-  setHadInvalid(hadInvalidLine);
 
   std::map<std::string, std::function<void(const std::vector<Polygon>&, std::ostream&)>> commands;
   commands["AREA"] = Area;

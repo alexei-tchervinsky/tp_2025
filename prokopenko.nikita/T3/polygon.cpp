@@ -27,7 +27,7 @@ namespace prokopenko {
   bool Polygon::isRight() const {
     size_t n = points.size();
     if (n < 3) return false;
-    // считаем, что нужно найти хотя бы один угол 90°? (по исходным примерам так)
+    // проверяем, есть ли хоть один угол прямой в последовательности точек
     for (size_t i = 0; i < n; ++i) {
       const Point& a = points[i];
       const Point& b = points[(i + 1) % n];
@@ -47,6 +47,7 @@ namespace prokopenko {
     if (points.size() != other.points.size()) return false;
     size_t n = points.size();
     if (n == 0) return false;
+    // циклические сдвиги CW и CCW
     for (size_t shift = 0; shift < n; ++shift) {
       bool ok = true;
       for (size_t i = 0; i < n; ++i) {
