@@ -14,7 +14,6 @@ namespace prokopenko {
     return std::fabs(a.getArea() - b.getArea()) < EPS;
   }
 
-  // Remove deduplication: count every occurrence
   void Area(const std::vector<Polygon>& polys, std::ostream& out) {
     std::string param;
     if (!(std::cin >> param)) {
@@ -212,8 +211,7 @@ namespace prokopenko {
   void CountOdd(const std::vector<Polygon>& polys, std::ostream& out) {
     size_t cnt = 0;
     for (const auto& p : polys) {
-      double a = p.getArea();
-      if (a > EPS && (p.points.size() % 2 == 1)) {
+      if (p.getArea() > EPS && (p.points.size() % 2 == 1)) {
         ++cnt;
       }
     }
@@ -223,8 +221,7 @@ namespace prokopenko {
   void CountEven(const std::vector<Polygon>& polys, std::ostream& out) {
     size_t cnt = 0;
     for (const auto& p : polys) {
-      double a = p.getArea();
-      if (a > EPS && (p.points.size() % 2 == 0)) {
+      if (p.getArea() > EPS && (p.points.size() % 2 == 0)) {
         ++cnt;
       }
     }
@@ -240,8 +237,7 @@ namespace prokopenko {
     }
     size_t cnt = 0;
     for (const auto& p : polys) {
-      double a = p.getArea();
-      if (a > EPS && p.points.size() == n) {
+      if (p.getArea() > EPS && p.points.size() == n) {
         ++cnt;
       }
     }
