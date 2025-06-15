@@ -3,23 +3,32 @@
 #include <vector>
 #include <algorithm>
 #include <iomanip>
+#include <iterator>
+#include <limits>
 
-int main()
-{
-    shubina::iofmtguard guard(std::cout);
-    std::cout << std::fixed << std::setprecision(1);
-
-    std::vector<shubina::DataStruct> data = shubina::readDataStructs(std::cin);
-
-    if (data.empty())
+int main() {
+    std::vector<shubina::DataStruct> data;
+    while(!std::cin.eof())
     {
-        std::cerr << "Looks like there is no supported record. Cannot determine input. Test skipped\n";
-        return 0;
+        std::copy(
+        std::istream_iterator<shubina::DataStruct >(std::cin),
+        std::istream_iterator<shubina::DataStruct >(),
+        std::back_inserter(data));
+        if (std::cin.fail())
+        {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
     }
 
+
     std::sort(data.begin(), data.end(), shubina::compare_structures);
-    shubina::writeDataStructs(data, std::cout);
+
+    std::copy(
+        data.begin(),
+        data.end(),
+        std::ostream_iterator<shubina::DataStruct>(std::cout, "\n")
+    );
 
     return 0;
 }
-
