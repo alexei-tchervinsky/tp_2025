@@ -3,6 +3,7 @@
 #include <iomanip>
 #include <algorithm>
 #include <cctype>
+#include <iterator>
 
 namespace shubina
 {
@@ -127,7 +128,7 @@ namespace shubina
         return in;
     }
 
-    std::ostream& operator<<(std::ostream& out, const DataStruct& dest)
+    std::ostream& operator>>(std::ostream& out, const DataStruct& dest)
     {
         std::ostream::sentry sentry(out);
         if (!sentry) return out;
