@@ -7,6 +7,7 @@
 #include <cctype>
 #include <limits>
 #include <tuple>
+#include <climits>
 
 namespace prokopenko {
 
