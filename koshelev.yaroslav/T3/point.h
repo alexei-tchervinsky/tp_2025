@@ -2,16 +2,18 @@
 #define POINT_H
 
 #include <iostream>
-#include <compare>
 
 struct Point {
     int x, y;
-    auto operator<=>(const Point&) const = default;
-    bool operator==(const Point&) const = default;
+    bool operator<(const Point& o) const {
+        return x < o.x || (x == o.x && y < o.y);
+    }
+    bool operator==(const Point& o) const {
+        return x == o.x && y == o.y;
+    }
 };
 
 std::istream& operator>>(std::istream& in, Point& p);
 std::ostream& operator<<(std::ostream& out, const Point& p);
 
-#endif
-
+#endif // POINT_H
