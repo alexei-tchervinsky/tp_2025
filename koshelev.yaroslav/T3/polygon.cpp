@@ -64,3 +64,4 @@ std::ostream& operator<<(std::ostream& out, const Polygon& poly) {
     }
     return out;
 }
+

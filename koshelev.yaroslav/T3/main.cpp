@@ -27,3 +27,4 @@ int main(int argc, char* argv[]) {
     processCommands(polygons);
     return 0;
 }
+

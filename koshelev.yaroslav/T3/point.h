@@ -14,3 +14,4 @@ std::istream& operator>>(std::istream& in, Point& p);
 std::ostream& operator<<(std::ostream& out, const Point& p);
 
 #endif
+

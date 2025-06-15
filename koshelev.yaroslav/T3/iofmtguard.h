@@ -20,3 +20,4 @@ namespace koshelev {
 }
 
 #endif // IOFMTGUARD_H
+

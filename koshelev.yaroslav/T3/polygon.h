@@ -17,3 +17,4 @@ std::istream& operator>>(std::istream& in, Polygon& poly);
 std::ostream& operator<<(std::ostream& out, const Polygon& poly);
 
 #endif
+

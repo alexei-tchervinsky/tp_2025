@@ -17,3 +17,4 @@ std::ostream& operator<<(std::ostream& out, const Point& p) {
     koshelev::iofmtguard guard(out);
     return out << '(' << p.x << ';' << p.y << ')';
 }
+
