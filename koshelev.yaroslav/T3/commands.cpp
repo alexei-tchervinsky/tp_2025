@@ -11,7 +11,7 @@
 #include <iomanip>
 
 namespace {
-    void printArea(double value) {
+    static inline void printArea(double value) {
         koshelev::iofmtguard guard(std::cout);
         std::cout << std::fixed << std::setprecision(1) << value << '\n';
     }
@@ -49,7 +49,7 @@ namespace {
         {"AREA", [](const std::vector<Polygon>& polygons) {
             std::string arg;
             std::cin >> arg;
-            printArea(areaFilters.contains(arg)
+            printArea(areaFilters.find(arg) != areaFilters.end()
                 ? accumulateArea(polygons, areaFilters.at(arg)) / (arg == "MEAN" ? polygons.size() : 1)
                 : accumulateArea(polygons, [num = std::stoul(arg)](const Polygon& p) { return p.vertexCount() == num; }));
         }},
@@ -68,7 +68,7 @@ namespace {
         {"COUNT", [](const std::vector<Polygon>& polygons) {
             std::string arg;
             std::cin >> arg;
-            std::cout << (countFilters.contains(arg)
+            std::cout << (countFilters.find(arg) != countFilters.end()
                 ? countIf(polygons, countFilters.at(arg))
                 : countIf(polygons, [num = std::stoul(arg)](const Polygon& p) { return p.vertexCount() == num; })) << '\n';
         }},
@@ -86,8 +86,9 @@ namespace {
 void processCommands(const std::vector<Polygon>& polygons) {
     std::string cmd;
     while (std::cin >> cmd) {
-        commandMap.contains(cmd)
-            ? commandMap.at(cmd)(polygons)
+        auto it = commandMap.find(cmd);
+        it != commandMap.end()
+            ? it->second(polygons)
             : std::cout << "<INVALID COMMAND>\n";
     }
 }
