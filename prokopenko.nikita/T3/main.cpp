@@ -1,26 +1,27 @@
 ﻿#include <iostream>
-#include <map>
-#include <vector>
 #include <fstream>
 #include <string>
-#include <limits>
+#include <vector>
+#include <map>
+#include <set>
 #include <functional>
 #include <algorithm>
-#include <set>
+#include <limits>
 #include "commands.hpp"
 
 using namespace prokopenko;
 
-static bool allPointsDistinct(const Polygon& poly) {
-  std::set<std::pair<int, int>> st;
-  for (auto& pt : poly.points) {
-    st.insert({ pt.x, pt.y });
+namespace {
+  bool allPointsDistinct(const Polygon& poly) {
+    std::set<std::pair<int, int>> uniquePoints;
+    for (const auto& pt : poly.points) {
+      uniquePoints.emplace(pt.x, pt.y);
+    }
+    return uniquePoints.size() == poly.points.size();
   }
-  return st.size() == poly.points.size();
 }
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
   if (argc != 2) {
     std::cerr << "Error: wrong input\n";
     return 1;
@@ -50,6 +51,8 @@ int main(int argc, char* argv[])
   }
 
   std::map<std::string, std::function<void(const std::vector<Polygon>&, std::ostream&)>> commands;
+
+  // Регистрация команд
   commands["AREA"] = Area;
   commands["MAX"] = Max;
   commands["MIN"] = Min;
@@ -60,12 +63,14 @@ int main(int argc, char* argv[])
   commands["LESS"] = Less;
   commands["MORE"] = More;
   commands["EQUAL"] = Equal;
+
   commands["COUNT"] = [](const std::vector<Polygon>& polys, std::ostream& out) {
     std::string param;
     if (!(std::cin >> param)) {
       out << "<INVALID COMMAND>\n";
       return;
     }
+
     if (param == "ODD") {
       CountOdd(polys, out);
     }
