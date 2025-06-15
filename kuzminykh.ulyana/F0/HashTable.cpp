@@ -22,13 +22,13 @@ void HashTable::getThree() const
 
     std::partial_sort(
         sorted_words.begin(),
-        sorted_words.begin() + std::min(3, (int)sorted_words.size()),
+        sorted_words.begin() + std::min(3, static_cast<int>(sorted_words.size())),
         sorted_words.end(),
         [](const auto& a, const auto& b) { return a.second > b.second; }
     );
 
     std::cout << "\n3 most frequent words:\n";
-    for (int i = 0; i < std::min(3, (int)sorted_words.size()); ++i)
+    for (int i = 0; i < std::min(3, static_cast<int>(sorted_words.size())); ++i)
     {
         std::cout << sorted_words[i].first << ": " << sorted_words[i].second << "\n";
     }
