@@ -6,21 +6,12 @@
 #include <limits>
 #include <functional>
 #include <algorithm>
-#include <set>
 #include "commands.hpp"
 
 using namespace prokopenko;
 
-// Проверка, что внутри полигона нет дублирующихся точек
-static bool allPointsDistinct(const Polygon& poly) {
-  std::set<std::pair<int, int>> st;
-  for (const auto& pt : poly.points) {
-    st.insert({ pt.x, pt.y });
-  }
-  return st.size() == poly.points.size();
-}
-
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
   if (argc != 2) {
     std::cerr << "Error: wrong input\n";
     return 1;
@@ -35,8 +26,7 @@ int main(int argc, char* argv[]) {
     Polygon poly;
     std::streampos pos = input.tellg();
     if (input >> poly) {
-      double area = poly.getArea();
-      if (area > 1e-6 && allPointsDistinct(poly)) {
+      if (poly.getArea() > 1e-6) {
         polygons.push_back(poly);
       }
     }
@@ -46,7 +36,6 @@ int main(int argc, char* argv[]) {
       input.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
   }
-
   std::map<std::string, std::function<void(const std::vector<Polygon>&, std::ostream&)>> commands;
   commands["AREA"] = Area;
   commands["MAX"] = Max;
@@ -83,7 +72,6 @@ int main(int argc, char* argv[]) {
       out << "<INVALID COMMAND>\n";
     }
     };
-
   std::string cmd;
   while (std::cin >> cmd) {
     auto it = commands.find(cmd);
