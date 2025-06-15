@@ -6,9 +6,18 @@
 #include <limits>
 #include <functional>
 #include <algorithm>
+#include <set>
 #include "commands.hpp"
 
 using namespace prokopenko;
+
+static bool allPointsDistinct(const Polygon& poly) {
+  std::set<std::pair<int, int>> st;
+  for (auto& pt : poly.points) {
+    st.insert({ pt.x, pt.y });
+  }
+  return st.size() == poly.points.size();
+}
 
 int main(int argc, char* argv[])
 {
@@ -26,7 +35,8 @@ int main(int argc, char* argv[])
     Polygon poly;
     std::streampos pos = input.tellg();
     if (input >> poly) {
-      if (poly.getArea() > 1e-6) {
+      double area = poly.getArea();
+      if (area > 1e-6 && allPointsDistinct(poly)) {
         polygons.push_back(poly);
       }
     }
