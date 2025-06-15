@@ -21,12 +21,11 @@ int main(int argc, char* argv[])
     return 1;
   }
   std::vector<Polygon> polygons;
-  const double EPS = 1e-6;
   while (!input.eof()) {
     Polygon poly;
     std::streampos pos = input.tellg();
     if (input >> poly) {
-      if (poly.getArea() > EPS) {
+      if (poly.getArea() > 1e-6) {
         polygons.push_back(poly);
       }
     }
@@ -36,13 +35,13 @@ int main(int argc, char* argv[])
       input.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
   }
-  // При старте выводим "With data:" и текущий набор
+  // Print initial data
   std::cout << "With data:\n";
-  for (const auto& p : polygons) {
+  for (auto& p : polygons) {
     std::cout << "\t" << p << "\n";
   }
-
-  std::map<std::string, std::function<void(std::vector<Polygon>&, std::ostream&)>>
+  std::map<std::string,
+    std::function<void(std::vector<Polygon>&, std::ostream&)>>
     commands;
   commands["AREA"] = Area;
   commands["MAX"] = Max;
@@ -59,7 +58,6 @@ int main(int argc, char* argv[])
   commands["SAME"] = Same;
   commands["RECTS"] = Rects;
   commands["RIGHTSHAPES"] = RightShapes;
-
   std::string cmd;
   while (std::cin >> cmd) {
     auto it = commands.find(cmd);
