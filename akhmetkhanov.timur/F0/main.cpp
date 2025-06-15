@@ -141,9 +141,9 @@ void test_error_handling(HashTable& dictionary) {
     std::cout << "\n1. Попытка вставить пустой ключ:" << std::endl;
     try {
         dictionary.insert("", "перевод");
-        std::cout << "  ✗ Ошибка: исключение не было выброшено!" << std::endl;
+        std::cout << "Ошибка: исключение не было выброшено!" << std::endl;
     } catch (const std::exception& e) {
-        std::cout << "  ✓ Поймано ожидаемое исключение: " <<
+        std::cout << "Поймано ожидаемое исключение: " <<
         e.what() << std::endl;
     }
 
@@ -151,9 +151,9 @@ void test_error_handling(HashTable& dictionary) {
     std::cout << "\n2. Попытка вставить пустой перевод:" << std::endl;
     try {
         dictionary.insert("test", "");
-        std::cout << "  ✗ Ошибка: исключение не было выброшено!" << std::endl;
+        std::cout << "Ошибка: исключение не было выброшено!" << std::endl;
     } catch (const std::exception& e) {
-        std::cout << "  ✓ Поймано ожидаемое исключение: " <<
+        std::cout << " Поймано ожидаемое исключение: " <<
         e.what() << std::endl;
     }
 
@@ -163,9 +163,9 @@ void test_error_handling(HashTable& dictionary) {
     try {
         std::string long_key(150, 'a');
         dictionary.insert(long_key, "перевод");
-        std::cout << "  ✗ Ошибка: исключение не было выброшено!" << std::endl;
+        std::cout << "Ошибка: исключение не было выброшено!" << std::endl;
     } catch (const std::exception& e) {
-        std::cout << "  ✓ Поймано ожидаемое исключение: " << e.what()
+        std::cout << "Поймано ожидаемое исключение: " << e.what()
         << std::endl;
     }
 
@@ -173,23 +173,23 @@ void test_error_handling(HashTable& dictionary) {
     std::cout << "\n4. Поиск с невалидными ключами:" << std::endl;
     auto result1 = dictionary.search("");
     std::cout << "  Поиск пустого ключа: " << (result1.empty() ?
-        "✓ корректно возвращен пустой результат" : "✗ ошибка") << std::endl;
+        "корректно возвращен пустой результат" : "✗ ошибка") << std::endl;
 
     std::string long_key(150, 'b');
     auto result2 = dictionary.search(long_key);
     std::cout << "  Поиск длинного ключа: " <<
-    (result2.empty() ? "✓ корректно возвращен пустой результат" :
-     "✗ ошибка") << std::endl;
+    (result2.empty() ? "корректно возвращен пустой результат" :
+     "ошибка") << std::endl;
 
     // Тест 5: Удаление невалидных ключей
     std::cout << "\n5. Удаление невалидных ключей:" << std::endl;
     bool removed1 = dictionary.remove("");
     std::cout << "  Удаление пустого ключа: " << (!removed1 ?
-                    "✓ корректно возвращен false" : "✗ ошибка") << std::endl;
+                    "корректно возвращен false" : "ошибка") << std::endl;
 
     bool removed2 = dictionary.remove(long_key);
     std::cout << "  Удаление длинного ключа: " <<
-    (!removed2 ? "✓ корректно возвращен false" : "✗ ошибка") << std::endl;
+    (!removed2 ? "корректно возвращен false" : "ошибка") << std::endl;
 }
 
 void demonstrate_performance_test(HashTable& dictionary) {
@@ -207,19 +207,22 @@ void demonstrate_performance_test(HashTable& dictionary) {
     // Засекаем время вставки
     auto start = std::chrono::high_resolution_clock::now();
 
-    for (const auto& word : test_words) {
-        dictionary.insert(word, "translation_" + word);
+    for (size_t i = 0; i < test_words.size(); ++i) {
+        dictionary.insert(test_words[i], "translation_" + test_words[i]);
         if (i % 2 == 0) {
-            dictionary.insert(word, "alt_translation_" + word);
+            dictionary.insert(test_words[i], "alt_translation_" +
+                              test_words[i]);
         }
     }
 
     auto end = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end
+                                                                    - start);
 
     std::cout << "Результаты теста производительности:" << std::endl;
     std::cout << "  Вставлено слов: " << test_words.size() << std::endl;
-    std::cout << "  Время выполнения: " << duration.count() << " мкс" << std::endl;
+    std::cout << "  Время выполнения: " << duration.count() << " мкс"
+    << std::endl;
     std::cout << "  Среднее время на вставку: " << (duration.count()
                             / test_words.size()) << " мкс/слово" << std::endl;
 
@@ -227,9 +230,8 @@ void demonstrate_performance_test(HashTable& dictionary) {
     dictionary.print_statistics();
     dictionary.print_hash_statistics();
 }
-
 int main() {
-    std::cout << "🔤 Демонстрация работы словаря на основе хеш-таблицы"
+    std::cout << "Демонстрация работы словаря на основе хеш-таблицы"
     << std::endl;
     std::cout << "Использует std::unordered_map" << std::endl;
 
@@ -244,10 +246,10 @@ int main() {
         demonstrate_performance_test(dictionary);
 
         print_separator("Программа успешно завершена");
-        std::cout << "✅ Все тесты пройдены успешно!" << std::endl;
+        std::cout << "Все тесты пройдены успешно!" << std::endl;
 
     } catch (const std::exception& e) {
-        std::cerr << "❌ Критическая ошибка: " << e.what() << std::endl;
+        std::cerr << "Критическая ошибка: " << e.what() << std::endl;
         return 1;
     }
 
