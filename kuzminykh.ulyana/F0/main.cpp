@@ -65,7 +65,8 @@ int main()
         }
         else
         {
-            std::cout << "Unknown command. Try again.\n";
+            std::cerr << "FATAL ERROR: Unknown command.\n";
+            return 1;
         }
     }
 
