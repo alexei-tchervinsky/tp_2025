@@ -77,14 +77,20 @@ namespace prokopenko {
       return in;
     }
     in >> point.x;
-    if (!in) { in.setstate(std::ios::failbit); return in; }
+    if (!in) {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
     in >> ch;
     if (!in || ch != ';') {
       in.setstate(std::ios::failbit);
       return in;
     }
     in >> point.y;
-    if (!in) { in.setstate(std::ios::failbit); return in; }
+    if (!in) {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
     in >> ch;
     if (!in || ch != ')') {
       in.setstate(std::ios::failbit);

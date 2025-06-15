@@ -11,7 +11,7 @@ namespace prokopenko {
 
   static constexpr double EPS = 1e-6;
 
-  // проверка одинаковости по перестановке
+  // Проверка «уже встречалось» по перестановке
   static bool isDuplicate(const std::vector<Polygon>& seen,
     const Polygon& p) {
     for (const auto& q : seen) {
@@ -20,7 +20,7 @@ namespace prokopenko {
     return false;
   }
 
-  // AREA ...
+  // AREA <...>
   void Area(const std::vector<Polygon>& polys, std::ostream& out) {
     std::string param;
     if (!(std::cin >> param)) {
@@ -56,7 +56,10 @@ namespace prokopenko {
       size_t cnt = 0;
       for (const auto& p : polys) {
         double a = p.getArea();
-        if (a > EPS) { sum += a; ++cnt; }
+        if (a > EPS) {
+          sum += a;
+          ++cnt;
+        }
       }
       if (cnt == 0) {
         out << "<INVALID COMMAND>\n";
@@ -94,7 +97,7 @@ namespace prokopenko {
     }
   }
 
-  // MAX ...
+  // MAX <AREA|VERTEXES>
   void Max(const std::vector<Polygon>& polys, std::ostream& out) {
     std::string param;
     if (!(std::cin >> param)) {
@@ -144,7 +147,7 @@ namespace prokopenko {
     }
   }
 
-  // MIN ...
+  // MIN <AREA|VERTEXES>
   void Min(const std::vector<Polygon>& polys, std::ostream& out) {
     std::string param;
     if (!(std::cin >> param)) {
@@ -194,7 +197,7 @@ namespace prokopenko {
     }
   }
 
-  // Mean (без аргумента) – тот же, что и AREA MEAN
+  // MEAN (без аргумента) — аналог AREA MEAN
   void Mean(const std::vector<Polygon>& polys, std::ostream& out) {
     if (polys.empty()) {
       out << "<INVALID COMMAND>\n";
@@ -248,7 +251,8 @@ namespace prokopenko {
   }
 
   // COUNT N
-  void CountN(const std::vector<Polygon>& polys, std::ostream& out,
+  void CountN(const std::vector<Polygon>& polys,
+    std::ostream& out,
     size_t n) {
     if (n < 3) {
       out << "<INVALID COMMAND>\n";
@@ -310,7 +314,7 @@ namespace prokopenko {
     out << cnt << '\n';
   }
 
-  // LESS <Polygon>  (подсчёт area<pattern.area)
+  // LESS <Polygon>
   void Less(const std::vector<Polygon>& polys, std::ostream& out) {
     Polygon pattern;
     if (!(std::cin >> pattern)) {
@@ -350,7 +354,7 @@ namespace prokopenko {
     out << cnt << '\n';
   }
 
-  // EQUAL <Polygon> (area equal)
+  // EQUAL <Polygon>
   void Equal(const std::vector<Polygon>& polys, std::ostream& out) {
     Polygon pattern;
     if (!(std::cin >> pattern)) {
@@ -394,24 +398,19 @@ namespace prokopenko {
       out << "<INVALID COMMAND>\n";
       return;
     }
-    // коллекция неизменяемая, но возвращаем число удалённых из гипотетической
     size_t removed = 0;
     bool in_seq = false;
-    size_t seq_count = 0;
     for (size_t i = 0; i < polys.size(); ++i) {
       if (polys[i].isPermOf(pattern)) {
         if (!in_seq) {
           in_seq = true;
-          seq_count = 1;
         }
         else {
-          ++seq_count;
           ++removed;
         }
       }
       else {
         in_seq = false;
-        seq_count = 0;
       }
     }
     out << removed << '\n';
@@ -425,7 +424,6 @@ namespace prokopenko {
       return;
     }
     size_t added = 0;
-    // гипотетически вставляем, но не меняем исходный вектор
     for (size_t i = 0; i < polys.size(); ++i) {
       if (polys[i].isPermOf(pattern)) {
         ++added;
@@ -466,7 +464,6 @@ namespace prokopenko {
       out << "<INVALID COMMAND>\n";
       return;
     }
-    // вычислить bounding box всех точек в polys
     if (polys.empty()) {
       out << "<INVALID COMMAND>\n";
       return;
@@ -494,18 +491,130 @@ namespace prokopenko {
     out << (inside ? "<TRUE>\n" : "<FALSE>\n");
   }
 
-  // пересечение отрезков
+  // Проверка пересечения отрезков
   static bool segmentsIntersect(
     int x1, int y1, int x2, int y2,
     int x3, int y3, int x4, int y4) {
     auto orient = [](int ax, int ay, int bx, int by,
       int cx, int cy) {
-        long long v = (long long)(bx - ax) * (cy - ay)
-          - (long long)(by - ay) * (cx - ax);
+        long long v = static_cast<long long>(bx - ax) * (cy - ay)
+          - static_cast<long long>(by - ay) * (cx - ax);
         if (v > 0) return 1;
         if (v < 0) return -1;
         return 0;
       };
-    auto onSeg = [](int ax, int ay, int bx, int by, int cx, int cy) {
-      return std::min(ax, bx) <= cx && cx <= std::max(ax, bx)
-        && std::min(ay, by) <= cy && cy <= s
+    auto onSeg = [](int ax, int ay, int bx, int by,
+      int cx, int cy) {
+        return std::min(ax, bx) <= cx && cx <= std::max(ax, bx)
+          && std::min(ay, by) <= cy && cy <= std::max(ay, by);
+      };
+    int o1 = orient(x1, y1, x2, y2, x3, y3);
+    int o2 = orient(x1, y1, x2, y2, x4, y4);
+    int o3 = orient(x3, y3, x4, y4, x1, y1);
+    int o4 = orient(x3, y3, x4, y4, x2, y2);
+    if (o1 != o2 && o3 != o4) return true;
+    if (o1 == 0 && onSeg(x1, y1, x2, y2, x3, y3)) return true;
+    if (o2 == 0 && onSeg(x1, y1, x2, y2, x4, y4)) return true;
+    if (o3 == 0 && onSeg(x3, y3, x4, y4, x1, y1)) return true;
+    if (o4 == 0 && onSeg(x3, y3, x4, y4, x2, y2)) return true;
+    return false;
+  }
+
+  // Точка в полигона (ray casting)
+  static bool pointInPoly(const Polygon& poly, const Point& pt) {
+    bool inside = false;
+    size_t n = poly.points.size();
+    for (size_t i = 0, j = n - 1; i < n; j = i++) {
+      const auto& pi = poly.points[i];
+      const auto& pj = poly.points[j];
+      if (((pi.y > pt.y) != (pj.y > pt.y)) &&
+        (pt.x < static_cast<long double>(pj.x - pi.x) *
+          (pt.y - pi.y) / (pj.y - pi.y) + pi.x)) {
+        inside = !inside;
+      }
+    }
+    return inside;
+  }
+
+  // INTERSECTIONS <Polygon>
+  void Intersections(const std::vector<Polygon>& polys,
+    std::ostream& out) {
+    Polygon pattern;
+    if (!(std::cin >> pattern)) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
+    double a0 = pattern.getArea();
+    if (a0 <= EPS) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
+    size_t cnt = 0;
+    for (const auto& p : polys) {
+      double a = p.getArea();
+      if (a <= EPS) continue;
+      bool inter = false;
+      size_t n1 = p.points.size();
+      size_t n2 = pattern.points.size();
+      for (size_t i = 0; i < n1 && !inter; ++i) {
+        int x1 = p.points[i].x;
+        int y1 = p.points[i].y;
+        int x2 = p.points[(i + 1) % n1].x;
+        int y2 = p.points[(i + 1) % n1].y;
+        for (size_t j = 0; j < n2; ++j) {
+          int x3 = pattern.points[j].x;
+          int y3 = pattern.points[j].y;
+          int x4 = pattern.points[(j + 1) % n2].x;
+          int y4 = pattern.points[(j + 1) % n2].y;
+          if (segmentsIntersect(x1, y1, x2, y2, x3, y3, x4, y4)) {
+            inter = true;
+            break;
+          }
+        }
+      }
+      if (!inter) {
+        if (pointInPoly(p, pattern.points[0]) ||
+          pointInPoly(pattern, p.points[0])) {
+          inter = true;
+        }
+      }
+      if (inter) ++cnt;
+    }
+    out << cnt << '\n';
+  }
+
+  // RECTS
+  void Rects(const std::vector<Polygon>& polys, std::ostream& out) {
+    size_t cnt = 0;
+    for (const auto& p : polys) {
+      if (p.points.size() != 4) continue;
+      bool ok = true;
+      for (size_t i = 0; i < 4; ++i) {
+        const auto& a = p.points[i];
+        const auto& b = p.points[(i + 1) % 4];
+        const auto& c = p.points[(i + 2) % 4];
+        int dx1 = b.x - a.x;
+        int dy1 = b.y - a.y;
+        int dx2 = c.x - b.x;
+        int dy2 = c.y - b.y;
+        if (dx1 * dx2 + dy1 * dy2 != 0) {
+          ok = false;
+          break;
+        }
+      }
+      if (ok) ++cnt;
+    }
+    out << cnt << '\n';
+  }
+
+  // RIGHTSHAPES
+  void RightShapes(const std::vector<Polygon>& polys,
+    std::ostream& out) {
+    size_t cnt = 0;
+    for (const auto& p : polys) {
+      if (p.getArea() > EPS && p.isRight()) ++cnt;
+    }
+    out << cnt << '\n';
+  }
+
+} // namespace prokopenko

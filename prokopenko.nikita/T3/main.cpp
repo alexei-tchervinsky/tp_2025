@@ -33,10 +33,10 @@ int main(int argc, char* argv[]) {
     else {
       input.clear();
       input.seekg(pos);
-      input.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      input.ignore(
+        std::numeric_limits<std::streamsize>::max(), '\n');
     }
   }
-  // Вывести With data:
   std::cout << "With data:\n";
   for (const auto& p : polygons) {
     std::cout << "\t" << p << "\n";
@@ -92,4 +92,17 @@ int main(int argc, char* argv[]) {
   commands["RECTS"] = Rects;
   commands["RIGHTSHAPES"] = RightShapes;
 
-  std::strin
+  std::string cmd;
+  while (std::cin >> cmd) {
+    auto it = commands.find(cmd);
+    if (it != commands.end()) {
+      it->second(polygons, std::cout);
+    }
+    else {
+      std::cout << "<INVALID COMMAND>\n";
+      std::cin.ignore(
+        std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+  }
+  return 0;
+}

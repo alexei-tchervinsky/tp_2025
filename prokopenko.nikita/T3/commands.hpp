@@ -21,7 +21,6 @@ namespace prokopenko {
   void CountEven(const std::vector<Polygon>&, std::ostream&);
   void CountN(const std::vector<Polygon>&, std::ostream&, size_t);
 
-  // Дополнительные:
   void MaxSeq(const std::vector<Polygon>&, std::ostream&);
   void RmEcho(const std::vector<Polygon>&, std::ostream&);
   void EchoCmd(const std::vector<Polygon>&, std::ostream&);
