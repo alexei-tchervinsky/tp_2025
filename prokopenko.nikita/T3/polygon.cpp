@@ -11,6 +11,11 @@ namespace prokopenko {
       static_cast<double>(b.y - a.y) * (c.x - a.x);
   }
 
+  // Используем crossProduct в "заглушке", чтобы избежать ошибки "unused-function"
+  namespace {
+    volatile double __unused_cross = crossProduct({ 0, 0 }, { 1, 0 }, { 0, 1 });
+  }
+
   double Polygon::getArea() const {
     double area = 0.0;
     size_t n = points.size();
