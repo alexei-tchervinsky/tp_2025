@@ -1,12 +1,14 @@
 #include <iostream>
 #include <string>
+#include <map>
 #include <limits>
+#include <functional>
 #include "commands.h"
+#include "polygon.h"
 #include "iofmtguard.h"
 #include <algorithm>
 #include <numeric>
 #include <iomanip>
-#include <functional>
 
 namespace {
     void printArea(double value) {
@@ -15,101 +17,77 @@ namespace {
     }
 
     template <typename Pred>
-    double accumulateArea(const std::vector<Polygon>& v, Pred pred) {
-        return std::accumulate(v.begin(), v.end(), 0.0,
+    double accumulateArea(const std::vector<Polygon>& polygons, Pred pred) {
+        return std::accumulate(polygons.begin(), polygons.end(), 0.0,
             [&pred](double acc, const Polygon& p) {
                 return acc + (pred(p) ? p.area() : 0.0);
             });
     }
 
     template <typename Pred>
-    size_t countIf(const std::vector<Polygon>& v, Pred pred) {
-        return std::count_if(v.begin(), v.end(), pred);
+    size_t countIf(const std::vector<Polygon>& polygons, Pred pred) {
+        return std::count_if(polygons.begin(), polygons.end(), pred);
     }
 
-    void areaCommand(const std::vector<Polygon>& v, const std::string& arg) {
-        if (arg == "EVEN") {
-            printArea(accumulateArea(v, [](auto& p){ return p.vertexCount()%2==0; }));
-        }
-        else if (arg == "ODD") {
-            printArea(accumulateArea(v, [](auto& p){ return p.vertexCount()%2==1; }));
-        }
-        else if (arg == "MEAN") {
-            if (v.empty()) throw std::invalid_argument("");
-            printArea(accumulateArea(v, [](auto&){ return true; }) / v.size());
-        }
-        else {
-            size_t num = std::stoul(arg);
-            if (num < 3) throw std::invalid_argument("");
-            printArea(accumulateArea(v, [num](auto& p){ return p.vertexCount()==num; }));
-        }
-    }
+    std::map<std::string, std::function<double(const Polygon&)>> areaFilters = {
+        {"EVEN", [](const Polygon& p) { return p.vertexCount() % 2 == 0; }},
+        {"ODD", [](const Polygon& p) { return p.vertexCount() % 2 == 1; }},
+        {"MEAN", [](const Polygon&) { return true; }}
+    };
 
-    void maxMinCommand(const std::vector<Polygon>& v,
-                       const std::string& cmd, const std::string& arg) {
-        if (v.empty()) throw std::invalid_argument("");
-        auto cmp = [&arg](auto& a, auto& b) {
-            return arg=="AREA" ? a.area()<b.area() : a.vertexCount()<b.vertexCount();
-        };
-        auto it = cmd=="MAX"
-              ? std::max_element(v.begin(), v.end(), cmp)
-              : std::min_element(v.begin(), v.end(), cmp);
+    std::map<std::string, std::function<bool(const Polygon&, const Polygon&)>> comparisonFuncs = {
+        {"AREA", [](const Polygon& a, const Polygon& b) { return a.area() < b.area(); }},
+        {"VERTEXES", [](const Polygon& a, const Polygon& b) { return a.vertexCount() < b.vertexCount(); }}
+    };
 
-        koshelev::iofmtguard guard(std::cout);
-        if (arg=="AREA") {
-            std::cout << std::fixed << std::setprecision(1) << it->area() << '\n';
-        } else {
-            std::cout << it->vertexCount() << '\n';
-        }
-    }
+    std::map<std::string, std::function<size_t(const Polygon&)>> countFilters = {
+        {"EVEN", [](const Polygon& p) { return p.vertexCount() % 2 == 0; }},
+        {"ODD", [](const Polygon& p) { return p.vertexCount() % 2 == 1; }}
+    };
 
-    void countCommand(const std::vector<Polygon>& v, const std::string& arg) {
-        if (arg == "EVEN") {
-            std::cout << countIf(v, [](auto& p){ return p.vertexCount()%2==0; }) << '\n';
-        }
-        else if (arg == "ODD") {
-            std::cout << countIf(v, [](auto& p){ return p.vertexCount()%2==1; }) << '\n';
-        }
-        else {
-            size_t num = std::stoul(arg);
-            if (num < 3) throw std::invalid_argument("");
-            std::cout << countIf(v, [num](auto& p){ return p.vertexCount()==num; }) << '\n';
-        }
-    }
+    std::map<std::string, std::function<void(const std::vector<Polygon>&)>> commandMap = {
+        {"AREA", [](const std::vector<Polygon>& polygons) {
+            std::string arg;
+            std::cin >> arg;
+            printArea(areaFilters.contains(arg)
+                ? accumulateArea(polygons, areaFilters.at(arg)) / (arg == "MEAN" ? polygons.size() : 1)
+                : accumulateArea(polygons, [num = std::stoul(arg)](const Polygon& p) { return p.vertexCount() == num; }));
+        }},
+        {"MAX", [](const std::vector<Polygon>& polygons) {
+            std::string arg;
+            std::cin >> arg;
+            auto it = std::max_element(polygons.begin(), polygons.end(), comparisonFuncs.at(arg));
+            std::cout << std::fixed << std::setprecision(1) << (arg == "AREA" ? it->area() : it->vertexCount()) << '\n';
+        }},
+        {"MIN", [](const std::vector<Polygon>& polygons) {
+            std::string arg;
+            std::cin >> arg;
+            auto it = std::min_element(polygons.begin(), polygons.end(), comparisonFuncs.at(arg));
+            std::cout << std::fixed << std::setprecision(1) << (arg == "AREA" ? it->area() : it->vertexCount()) << '\n';
+        }},
+        {"COUNT", [](const std::vector<Polygon>& polygons) {
+            std::string arg;
+            std::cin >> arg;
+            std::cout << (countFilters.contains(arg)
+                ? countIf(polygons, countFilters.at(arg))
+                : countIf(polygons, [num = std::stoul(arg)](const Polygon& p) { return p.vertexCount() == num; })) << '\n';
+        }},
+        {"PERMS", [](const std::vector<Polygon>& polygons) {
+            Polygon pattern;
+            std::cin >> pattern;
+            std::cout << countIf(polygons, [&pattern](const Polygon& p) { return p.isPermutation(pattern); }) << '\n';
+        }},
+        {"RIGHTSHAPES", [](const std::vector<Polygon>& polygons) {
+            std::cout << countIf(polygons, [](const Polygon& p) { return p.hasRightAngle(); }) << '\n';
+        }}
+    };
 }
 
-void processCommands(const std::vector<Polygon>& v) {
+void processCommands(const std::vector<Polygon>& polygons) {
     std::string cmd;
     while (std::cin >> cmd) {
-        try {
-            if (cmd == "AREA") {
-                std::string arg; std::cin >> arg;
-                areaCommand(v, arg);
-            }
-            else if (cmd == "MAX" || cmd == "MIN") {
-                std::string arg; std::cin >> arg;
-                maxMinCommand(v, cmd, arg);
-            }
-            else if (cmd == "COUNT") {
-                std::string arg; std::cin >> arg;
-                countCommand(v, arg);
-            }
-            else if (cmd == "PERMS") {
-                Polygon pat;
-                if (!(std::cin >> pat)) throw std::invalid_argument("");
-                std::cout << countIf(v, [&pat](auto& p){ return p.isPermutation(pat); }) << '\n';
-            }
-            else if (cmd == "RIGHTSHAPES") {
-                std::cout << countIf(v, [](auto& p){ return p.hasRightAngle(); }) << '\n';
-            }
-            else {
-                throw std::invalid_argument("");
-            }
-        }
-        catch (...) {
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cout << "<INVALID COMMAND>\n";
-        }
+        commandMap.contains(cmd)
+            ? commandMap.at(cmd)(polygons)
+            : std::cout << "<INVALID COMMAND>\n";
     }
 }
