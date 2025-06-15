@@ -57,7 +57,7 @@ public:
   Graph() = default;
 
   bool has_vertex(const std::string& name) const {
-    return name_to_index.find(name) != name_to_index.end(); // исправлено
+    return name_to_index.find(name) != name_to_index.end(); 
   }
 
   void add_vertex(const std::string& name) {
