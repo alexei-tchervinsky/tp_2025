@@ -3,10 +3,11 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <algorithm> // ← добавлено для std::all_of
 
 using namespace prokopenko;
 
-int main(int argc, char* argv[]) {
+int main() {
   std::vector<Polygon> polys;
   std::string cmd;
 
