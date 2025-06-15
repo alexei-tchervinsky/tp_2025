@@ -6,6 +6,7 @@
 #include <string>
 #include <cctype>
 #include <limits>
+#include <tuple>
 
 namespace prokopenko {
 
@@ -50,7 +51,7 @@ namespace prokopenko {
         out << "<INVALID COMMAND>\n";
       }
       else {
-        out << std::fixed << std::setprecision(1) << sum / count << '\n';
+        out << std::fixed << std::setprecision(1) << (sum / count) << '\n';
       }
     }
     else if (std::all_of(param.begin(), param.end(), ::isdigit)) {
@@ -124,9 +125,9 @@ namespace prokopenko {
       double maxA = -1.0;
       for (const auto& p : polys) {
         double a = p.getArea();
-        if (a > maxA) maxA = a;
+        if (a > EPS && a > maxA) maxA = a;
       }
-      if (maxA < EPS) {
+      if (maxA < 0) {
         out << "<INVALID COMMAND>\n";
       }
       else {
@@ -166,7 +167,7 @@ namespace prokopenko {
       out << "<INVALID COMMAND>\n";
     }
     else {
-      out << std::fixed << std::setprecision(1) << sum / count << '\n';
+      out << std::fixed << std::setprecision(1) << (sum / count) << '\n';
     }
   }
 
@@ -177,8 +178,10 @@ namespace prokopenko {
       return;
     }
     size_t count = 0;
-    for (const auto& p : polys) {
-      if (p.isPermOf(ref)) ++count;
+    if (ref.getArea() > EPS) {
+      for (const auto& p : polys) {
+        if (p.isPermOf(ref)) ++count;
+      }
     }
     out << count << '\n';
   }
@@ -186,7 +189,7 @@ namespace prokopenko {
   void Right(const std::vector<Polygon>& polys, std::ostream& out) {
     size_t count = 0;
     for (const auto& p : polys) {
-      if (p.isRight() && p.getArea() > EPS) ++count;
+      if (p.getArea() > EPS && p.isRight()) ++count;
     }
     out << count << '\n';
   }
