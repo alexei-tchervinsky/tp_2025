@@ -87,8 +87,10 @@ void processCommands(const std::vector<Polygon>& polygons) {
     std::string cmd;
     while (std::cin >> cmd) {
         auto it = commandMap.find(cmd);
-        it != commandMap.end()
-            ? it->second(polygons)
-            : std::cout << "<INVALID COMMAND>\n";
+        if (it != commandMap.end()) {
+            it->second(polygons);
+        } else {
+            std::cout << "<INVALID COMMAND>\n";
+        }
     }
 }
