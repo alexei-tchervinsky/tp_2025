@@ -7,7 +7,7 @@
 namespace prokopenko {
 
   struct Point {
-    int x = 0, y = 0;
+    int x, y;
   };
 
   struct Polygon {
@@ -15,7 +15,7 @@ namespace prokopenko {
 
     double getArea() const;
     bool isRight() const;
-    bool isPermOf(const Polygon& other) const;
+    bool isPermOf(const Polygon&) const;
   };
 
   std::istream& operator>>(std::istream&, Polygon&);
@@ -23,4 +23,4 @@ namespace prokopenko {
 
 } // namespace prokopenko
 
-#endif // POLYGON_HPP
+#endif

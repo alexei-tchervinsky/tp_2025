@@ -1,39 +1,43 @@
-﻿#include "polygon.hpp"
-#include "commands.hpp"
-#include <vector>
+﻿#include <iostream>
+#include <fstream>
 #include <string>
-#include <iostream>
-#include <algorithm> // ← добавлено для std::all_of
+#include <vector>
+#include "polygon.hpp"
+#include "commands.hpp"
 
 using namespace prokopenko;
 
-int main() {
+int main(int argc, char* argv[]) {
+  if (argc != 1) {
+    std::cerr << "Unexpected arguments\n";
+    return 1;
+  }
+
   std::vector<Polygon> polys;
+  Polygon p;
+  while (std::cin >> p) {
+    polys.push_back(p);
+  }
+
+  std::cin.clear(); // сброс флага EOF для последующего чтения команд
   std::string cmd;
 
+  std::cout << "With data:\n";
+  for (const auto& poly : polys) {
+    std::cout << '\t' << poly << '\n';
+  }
+
   while (std::cin >> cmd) {
-    if (cmd == "ECHO") {
-      Polygon p;
-      if (std::cin >> p) {
-        polys.push_back(p);
-      }
-      else {
-        std::cout << "<INVALID COMMAND>\n";
-        std::cin.clear();
-        std::string skip;
-        std::getline(std::cin, skip);
-      }
-    }
-    else if (cmd == "COUNT") {
-      std::string param;
-      if (!(std::cin >> param)) {
+    if (cmd == "COUNT") {
+      std::string arg;
+      if (!(std::cin >> arg)) {
         std::cout << "<INVALID COMMAND>\n";
         continue;
       }
-      if (param == "ODD") CountOdd(polys, std::cout);
-      else if (param == "EVEN") CountEven(polys, std::cout);
-      else if (std::all_of(param.begin(), param.end(), ::isdigit)) {
-        size_t n = std::stoul(param);
+      if (arg == "EVEN") CountEven(polys, std::cout);
+      else if (arg == "ODD") CountOdd(polys, std::cout);
+      else if (std::all_of(arg.begin(), arg.end(), ::isdigit)) {
+        size_t n = std::stoul(arg);
         CountN(polys, std::cout, n);
       }
       else {
@@ -75,6 +79,9 @@ int main() {
     }
     else if (cmd == "RMECHO") {
       RmEcho(polys, std::cout);
+    }
+    else if (cmd == "ECHO") {
+      EchoCmd(polys, std::cout);
     }
     else if (cmd == "LESSAREA") {
       LessArea(polys, std::cout);
