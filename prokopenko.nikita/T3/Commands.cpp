@@ -229,9 +229,7 @@ namespace prokopenko {
     out << cnt << '\n';
   }
 
-  void CountN(const std::vector<Polygon>& polys,
-    std::ostream& out,
-    size_t n) {
+  void CountN(const std::vector<Polygon>& polys, std::ostream& out, size_t n) {
     if (n < 3) {
       out << "<INVALID COMMAND>\n";
       return;
