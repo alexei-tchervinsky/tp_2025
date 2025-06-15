@@ -16,11 +16,13 @@ namespace prokopenko {
     double getArea() const;
     bool isRight() const;
     bool isPermOf(const Polygon&) const;
+    bool intersects(const Polygon&) const; // 🔧 Добавлено
   };
 
-  std::istream& operator>>(std::istream&, Polygon&);
-  std::ostream& operator<<(std::ostream&, const Polygon&);
+  std::istream& operator>>(std::istream& in, Point& p);
+  std::istream& operator>>(std::istream& in, Polygon& poly);
+  std::ostream& operator<<(std::ostream& out, const Point& p);
 
 } // namespace prokopenko
 
-#endif
+#endif // POLYGON_HPP
