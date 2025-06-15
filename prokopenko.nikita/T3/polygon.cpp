@@ -1,6 +1,6 @@
 ﻿#include "polygon.hpp"
 #include <cmath>
-#include <algorithm>
+#include <limits>
 #include <ios>
 
 namespace prokopenko {
@@ -27,6 +27,7 @@ namespace prokopenko {
   bool Polygon::isRight() const {
     size_t n = points.size();
     if (n < 3) return false;
+    // проверяем, есть ли хотя бы один прямой угол
     for (size_t i = 0; i < n; ++i) {
       const Point& a = points[i];
       const Point& b = points[(i + 1) % n];
@@ -45,6 +46,7 @@ namespace prokopenko {
   bool Polygon::isPermOf(const Polygon& other) const {
     if (points.size() != other.points.size()) return false;
     size_t n = points.size();
+    if (n == 0) return true;
     for (size_t shift = 0; shift < n; ++shift) {
       bool ok = true;
       for (size_t i = 0; i < n; ++i) {
@@ -56,7 +58,9 @@ namespace prokopenko {
       if (ok) return true;
       ok = true;
       for (size_t i = 0; i < n; ++i) {
-        if (!(points[i] == other.points[(n + shift - i) % n])) {
+        // обратный порядок
+        size_t idx = (n + shift - i) % n;
+        if (!(points[i] == other.points[idx])) {
           ok = false;
           break;
         }
@@ -90,11 +94,6 @@ namespace prokopenko {
     return in;
   }
 
-  std::ostream& operator<<(std::ostream& out, const Point& point) {
-    out << "(" << point.x << ";" << point.y << ")";
-    return out;
-  }
-
   std::istream& operator>>(std::istream& in, Polygon& polygon) {
     size_t sz;
     in >> sz;
@@ -110,14 +109,6 @@ namespace prokopenko {
     }
     polygon.points = std::move(pts);
     return in;
-  }
-
-  std::ostream& operator<<(std::ostream& out, const Polygon& polygon) {
-    out << polygon.points.size();
-    for (const auto& pt : polygon.points) {
-      out << " " << pt;
-    }
-    return out;
   }
 
 } // namespace prokopenko

@@ -36,49 +36,23 @@ int main(int argc, char* argv[])
       input.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
   }
-  // Перед выполнением команд печатаем загруженные данные:
-  std::cout << "With data:\n";
-  for (const auto& p : polygons) {
-    std::cout << "\t" << p << "\n";
-  }
-  std::cout << std::endl;
-
-  std::map<std::string, std::function<void(const std::vector<Polygon>&, std::ostream&)>> commands;
+  // команды принимают vector<Polygon>&, т.к. некоторые модифицируют набор
+  std::map<std::string, std::function<void(std::vector<Polygon>&, std::ostream&)>> commands;
   commands["AREA"] = Area;
   commands["MAX"] = Max;
   commands["MIN"] = Min;
   commands["MEAN"] = Mean;
-  commands["SAME"] = Same;
-  commands["RIGHT"] = Right;
+  commands["COUNT"] = Count;
   commands["PERMS"] = Perms;
-  commands["LESS"] = Less;
-  commands["MORE"] = More;
-  commands["EQUAL"] = Equal;
-  commands["COUNT"] = [](const std::vector<Polygon>& polys, std::ostream& out) {
-    std::string param;
-    if (!(std::cin >> param)) {
-      out << "<INVALID COMMAND>\n";
-      return;
-    }
-    if (param == "ODD") {
-      CountOdd(polys, out);
-    }
-    else if (param == "EVEN") {
-      CountEven(polys, out);
-    }
-    else if (!param.empty() && std::all_of(param.begin(), param.end(), ::isdigit)) {
-      try {
-        size_t n = std::stoul(param);
-        CountN(polys, out, n);
-      }
-      catch (...) {
-        out << "<INVALID COMMAND>\n";
-      }
-    }
-    else {
-      out << "<INVALID COMMAND>\n";
-    }
-    };
+  commands["MAXSEQ"] = MaxSeq;
+  commands["RMECHO"] = RmEcho;
+  commands["ECHO"] = Echo;
+  commands["LESSAREA"] = LessArea;
+  commands["INFRAME"] = InFrame;
+  commands["INTERSECTIONS"] = Intersections;
+  commands["SAME"] = Same;
+  commands["RECTS"] = Rects;
+  commands["RIGHTSHAPES"] = RightShapes;
 
   std::string cmd;
   while (std::cin >> cmd) {
