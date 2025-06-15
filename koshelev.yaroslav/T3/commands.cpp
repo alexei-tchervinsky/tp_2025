@@ -3,94 +3,138 @@
 #include <map>
 #include <limits>
 #include <functional>
-#include "commands.h"
-#include "polygon.h"
-#include "iofmtguard.h"
 #include <algorithm>
 #include <numeric>
 #include <iomanip>
 
+#include "commands.h"
+#include "polygon.h"
+#include "iofmtguard.h"
+
 namespace {
-    static inline void printArea(double value) {
-        koshelev::iofmtguard guard(std::cout);
-        std::cout << std::fixed << std::setprecision(1) << value << '\n';
+    using VC = std::vector<Polygon>;
+
+    void cmdAREA(const VC &v) {
+        std::string a; std::cin >> a;
+        if      (a == "EVEN" || a == "ODD") {
+            bool wantEven = (a == "EVEN");
+            double sum = std::accumulate(v.begin(), v.end(), 0.0,
+                [wantEven](double s, auto &p){
+                    return s + ((p.vertexCount() % 2 == 0) == wantEven ? p.area() : 0);
+                });
+            koshelev::iofmtguard g(std::cout);
+            std::cout << std::fixed << std::setprecision(1) << sum << "\n";
+        }
+        else if (a == "MEAN") {
+            if (v.empty()) throw std::invalid_argument("");
+            double sum = std::accumulate(v.begin(), v.end(), 0.0,
+                [](double s, auto &p){ return s + p.area(); });
+            koshelev::iofmtguard g(std::cout);
+            std::cout << std::fixed << std::setprecision(1) << sum / v.size() << "\n";
+        }
+        else {
+            size_t n = std::stoul(a);
+            if (n < 3) throw std::invalid_argument("");
+            double sum = std::accumulate(v.begin(), v.end(), 0.0,
+                [n](double s, auto &p){ return s + (p.vertexCount() == n ? p.area() : 0); });
+            koshelev::iofmtguard g(std::cout);
+            std::cout << std::fixed << std::setprecision(1) << sum << "\n";
+        }
     }
 
-    template <typename Pred>
-    double accumulateArea(const std::vector<Polygon>& polygons, Pred pred) {
-        return std::accumulate(polygons.begin(), polygons.end(), 0.0,
-            [&pred](double acc, const Polygon& p) {
-                return acc + (pred(p) ? p.area() : 0.0);
-            });
+    void cmdMAX(const VC &v) {
+        std::string a; std::cin >> a;
+        if (v.empty()) throw std::invalid_argument("");
+        if (a == "AREA") {
+            auto it = std::max_element(v.begin(), v.end(),
+                [](auto &x, auto &y){ return x.area() < y.area(); });
+            koshelev::iofmtguard g(std::cout);
+            std::cout << std::fixed << std::setprecision(1) << it->area() << "\n";
+        }
+        else if (a == "VERTEXES") {
+            auto it = std::max_element(v.begin(), v.end(),
+                [](auto &x, auto &y){ return x.vertexCount() < y.vertexCount(); });
+            std::cout << it->vertexCount() << "\n";
+        }
+        else throw std::invalid_argument("");
     }
 
-    template <typename Pred>
-    size_t countIf(const std::vector<Polygon>& polygons, Pred pred) {
-        return std::count_if(polygons.begin(), polygons.end(), pred);
+    void cmdMIN(const VC &v) {
+        std::string a; std::cin >> a;
+        if (v.empty()) throw std::invalid_argument("");
+        if (a == "AREA") {
+            auto it = std::min_element(v.begin(), v.end(),
+                [](auto &x, auto &y){ return x.area() < y.area(); });
+            koshelev::iofmtguard g(std::cout);
+            std::cout << std::fixed << std::setprecision(1) << it->area() << "\n";
+        }
+        else if (a == "VERTEXES") {
+            auto it = std::min_element(v.begin(), v.end(),
+                [](auto &x, auto &y){ return x.vertexCount() < y.vertexCount(); });
+            std::cout << it->vertexCount() << "\n";
+        }
+        else throw std::invalid_argument("");
     }
 
-    std::map<std::string, std::function<double(const Polygon&)>> areaFilters = {
-        {"EVEN", [](const Polygon& p) { return p.vertexCount() % 2 == 0; }},
-        {"ODD", [](const Polygon& p) { return p.vertexCount() % 2 == 1; }},
-        {"MEAN", [](const Polygon&) { return true; }}
-    };
+    void cmdCOUNT(const VC &v) {
+        std::string a; std::cin >> a;
+        if      (a == "EVEN" || a == "ODD") {
+            bool wantEven = (a == "EVEN");
+            size_t cnt = std::count_if(v.begin(), v.end(),
+                [wantEven](auto &p){ return (p.vertexCount() % 2 == 0) == wantEven; });
+            std::cout << cnt << "\n";
+        }
+        else {
+            size_t n = std::stoul(a);
+            if (n < 3) throw std::invalid_argument("");
+            size_t cnt = std::count_if(v.begin(), v.end(),
+                [n](auto &p){ return p.vertexCount() == n; });
+            std::cout << cnt << "\n";
+        }
+    }
 
-    std::map<std::string, std::function<bool(const Polygon&, const Polygon&)>> comparisonFuncs = {
-        {"AREA", [](const Polygon& a, const Polygon& b) { return a.area() < b.area(); }},
-        {"VERTEXES", [](const Polygon& a, const Polygon& b) { return a.vertexCount() < b.vertexCount(); }}
-    };
+    void cmdPERMS(const VC &v) {
+        Polygon pat;
+        if (!(std::cin >> pat)) throw std::invalid_argument("");
+        size_t cnt = std::count_if(v.begin(), v.end(),
+            [&pat](auto &p){ return p.isPermutation(pat); });
+        std::cout << cnt << "\n";
+    }
 
-    std::map<std::string, std::function<size_t(const Polygon&)>> countFilters = {
-        {"EVEN", [](const Polygon& p) { return p.vertexCount() % 2 == 0; }},
-        {"ODD", [](const Polygon& p) { return p.vertexCount() % 2 == 1; }}
-    };
+    void cmdRIGHTSHAPES(const VC &v) {
+        size_t cnt = std::count_if(v.begin(), v.end(),
+            [](auto &p){ return p.hasRightAngle(); });
+        std::cout << cnt << "\n";
+    }
 
-    std::map<std::string, std::function<void(const std::vector<Polygon>&)>> commandMap = {
-        {"AREA", [](const std::vector<Polygon>& polygons) {
-            std::string arg;
-            std::cin >> arg;
-            printArea(areaFilters.find(arg) != areaFilters.end()
-                ? accumulateArea(polygons, areaFilters.at(arg)) / (arg == "MEAN" ? polygons.size() : 1)
-                : accumulateArea(polygons, [num = std::stoul(arg)](const Polygon& p) { return p.vertexCount() == num; }));
-        }},
-        {"MAX", [](const std::vector<Polygon>& polygons) {
-            std::string arg;
-            std::cin >> arg;
-            auto it = std::max_element(polygons.begin(), polygons.end(), comparisonFuncs.at(arg));
-            std::cout << std::fixed << std::setprecision(1) << (arg == "AREA" ? it->area() : it->vertexCount()) << '\n';
-        }},
-        {"MIN", [](const std::vector<Polygon>& polygons) {
-            std::string arg;
-            std::cin >> arg;
-            auto it = std::min_element(polygons.begin(), polygons.end(), comparisonFuncs.at(arg));
-            std::cout << std::fixed << std::setprecision(1) << (arg == "AREA" ? it->area() : it->vertexCount()) << '\n';
-        }},
-        {"COUNT", [](const std::vector<Polygon>& polygons) {
-            std::string arg;
-            std::cin >> arg;
-            std::cout << (countFilters.find(arg) != countFilters.end()
-                ? countIf(polygons, countFilters.at(arg))
-                : countIf(polygons, [num = std::stoul(arg)](const Polygon& p) { return p.vertexCount() == num; })) << '\n';
-        }},
-        {"PERMS", [](const std::vector<Polygon>& polygons) {
-            Polygon pattern;
-            std::cin >> pattern;
-            std::cout << countIf(polygons, [&pattern](const Polygon& p) { return p.isPermutation(pattern); }) << '\n';
-        }},
-        {"RIGHTSHAPES", [](const std::vector<Polygon>& polygons) {
-            std::cout << countIf(polygons, [](const Polygon& p) { return p.hasRightAngle(); }) << '\n';
-        }}
+    using Func = std::function<void(const VC&)>;
+    const std::map<std::string, Func> handlers = {
+        {"AREA",        cmdAREA},
+        {"MAX",         cmdMAX},
+        {"MIN",         cmdMIN},
+        {"COUNT",       cmdCOUNT},
+        {"PERMS",       cmdPERMS},
+        {"RIGHTSHAPES", cmdRIGHTSHAPES},
     };
 }
 
 void processCommands(const std::vector<Polygon>& polygons) {
     std::string cmd;
     while (std::cin >> cmd) {
-        auto it = commandMap.find(cmd);
-        if (it != commandMap.end()) {
-            it->second(polygons);
-        } else {
+        auto it = handlers.find(cmd);
+        if (it == handlers.end()) {
             std::cout << "<INVALID COMMAND>\n";
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            continue;
+        }
+        try {
+            it->second(polygons);
+        }
+        catch (...) {
+            std::cout << "<INVALID COMMAND>\n";
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
     }
 }
