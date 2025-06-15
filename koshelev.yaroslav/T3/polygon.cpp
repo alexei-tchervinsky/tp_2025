@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <numeric>
 #include <cmath>
+#include <cctype>
 
 double Polygon::area() const {
     if (points.size() < 3) return 0.0;
@@ -47,14 +48,22 @@ std::istream& operator>>(std::istream& in, Polygon& poly) {
         in.setstate(std::ios::failbit);
         return in;
     }
-    poly.points.resize(num);
-    for (auto& p : poly.points) {
+    std::vector<Point> tmp;
+    tmp.reserve(num);
+    for (size_t i = 0; i < num; ++i) {
+        Point p;
         if (!(in >> p)) {
-            poly.points.clear();
             in.setstate(std::ios::failbit);
             return in;
         }
+        tmp.push_back(p);
     }
+    in >> std::ws;
+    if (in.peek() != std::char_traits<char>::eof()) {
+        in.setstate(std::ios::failbit);
+        return in;
+    }
+    poly.points = std::move(tmp);
     return in;
 }
 
