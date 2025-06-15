@@ -1,8 +1,13 @@
 ﻿#include "polygon.hpp"
 #include <cmath>
 #include <algorithm>
+#include <tuple> // для std::tie
 
 namespace prokopenko {
+
+  bool operator==(const Point& a, const Point& b) {
+    return a.x == b.x && a.y == b.y;
+  }
 
   double Polygon::getArea() const {
     double area = 0.0;
@@ -52,7 +57,8 @@ namespace prokopenko {
     for (size_t i = 0; i < n; ++i) {
       char ch1, ch2, ch3;
       int x, y;
-      if (!(in >> ch1 >> x >> ch2 >> y >> ch3) || ch1 != '(' || ch2 != ';' || ch3 != ')') {
+      if (!(in >> ch1 >> x >> ch2 >> y >> ch3)
+        || ch1 != '(' || ch2 != ';' || ch3 != ')') {
         in.setstate(std::ios::failbit);
         return in;
       }
