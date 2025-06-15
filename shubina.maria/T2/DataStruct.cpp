@@ -90,14 +90,8 @@ namespace shubina
 
         in >> DelimiterIO{'('} >> DelimiterIO{':'};
 
-        while (true)
+        while (in.peek() != ')' && in.peek() != EOF)
         {
-            if (in.peek() == ')')
-            {
-                in.ignore();
-                break;
-            }
-
             std::string field;
             if (!(in >> field)) break;
 
@@ -122,6 +116,8 @@ namespace shubina
                 std::getline(in, stranger, ':');
             }
         }
+
+        if (in.peek() == ')') in.ignore();
 
         if (has_key1 && has_key2 && has_key3)
             dest = input;
@@ -164,30 +160,21 @@ namespace shubina
     std::vector<DataStruct> readDataStructs(std::istream& in)
     {
         std::vector<DataStruct> result;
-        DataStruct ds;
-
-        while (true)
-        {
-            char c;
-            // Пропуск пробелов
-            while (in.get(c) && std::isspace(c)) {}
-            if (!in) break;
-            in.putback(c);
-
-            if (in >> ds)
-                result.push_back(ds);
-            else
-                in.clear(in.rdstate() & ~std::ios::failbit & ~std::ios::badbit),
-                in.ignore(1000, '\n');
-        }
-
+        std::copy(
+            std::istream_iterator<DataStruct>(in),
+            std::istream_iterator<DataStruct>(),
+            std::back_inserter(result)
+        );
         return result;
     }
 
     void writeDataStructs(const std::vector<DataStruct>& data, std::ostream& out)
     {
-        for (const auto& ds : data)
-            out << ds << "\n";
+        std::copy(
+            data.begin(),
+            data.end(),
+            std::ostream_iterator<DataStruct>(out, "\n")
+        );
     }
 }
 
