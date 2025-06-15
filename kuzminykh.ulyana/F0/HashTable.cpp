@@ -5,7 +5,8 @@ void HashTable::insert(const std::string& key)
     word_counts_[key]++;
 }
 
-void HashTable::remove(const std::string& key) {
+void HashTable::remove(const std::string& key)
+{
     word_counts_.erase(key);
 }
 

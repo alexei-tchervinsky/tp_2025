@@ -63,7 +63,8 @@ int main()
         {
             break;
         }
-        else {
+        else
+        {
             std::cout << "Unknown command. Try again.\n";
         }
     }
