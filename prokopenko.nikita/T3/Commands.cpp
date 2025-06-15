@@ -11,25 +11,41 @@ namespace prokopenko {
 
   static constexpr double EPS = 1e-6;
 
-  // AREA <EVEN|ODD|MEAN|num>
-  void Area(std::vector<Polygon>& polys, std::ostream& out) {
+  // проверка одинаковости по перестановке
+  static bool isDuplicate(const std::vector<Polygon>& seen,
+    const Polygon& p) {
+    for (const auto& q : seen) {
+      if (p.isPermOf(q)) return true;
+    }
+    return false;
+  }
+
+  // AREA ...
+  void Area(const std::vector<Polygon>& polys, std::ostream& out) {
     std::string param;
     if (!(std::cin >> param)) {
       out << "<INVALID COMMAND>\n";
       return;
     }
-    if (param == "EVEN" || param == "ODD") {
-      bool wantEven = (param == "EVEN");
+    if (param == "EVEN") {
       double sum = 0.0;
-      for (auto& p : polys) {
+      for (const auto& p : polys) {
         double a = p.getArea();
-        if (a > EPS) {
-          if ((p.points.size() % 2 == 0) == wantEven) {
-            sum += a;
-          }
+        if (a > EPS && (p.points.size() % 2 == 0)) {
+          sum += a;
         }
       }
-      out << std::fixed << std::setprecision(1) << sum << "\n";
+      out << std::fixed << std::setprecision(1) << sum << '\n';
+    }
+    else if (param == "ODD") {
+      double sum = 0.0;
+      for (const auto& p : polys) {
+        double a = p.getArea();
+        if (a > EPS && (p.points.size() % 2 == 1)) {
+          sum += a;
+        }
+      }
+      out << std::fixed << std::setprecision(1) << sum << '\n';
     }
     else if (param == "MEAN") {
       if (polys.empty()) {
@@ -38,22 +54,20 @@ namespace prokopenko {
       }
       double sum = 0.0;
       size_t cnt = 0;
-      for (auto& p : polys) {
+      for (const auto& p : polys) {
         double a = p.getArea();
-        if (a > EPS) {
-          sum += a;
-          ++cnt;
-        }
+        if (a > EPS) { sum += a; ++cnt; }
       }
       if (cnt == 0) {
-        out << "0.0\n";
+        out << "<INVALID COMMAND>\n";
       }
       else {
-        out << std::fixed << std::setprecision(1) << (sum / cnt) << "\n";
+        out << std::fixed << std::setprecision(1)
+          << (sum / cnt) << '\n';
       }
     }
-    else if (!param.empty()
-      && std::all_of(param.begin(), param.end(), ::isdigit)) {
+    else if (!param.empty() &&
+      std::all_of(param.begin(), param.end(), ::isdigit)) {
       size_t n = 0;
       try {
         n = std::stoul(param);
@@ -67,125 +81,62 @@ namespace prokopenko {
         return;
       }
       double sum = 0.0;
-      for (auto& p : polys) {
+      for (const auto& p : polys) {
         double a = p.getArea();
         if (a > EPS && p.points.size() == n) {
           sum += a;
         }
       }
-      out << std::fixed << std::setprecision(1) << sum << "\n";
+      out << std::fixed << std::setprecision(1) << sum << '\n';
     }
     else {
       out << "<INVALID COMMAND>\n";
     }
   }
 
-  // MAX <AREA|VERTEXES>
-  void Max(std::vector<Polygon>& polys, std::ostream& out) {
+  // MAX ...
+  void Max(const std::vector<Polygon>& polys, std::ostream& out) {
     std::string param;
     if (!(std::cin >> param)) {
       out << "<INVALID COMMAND>\n";
       return;
     }
     if (param == "AREA") {
-      if (polys.empty()) {
-        out << "<INVALID COMMAND>\n";
-        return;
-      }
-      double m = -std::numeric_limits<double>::infinity();
-      bool any = false;
-      for (auto& p : polys) {
+      double mval = -1.0;
+      bool found = false;
+      for (const auto& p : polys) {
         double a = p.getArea();
         if (a > EPS) {
-          any = true;
-          if (a > m) m = a;
+          if (!found || a > mval) {
+            mval = a;
+            found = true;
+          }
         }
       }
-      if (!any) {
+      if (!found) {
         out << "<INVALID COMMAND>\n";
       }
       else {
-        out << std::fixed << std::setprecision(1) << m << "\n";
+        out << std::fixed << std::setprecision(1) << mval << '\n';
       }
     }
     else if (param == "VERTEXES") {
-      if (polys.empty()) {
-        out << "<INVALID COMMAND>\n";
-        return;
-      }
       size_t mv = 0;
-      bool any = false;
-      for (auto& p : polys) {
+      bool found = false;
+      for (const auto& p : polys) {
         double a = p.getArea();
         if (a > EPS) {
-          any = true;
-          mv = std::max(mv, p.points.size());
-        }
-      }
-      if (!any) {
-        out << "<INVALID COMMAND>\n";
-      }
-      else {
-        out << mv << "\n";
-      }
-    }
-    else {
-      out << "<INVALID COMMAND>\n";
-    }
-  }
-
-  // MIN <AREA|VERTEXES>
-  void Min(std::vector<Polygon>& polys, std::ostream& out) {
-    std::string param;
-    if (!(std::cin >> param)) {
-      out << "<INVALID COMMAND>\n";
-      return;
-    }
-    if (param == "AREA") {
-      if (polys.empty()) {
-        out << "<INVALID COMMAND>\n";
-        return;
-      }
-      double m = std::numeric_limits<double>::infinity();
-      bool any = false;
-      for (auto& p : polys) {
-        double a = p.getArea();
-        if (a > EPS) {
-          any = true;
-          if (a < m) m = a;
-        }
-      }
-      if (!any) {
-        out << "<INVALID COMMAND>\n";
-      }
-      else {
-        out << std::fixed << std::setprecision(1) << m << "\n";
-      }
-    }
-    else if (param == "VERTEXES") {
-      if (polys.empty()) {
-        out << "<INVALID COMMAND>\n";
-        return;
-      }
-      size_t mv = 0;
-      bool any = false;
-      for (auto& p : polys) {
-        double a = p.getArea();
-        if (a > EPS) {
-          if (!any) {
+          if (!found || p.points.size() > mv) {
             mv = p.points.size();
+            found = true;
           }
-          else {
-            mv = std::min(mv, p.points.size());
-          }
-          any = true;
         }
       }
-      if (!any) {
+      if (!found) {
         out << "<INVALID COMMAND>\n";
       }
       else {
-        out << mv << "\n";
+        out << mv << '\n';
       }
     }
     else {
@@ -193,15 +144,65 @@ namespace prokopenko {
     }
   }
 
-  // MEAN (standalone, similar to AREA MEAN)
-  void Mean(std::vector<Polygon>& polys, std::ostream& out) {
+  // MIN ...
+  void Min(const std::vector<Polygon>& polys, std::ostream& out) {
+    std::string param;
+    if (!(std::cin >> param)) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
+    if (param == "AREA") {
+      double mval = 0.0;
+      bool found = false;
+      for (const auto& p : polys) {
+        double a = p.getArea();
+        if (a > EPS) {
+          if (!found || a < mval) {
+            mval = a;
+            found = true;
+          }
+        }
+      }
+      if (!found) {
+        out << "<INVALID COMMAND>\n";
+      }
+      else {
+        out << std::fixed << std::setprecision(1) << mval << '\n';
+      }
+    }
+    else if (param == "VERTEXES") {
+      size_t mv = 0;
+      bool found = false;
+      for (const auto& p : polys) {
+        double a = p.getArea();
+        if (a > EPS) {
+          if (!found || p.points.size() < mv) {
+            mv = p.points.size();
+            found = true;
+          }
+        }
+      }
+      if (!found) {
+        out << "<INVALID COMMAND>\n";
+      }
+      else {
+        out << mv << '\n';
+      }
+    }
+    else {
+      out << "<INVALID COMMAND>\n";
+    }
+  }
+
+  // Mean (без аргумента) – тот же, что и AREA MEAN
+  void Mean(const std::vector<Polygon>& polys, std::ostream& out) {
     if (polys.empty()) {
       out << "<INVALID COMMAND>\n";
       return;
     }
     double sum = 0.0;
     size_t cnt = 0;
-    for (auto& p : polys) {
+    for (const auto& p : polys) {
       double a = p.getArea();
       if (a > EPS) {
         sum += a;
@@ -212,244 +213,299 @@ namespace prokopenko {
       out << "<INVALID COMMAND>\n";
     }
     else {
-      out << std::fixed << std::setprecision(1) << (sum / cnt) << "\n";
+      out << std::fixed << std::setprecision(1) << (sum / cnt) << '\n';
     }
   }
 
-  // COUNT <EVEN|ODD|num>
-  void Count(std::vector<Polygon>& polys, std::ostream& out) {
-    std::string param;
-    if (!(std::cin >> param)) {
+  // COUNT ODD
+  void CountOdd(const std::vector<Polygon>& polys, std::ostream& out) {
+    std::vector<Polygon> unique;
+    for (const auto& p : polys) {
+      if (p.getArea() > EPS && !isDuplicate(unique, p)) {
+        unique.push_back(p);
+      }
+    }
+    size_t cnt = 0;
+    for (const auto& p : unique) {
+      if (p.points.size() % 2 == 1) ++cnt;
+    }
+    out << cnt << '\n';
+  }
+
+  // COUNT EVEN
+  void CountEven(const std::vector<Polygon>& polys, std::ostream& out) {
+    std::vector<Polygon> unique;
+    for (const auto& p : polys) {
+      if (p.getArea() > EPS && !isDuplicate(unique, p)) {
+        unique.push_back(p);
+      }
+    }
+    size_t cnt = 0;
+    for (const auto& p : unique) {
+      if (p.points.size() % 2 == 0) ++cnt;
+    }
+    out << cnt << '\n';
+  }
+
+  // COUNT N
+  void CountN(const std::vector<Polygon>& polys, std::ostream& out,
+    size_t n) {
+    if (n < 3) {
       out << "<INVALID COMMAND>\n";
       return;
     }
-    if (param == "EVEN" || param == "ODD") {
-      bool wantEven = (param == "EVEN");
-      size_t cnt = 0;
-      for (auto& p : polys) {
-        double a = p.getArea();
-        if (a > EPS) {
-          if ((p.points.size() % 2 == 0) == wantEven) {
-            ++cnt;
-          }
-        }
+    std::vector<Polygon> unique;
+    for (const auto& p : polys) {
+      if (p.getArea() > EPS && !isDuplicate(unique, p)) {
+        unique.push_back(p);
       }
-      out << cnt << "\n";
     }
-    else if (!param.empty()
-      && std::all_of(param.begin(), param.end(), ::isdigit)) {
-      size_t n = 0;
-      try {
-        n = std::stoul(param);
-      }
-      catch (...) {
-        out << "<INVALID COMMAND>\n";
-        return;
-      }
-      if (n < 3) {
-        out << "<INVALID COMMAND>\n";
-        return;
-      }
-      size_t cnt = 0;
-      for (auto& p : polys) {
-        double a = p.getArea();
-        if (a > EPS && p.points.size() == n) {
-          ++cnt;
-        }
-      }
-      out << cnt << "\n";
+    size_t cnt = 0;
+    for (const auto& p : unique) {
+      if (p.points.size() == n) ++cnt;
     }
-    else {
-      out << "<INVALID COMMAND>\n";
-    }
+    out << cnt << '\n';
   }
 
-  // PERMS <Polygon>
-  void Perms(std::vector<Polygon>& polys, std::ostream& out) {
+  // SAME <Polygon>
+  void Same(const std::vector<Polygon>& polys, std::ostream& out) {
     Polygon pattern;
     if (!(std::cin >> pattern)) {
       out << "<INVALID COMMAND>\n";
       return;
     }
     size_t cnt = 0;
-    for (auto& p : polys) {
-      if (p.isPermOf(pattern)) {
-        ++cnt;
+    double a0 = pattern.getArea();
+    if (a0 > EPS) {
+      for (const auto& p : polys) {
+        if (p.isPermOf(pattern)) ++cnt;
       }
     }
-    out << cnt << "\n";
+    out << cnt << '\n';
   }
 
-  // MAXSEQ <Polygon>
-  void MaxSeq(std::vector<Polygon>& polys, std::ostream& out) {
+  // RIGHT
+  void Right(const std::vector<Polygon>& polys, std::ostream& out) {
+    size_t cnt = 0;
+    for (const auto& p : polys) {
+      if (p.getArea() > EPS && p.isRight()) ++cnt;
+    }
+    out << cnt << '\n';
+  }
+
+  // PERMS <Polygon>
+  void Perms(const std::vector<Polygon>& polys, std::ostream& out) {
     Polygon pattern;
     if (!(std::cin >> pattern)) {
       out << "<INVALID COMMAND>\n";
       return;
     }
-    size_t best = 0;
-    size_t cur = 0;
-    for (auto& p : polys) {
-      if (p.isPermOf(pattern)) {
-        ++cur;
-        best = std::max(best, cur);
-      }
-      else {
-        cur = 0;
+    size_t cnt = 0;
+    double a0 = pattern.getArea();
+    if (a0 > EPS) {
+      for (const auto& p : polys) {
+        if (p.isPermOf(pattern)) ++cnt;
       }
     }
-    out << best << "\n";
+    out << cnt << '\n';
   }
 
-  // RMECHO <Polygon>
-  void RmEcho(std::vector<Polygon>& polys, std::ostream& out) {
-    Polygon pattern;
-    if (!(std::cin >> pattern)) {
-      out << "<INVALID COMMAND>\n";
-      return;
-    }
-    size_t removed = 0;
-    // Remove consecutive duplicates equal to pattern
-    for (size_t i = 0; i + 1 < polys.size(); ) {
-      if (polys[i].isPermOf(pattern)
-        && polys[i + 1].isPermOf(pattern)) {
-        polys.erase(polys.begin() + (i + 1));
-        ++removed;
-      }
-      else {
-        ++i;
-      }
-    }
-    out << removed << "\n";
-  }
-
-  // ECHO <Polygon>
-  void Echo(std::vector<Polygon>& polys, std::ostream& out) {
-    Polygon pattern;
-    if (!(std::cin >> pattern)) {
-      out << "<INVALID COMMAND>\n";
-      return;
-    }
-    size_t added = 0;
-    for (size_t i = 0; i < polys.size(); ++i) {
-      if (polys[i].isPermOf(pattern)) {
-        polys.insert(polys.begin() + i + 1, pattern);
-        ++added;
-        ++i;
-      }
-    }
-    out << added << "\n";
-  }
-
-  // LESSAREA <Polygon>
-  void LessArea(std::vector<Polygon>& polys, std::ostream& out) {
+  // LESS <Polygon>  (подсчёт area<pattern.area)
+  void Less(const std::vector<Polygon>& polys, std::ostream& out) {
     Polygon pattern;
     if (!(std::cin >> pattern)) {
       out << "<INVALID COMMAND>\n";
       return;
     }
     double a0 = pattern.getArea();
-    size_t cnt = 0;
-    for (auto& p : polys) {
-      double a = p.getArea();
-      if (a + EPS < a0) {
-        ++cnt;
-      }
+    if (a0 <= EPS) {
+      out << "<INVALID COMMAND>\n";
+      return;
     }
-    out << cnt << "\n";
+    size_t cnt = 0;
+    for (const auto& p : polys) {
+      double a = p.getArea();
+      if (a > EPS && a < a0) ++cnt;
+    }
+    out << cnt << '\n';
   }
 
-  // INFRAME <Polygon>
-  void InFrame(std::vector<Polygon>& polys, std::ostream& out) {
+  // MORE <Polygon>
+  void More(const std::vector<Polygon>& polys, std::ostream& out) {
     Polygon pattern;
     if (!(std::cin >> pattern)) {
       out << "<INVALID COMMAND>\n";
       return;
     }
-    if (polys.empty()) {
-      out << "<FALSE>\n";
+    double a0 = pattern.getArea();
+    if (a0 <= EPS) {
+      out << "<INVALID COMMAND>\n";
       return;
     }
-    // compute bounding rect of all stored polygons
-    int minx = std::numeric_limits<int>::max();
-    int miny = std::numeric_limits<int>::max();
-    int maxx = std::numeric_limits<int>::min();
-    int maxy = std::numeric_limits<int>::min();
-    for (auto& poly : polys) {
-      for (auto& pt : poly.points) {
-        minx = std::min(minx, pt.x);
-        miny = std::min(miny, pt.y);
-        maxx = std::max(maxx, pt.x);
-        maxy = std::max(maxy, pt.y);
+    size_t cnt = 0;
+    for (const auto& p : polys) {
+      double a = p.getArea();
+      if (a > EPS && a > a0) ++cnt;
+    }
+    out << cnt << '\n';
+  }
+
+  // EQUAL <Polygon> (area equal)
+  void Equal(const std::vector<Polygon>& polys, std::ostream& out) {
+    Polygon pattern;
+    if (!(std::cin >> pattern)) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
+    size_t cnt = 0;
+    double a0 = pattern.getArea();
+    if (a0 > EPS) {
+      for (const auto& p : polys) {
+        if (std::fabs(p.getArea() - a0) < EPS) ++cnt;
       }
     }
-    bool ok = true;
+    out << cnt << '\n';
+  }
+
+  // MAXSEQ <Polygon>
+  void MaxSeq(const std::vector<Polygon>& polys, std::ostream& out) {
+    Polygon pattern;
+    if (!(std::cin >> pattern)) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
+    size_t best = 0, cur = 0;
+    for (size_t i = 0; i < polys.size(); ++i) {
+      if (polys[i].isPermOf(pattern)) {
+        ++cur;
+        if (cur > best) best = cur;
+      }
+      else {
+        cur = 0;
+      }
+    }
+    out << best << '\n';
+  }
+
+  // RMECHO <Polygon>
+  void RmEcho(const std::vector<Polygon>& polys, std::ostream& out) {
+    Polygon pattern;
+    if (!(std::cin >> pattern)) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
+    // коллекция неизменяемая, но возвращаем число удалённых из гипотетической
+    size_t removed = 0;
+    bool in_seq = false;
+    size_t seq_count = 0;
+    for (size_t i = 0; i < polys.size(); ++i) {
+      if (polys[i].isPermOf(pattern)) {
+        if (!in_seq) {
+          in_seq = true;
+          seq_count = 1;
+        }
+        else {
+          ++seq_count;
+          ++removed;
+        }
+      }
+      else {
+        in_seq = false;
+        seq_count = 0;
+      }
+    }
+    out << removed << '\n';
+  }
+
+  // ECHO <Polygon>
+  void EchoCmd(const std::vector<Polygon>& polys, std::ostream& out) {
+    Polygon pattern;
+    if (!(std::cin >> pattern)) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
+    size_t added = 0;
+    // гипотетически вставляем, но не меняем исходный вектор
+    for (size_t i = 0; i < polys.size(); ++i) {
+      if (polys[i].isPermOf(pattern)) {
+        ++added;
+      }
+    }
+    out << added << '\n';
+  }
+
+  // LESSAREA <Polygon>
+  void LessArea(const std::vector<Polygon>& polys, std::ostream& out) {
+    Polygon pattern;
+    if (!(std::cin >> pattern)) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
+    double a0 = pattern.getArea();
+    if (a0 <= EPS) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
+    size_t cnt = 0;
+    for (const auto& p : polys) {
+      double a = p.getArea();
+      if (a > EPS && a < a0) ++cnt;
+    }
+    out << cnt << '\n';
+  }
+
+  // INFRAME <Polygon>
+  void InFrame(const std::vector<Polygon>& polys, std::ostream& out) {
+    Polygon pattern;
+    if (!(std::cin >> pattern)) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
+    double a0 = pattern.getArea();
+    if (a0 <= EPS) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
+    // вычислить bounding box всех точек в polys
+    if (polys.empty()) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
+    int minX = std::numeric_limits<int>::max();
+    int maxX = std::numeric_limits<int>::min();
+    int minY = std::numeric_limits<int>::max();
+    int maxY = std::numeric_limits<int>::min();
+    for (const auto& poly : polys) {
+      for (auto& pt : poly.points) {
+        if (pt.x < minX) minX = pt.x;
+        if (pt.x > maxX) maxX = pt.x;
+        if (pt.y < minY) minY = pt.y;
+        if (pt.y > maxY) maxY = pt.y;
+      }
+    }
+    bool inside = true;
     for (auto& pt : pattern.points) {
-      if (pt.x < minx || pt.x > maxx
-        || pt.y < miny || pt.y > maxy) {
-        ok = false;
+      if (pt.x < minX || pt.x > maxX ||
+        pt.y < minY || pt.y > maxY) {
+        inside = false;
         break;
       }
     }
-    out << (ok ? "<TRUE>\n" : "<FALSE>\n");
+    out << (inside ? "<TRUE>\n" : "<FALSE>\n");
   }
 
-  // INTERSECTIONS <Polygon>
-  static bool onSegment(const Point& a, const Point& b,
-    const Point& p) {
-    if (std::min(a.x, b.x) <= p.x && p.x <= std::max(a.x, b.x)
-      && std::min(a.y, b.y) <= p.y && p.y <= std::max(a.y, b.y)) {
-      long long cross = static_cast<long long>(b.x - a.x) *
-        (p.y - a.y)
-        - static_cast<long long>(b.y - a.y) *
-        (p.x - a.x);
-      return cross == 0;
-    }
-    return false;
-  }
-  static int orientation(const Point& a, const Point& b,
-    const Point& c) {
-    long long v = static_cast<long long>(b.y - a.y) *
-      (c.x - b.x)
-      - static_cast<long long>(b.x - a.x) *
-      (c.y - b.y);
-    if (v == 0) return 0;
-    return (v > 0 ? 1 : 2);
-  }
-  static bool segmentsIntersect(const Point& p1,
-    const Point& q1,
-    const Point& p2,
-    const Point& q2) {
-    int o1 = orientation(p1, q1, p2);
-    int o2 = orientation(p1, q1, q2);
-    int o3 = orientation(p2, q2, p1);
-    int o4 = orientation(p2, q2, q1);
-    if (o1 != o2 && o3 != o4) return true;
-    if (o1 == 0 && onSegment(p1, q1, p2)) return true;
-    if (o2 == 0 && onSegment(p1, q1, q2)) return true;
-    if (o3 == 0 && onSegment(p2, q2, p1)) return true;
-    if (o4 == 0 && onSegment(p2, q2, q1)) return true;
-    return false;
-  }
-  static bool polyIntersect(const Polygon& A, const Polygon& B) {
-    // edge intersection
-    size_t na = A.points.size();
-    size_t nb = B.points.size();
-    for (size_t i = 0; i < na; ++i) {
-      Point a1 = A.points[i];
-      Point a2 = A.points[(i + 1) % na];
-      for (size_t j = 0; j < nb; ++j) {
-        Point b1 = B.points[j];
-        Point b2 = B.points[(j + 1) % nb];
-        if (segmentsIntersect(a1, a2, b1, b2)) {
-          return true;
-        }
-      }
-    }
-    // containment: A inside B?
-    // Ray-casting for a point
-    auto pointInPoly = [&](const Polygon& P,
-      const Point& pt) {
-        bool inside = false;
-        size_t n = P.points.size();
-        for (size_t i = 0, j = n - 1; i < n; _
+  // пересечение отрезков
+  static bool segmentsIntersect(
+    int x1, int y1, int x2, int y2,
+    int x3, int y3, int x4, int y4) {
+    auto orient = [](int ax, int ay, int bx, int by,
+      int cx, int cy) {
+        long long v = (long long)(bx - ax) * (cy - ay)
+          - (long long)(by - ay) * (cx - ax);
+        if (v > 0) return 1;
+        if (v < 0) return -1;
+        return 0;
+      };
+    auto onSeg = [](int ax, int ay, int bx, int by, int cx, int cy) {
+      return std::min(ax, bx) <= cx && cx <= std::max(ax, bx)
+        && std::min(ay, by) <= cy && cy <= s

@@ -5,12 +5,12 @@
 #include <string>
 #include <limits>
 #include <functional>
+#include <algorithm>
 #include "commands.hpp"
 
 using namespace prokopenko;
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
   if (argc != 2) {
     std::cerr << "Error: wrong input\n";
     return 1;
@@ -25,7 +25,8 @@ int main(int argc, char* argv[])
     Polygon poly;
     std::streampos pos = input.tellg();
     if (input >> poly) {
-      if (poly.getArea() > 1e-6) {
+      double a = poly.getArea();
+      if (a > 1e-6) {
         polygons.push_back(poly);
       }
     }
@@ -35,39 +36,60 @@ int main(int argc, char* argv[])
       input.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
   }
-  // Print initial data
+  // Вывести With data:
   std::cout << "With data:\n";
-  for (auto& p : polygons) {
+  for (const auto& p : polygons) {
     std::cout << "\t" << p << "\n";
   }
+  std::cout << std::endl;
+
   std::map<std::string,
-    std::function<void(std::vector<Polygon>&, std::ostream&)>>
+    std::function<void(const std::vector<Polygon>&, std::ostream&)>>
     commands;
   commands["AREA"] = Area;
   commands["MAX"] = Max;
   commands["MIN"] = Min;
   commands["MEAN"] = Mean;
-  commands["COUNT"] = Count;
+  commands["SAME"] = Same;
+  commands["RIGHT"] = Right;
   commands["PERMS"] = Perms;
+  commands["LESS"] = Less;
+  commands["MORE"] = More;
+  commands["EQUAL"] = Equal;
+  commands["COUNT"] = [](const std::vector<Polygon>& polys,
+    std::ostream& out) {
+      std::string param;
+      if (!(std::cin >> param)) {
+        out << "<INVALID COMMAND>\n";
+        return;
+      }
+      if (param == "ODD") {
+        CountOdd(polys, out);
+      }
+      else if (param == "EVEN") {
+        CountEven(polys, out);
+      }
+      else if (!param.empty() &&
+        std::all_of(param.begin(), param.end(), ::isdigit)) {
+        try {
+          size_t n = std::stoul(param);
+          CountN(polys, out, n);
+        }
+        catch (...) {
+          out << "<INVALID COMMAND>\n";
+        }
+      }
+      else {
+        out << "<INVALID COMMAND>\n";
+      }
+    };
   commands["MAXSEQ"] = MaxSeq;
   commands["RMECHO"] = RmEcho;
-  commands["ECHO"] = Echo;
+  commands["ECHO"] = EchoCmd;
   commands["LESSAREA"] = LessArea;
   commands["INFRAME"] = InFrame;
   commands["INTERSECTIONS"] = Intersections;
-  commands["SAME"] = Same;
   commands["RECTS"] = Rects;
   commands["RIGHTSHAPES"] = RightShapes;
-  std::string cmd;
-  while (std::cin >> cmd) {
-    auto it = commands.find(cmd);
-    if (it != commands.end()) {
-      it->second(polygons, std::cout);
-    }
-    else {
-      std::cout << "<INVALID COMMAND>\n";
-      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    }
-  }
-  return 0;
-}
+
+  std::strin

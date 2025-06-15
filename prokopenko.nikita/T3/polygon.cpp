@@ -1,13 +1,21 @@
 ﻿#include "polygon.hpp"
 #include <cmath>
-#include <limits>
 #include <algorithm>
+#include <ios>
 
 namespace prokopenko {
+
+  bool Point::operator==(const Point& other) const {
+    return x == other.x && y == other.y;
+  }
+  bool Point::operator!=(const Point& other) const {
+    return !(*this == other);
+  }
 
   double Polygon::getArea() const {
     double area = 0.0;
     size_t n = points.size();
+    if (n < 3) return 0.0;
     for (size_t i = 0; i < n; ++i) {
       const Point& a = points[i];
       const Point& b = points[(i + 1) % n];
@@ -17,13 +25,32 @@ namespace prokopenko {
     return std::fabs(area) / 2.0;
   }
 
+  bool Polygon::isRight() const {
+    size_t n = points.size();
+    if (n < 3) return false;
+    for (size_t i = 0; i < n; ++i) {
+      const Point& a = points[i];
+      const Point& b = points[(i + 1) % n];
+      const Point& c = points[(i + 2) % n];
+      int dx1 = b.x - a.x;
+      int dy1 = b.y - a.y;
+      int dx2 = c.x - b.x;
+      int dy2 = c.y - b.y;
+      if (dx1 * dx2 + dy1 * dy2 == 0) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   bool Polygon::isPermOf(const Polygon& other) const {
     if (points.size() != other.points.size()) return false;
     size_t n = points.size();
     for (size_t shift = 0; shift < n; ++shift) {
       bool ok = true;
       for (size_t i = 0; i < n; ++i) {
-        if (points[i] != other.points[(i + shift) % n]) {
+        if (!(points[i] ==
+          other.points[(i + shift) % n])) {
           ok = false;
           break;
         }
@@ -31,7 +58,8 @@ namespace prokopenko {
       if (ok) return true;
       ok = true;
       for (size_t i = 0; i < n; ++i) {
-        if (points[i] != other.points[(n + shift - i) % n]) {
+        if (!(points[i] ==
+          other.points[(n + shift - i) % n])) {
           ok = false;
           break;
         }
@@ -39,45 +67,6 @@ namespace prokopenko {
       if (ok) return true;
     }
     return false;
-  }
-
-  bool Polygon::sameByTranslation(const Polygon& other) const {
-    if (points.size() != other.points.size()) return false;
-    size_t n = points.size();
-    // Try aligning points[0] to each other.points[j]
-    for (size_t j = 0; j < n; ++j) {
-      int dx = other.points[j].x - points[0].x;
-      int dy = other.points[j].y - points[0].y;
-      bool ok = true;
-      for (size_t i = 0; i < n; ++i) {
-        Point shifted{ points[i].x + dx, points[i].y + dy };
-        if (shifted != other.points[(j + i) % n]) {
-          ok = false;
-          break;
-        }
-      }
-      if (ok) return true;
-    }
-    return false;
-  }
-
-  bool Polygon::isRightRect() const {
-    // Check if 4 vertices and consecutive right angles (convex)
-    if (points.size() != 4) return false;
-    // Compute cross products for each consecutive triple
-    for (size_t i = 0; i < 4; ++i) {
-      const Point& a = points[i];
-      const Point& b = points[(i + 1) % 4];
-      const Point& c = points[(i + 2) % 4];
-      int dx1 = b.x - a.x;
-      int dy1 = b.y - a.y;
-      int dx2 = c.x - b.x;
-      int dy2 = c.y - b.y;
-      if (dx1 * dx2 + dy1 * dy2 != 0) {
-        return false;
-      }
-    }
-    return true;
   }
 
   std::istream& operator>>(std::istream& in, Point& point) {
@@ -104,6 +93,11 @@ namespace prokopenko {
     return in;
   }
 
+  std::ostream& operator<<(std::ostream& out, const Point& point) {
+    out << "(" << point.x << ";" << point.y << ")";
+    return out;
+  }
+
   std::istream& operator>>(std::istream& in, Polygon& polygon) {
     size_t sz;
     in >> sz;
@@ -124,8 +118,8 @@ namespace prokopenko {
   std::ostream& operator<<(std::ostream& out,
     const Polygon& polygon) {
     out << polygon.points.size();
-    for (auto& pt : polygon.points) {
-      out << " (" << pt.x << ";" << pt.y << ")";
+    for (const auto& pt : polygon.points) {
+      out << " " << pt;
     }
     return out;
   }
