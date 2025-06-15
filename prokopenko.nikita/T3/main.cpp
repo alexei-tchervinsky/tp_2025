@@ -25,11 +25,13 @@ int main(int argc, char* argv[])
     std::cerr << "Error: wrong input\n";
     return 1;
   }
+
   std::ifstream input(argv[1]);
   if (!input) {
     std::cerr << "Error: file cannot be opened\n";
     return 1;
   }
+
   std::vector<Polygon> polygons;
   while (!input.eof()) {
     Polygon poly;
@@ -46,6 +48,7 @@ int main(int argc, char* argv[])
       input.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
   }
+
   std::map<std::string, std::function<void(const std::vector<Polygon>&, std::ostream&)>> commands;
   commands["AREA"] = Area;
   commands["MAX"] = Max;
@@ -82,6 +85,7 @@ int main(int argc, char* argv[])
       out << "<INVALID COMMAND>\n";
     }
     };
+
   std::string cmd;
   while (std::cin >> cmd) {
     auto it = commands.find(cmd);
@@ -93,5 +97,6 @@ int main(int argc, char* argv[])
       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
   }
+
   return 0;
 }
