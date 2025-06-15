@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <vector>
 #include <string>
+#include <chrono>
 #include "hash_table.hpp"
 
 void print_separator(const std::string& title) {
