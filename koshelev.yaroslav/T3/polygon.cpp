@@ -3,15 +3,14 @@
 #include <algorithm>
 #include <numeric>
 #include <cmath>
-#include <cctype>
 
 double Polygon::area() const {
     if (points.size() < 3) return 0.0;
     double sum = 0.0;
     for (size_t i = 0; i < points.size(); ++i) {
-        const auto& curr = points[i];
-        const auto& next = points[(i + 1) % points.size()];
-        sum += (curr.x * next.y) - (next.x * curr.y);
+        const Point& a = points[i];
+        const Point& b = points[(i + 1) % points.size()];
+        sum += a.x * b.y - b.x * a.y;
     }
     return std::abs(sum) / 2.0;
 }
@@ -19,11 +18,11 @@ double Polygon::area() const {
 bool Polygon::hasRightAngle() const {
     if (points.size() < 3) return false;
     for (size_t i = 0; i < points.size(); ++i) {
-        const auto& a = points[i];
-        const auto& b = points[(i + 1) % points.size()];
-        const auto& c = points[(i + 2) % points.size()];
-        int dx1 = b.x - a.x, dy1 = b.y - a.y;
-        int dx2 = c.x - b.x, dy2 = c.y - b.y;
+        const Point& A = points[i];
+        const Point& B = points[(i + 1) % points.size()];
+        const Point& C = points[(i + 2) % points.size()];
+        int dx1 = B.x - A.x, dy1 = B.y - A.y;
+        int dx2 = C.x - B.x, dy2 = C.y - B.y;
         if (dx1 * dx2 + dy1 * dy2 == 0) return true;
     }
     return false;
@@ -31,10 +30,11 @@ bool Polygon::hasRightAngle() const {
 
 bool Polygon::isPermutation(const Polygon& other) const {
     if (points.size() != other.points.size()) return false;
-    auto a = points, b = other.points;
-    std::sort(a.begin(), a.end());
-    std::sort(b.begin(), b.end());
-    return a == b;
+    auto A = points;
+    auto B = other.points;
+    std::sort(A.begin(), A.end());
+    std::sort(B.begin(), B.end());
+    return A == B;
 }
 
 size_t Polygon::vertexCount() const {
@@ -43,25 +43,20 @@ size_t Polygon::vertexCount() const {
 
 std::istream& operator>>(std::istream& in, Polygon& poly) {
     koshelev::iofmtguard guard(in);
-    size_t num;
-    if (!(in >> num) || num < 3) {
+    size_t n;
+    if (!(in >> n) || n < 3) {
         in.setstate(std::ios::failbit);
         return in;
     }
     std::vector<Point> tmp;
-    tmp.reserve(num);
-    for (size_t i = 0; i < num; ++i) {
+    tmp.reserve(n);
+    for (size_t i = 0; i < n; ++i) {
         Point p;
         if (!(in >> p)) {
             in.setstate(std::ios::failbit);
             return in;
         }
         tmp.push_back(p);
-    }
-    in >> std::ws;
-    if (in.peek() != std::char_traits<char>::eof()) {
-        in.setstate(std::ios::failbit);
-        return in;
     }
     poly.points = std::move(tmp);
     return in;
@@ -70,7 +65,7 @@ std::istream& operator>>(std::istream& in, Polygon& poly) {
 std::ostream& operator<<(std::ostream& out, const Polygon& poly) {
     koshelev::iofmtguard guard(out);
     out << poly.vertexCount();
-    for (const auto& p : poly.points) {
+    for (auto& p : poly.points) {
         out << ' ' << p;
     }
     return out;
