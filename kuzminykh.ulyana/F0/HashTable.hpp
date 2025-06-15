@@ -1,3 +1,5 @@
+#ifndef HASHTABLE_HPP
+#define HASHTABLE_HPP
 #include <iostream>
 #include <string>
 #include <vector>
@@ -15,3 +17,4 @@ public:
     size_t search(const std::string& key) const;
     void getThree() const;
 };
+#endif // HASHTABLE_HPP
