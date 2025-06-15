@@ -15,14 +15,18 @@ namespace prokopenko {
 
   struct Polygon {
     std::vector<Point> points;
+
     double getArea() const;
-    bool isRight() const;
-    // для PERMS/ECHO/...: проверка на перестановку с учётом циклического сдвига и обратного порядка
+    bool isRectangle() const;
+    bool hasRightAngle() const;
     bool isPermOf(const Polygon& other) const;
+    bool isSameByTranslation(const Polygon& other) const;
+    // Для INFRAME/INTERSECTIONS: предоставим доступ к точкам
   };
 
   std::istream& operator>>(std::istream& in, Point& point);
   std::istream& operator>>(std::istream& in, Polygon& polygon);
+  std::ostream& operator<<(std::ostream& out, const Polygon& polygon);
 
 } // namespace prokopenko
 

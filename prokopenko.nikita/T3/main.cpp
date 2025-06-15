@@ -5,7 +5,6 @@
 #include <string>
 #include <limits>
 #include <functional>
-#include <algorithm>
 #include "commands.hpp"
 
 using namespace prokopenko;
@@ -22,11 +21,12 @@ int main(int argc, char* argv[])
     return 1;
   }
   std::vector<Polygon> polygons;
+  const double EPS = 1e-6;
   while (!input.eof()) {
     Polygon poly;
     std::streampos pos = input.tellg();
     if (input >> poly) {
-      if (poly.getArea() > 1e-6) {
+      if (poly.getArea() > EPS) {
         polygons.push_back(poly);
       }
     }
@@ -36,8 +36,14 @@ int main(int argc, char* argv[])
       input.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
   }
-  // команды принимают vector<Polygon>&, т.к. некоторые модифицируют набор
-  std::map<std::string, std::function<void(std::vector<Polygon>&, std::ostream&)>> commands;
+  // При старте выводим "With data:" и текущий набор
+  std::cout << "With data:\n";
+  for (const auto& p : polygons) {
+    std::cout << "\t" << p << "\n";
+  }
+
+  std::map<std::string, std::function<void(std::vector<Polygon>&, std::ostream&)>>
+    commands;
   commands["AREA"] = Area;
   commands["MAX"] = Max;
   commands["MIN"] = Min;
