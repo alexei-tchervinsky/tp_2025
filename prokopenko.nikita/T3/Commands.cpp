@@ -9,8 +9,15 @@
 namespace prokopenko {
 
   static constexpr double EPS = 1e-6;
+
   static bool equalArea(const Polygon& a, const Polygon& b) {
     return std::fabs(a.getArea() - b.getArea()) < EPS;
+  }
+  static bool isDuplicate(const std::vector<Polygon>& seen, const Polygon& p) {
+    for (const auto& q : seen) {
+      if (p.isPermOf(q)) return true;
+    }
+    return false;
   }
 
   void Area(const std::vector<Polygon>& polys, std::ostream& out) {
@@ -60,7 +67,7 @@ namespace prokopenko {
         out << std::fixed << std::setprecision(1) << (s / cnt) << '\n';
       }
     }
-    else if (std::all_of(param.begin(), param.end(), ::isdigit)) {
+    else if (!param.empty() && std::all_of(param.begin(), param.end(), ::isdigit)) {
       size_t n = 0;
       try {
         n = std::stoul(param);
@@ -208,23 +215,29 @@ namespace prokopenko {
   }
 
   void CountOdd(const std::vector<Polygon>& polys, std::ostream& out) {
-    size_t cnt = 0;
+    std::vector<Polygon> unique;
     for (const auto& p : polys) {
-      double a = p.getArea();
-      if (a > EPS && (p.points.size() % 2 == 1)) {
-        ++cnt;
+      if (p.getArea() > EPS && !isDuplicate(unique, p)) {
+        unique.push_back(p);
       }
+    }
+    size_t cnt = 0;
+    for (const auto& p : unique) {
+      if (p.points.size() % 2 == 1) ++cnt;
     }
     out << cnt << '\n';
   }
 
   void CountEven(const std::vector<Polygon>& polys, std::ostream& out) {
-    size_t cnt = 0;
+    std::vector<Polygon> unique;
     for (const auto& p : polys) {
-      double a = p.getArea();
-      if (a > EPS && (p.points.size() % 2 == 0)) {
-        ++cnt;
+      if (p.getArea() > EPS && !isDuplicate(unique, p)) {
+        unique.push_back(p);
       }
+    }
+    size_t cnt = 0;
+    for (const auto& p : unique) {
+      if (p.points.size() % 2 == 0) ++cnt;
     }
     out << cnt << '\n';
   }
@@ -236,12 +249,15 @@ namespace prokopenko {
       out << "<INVALID COMMAND>\n";
       return;
     }
-    size_t cnt = 0;
+    std::vector<Polygon> unique;
     for (const auto& p : polys) {
-      double a = p.getArea();
-      if (a > EPS && p.points.size() == n) {
-        ++cnt;
+      if (p.getArea() > EPS && !isDuplicate(unique, p)) {
+        unique.push_back(p);
       }
+    }
+    size_t cnt = 0;
+    for (const auto& p : unique) {
+      if (p.points.size() == n) ++cnt;
     }
     out << cnt << '\n';
   }

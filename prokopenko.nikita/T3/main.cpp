@@ -6,18 +6,9 @@
 #include <limits>
 #include <functional>
 #include <algorithm>
-#include <set>
 #include "commands.hpp"
 
 using namespace prokopenko;
-
-static bool allPointsDistinct(const Polygon& poly) {
-  std::set<std::pair<int, int>> st;
-  for (auto& pt : poly.points) {
-    st.insert({ pt.x, pt.y });
-  }
-  return st.size() == poly.points.size();
-}
 
 int main(int argc, char* argv[])
 {
@@ -35,8 +26,7 @@ int main(int argc, char* argv[])
     Polygon poly;
     std::streampos pos = input.tellg();
     if (input >> poly) {
-      double area = poly.getArea();
-      if (area > 1e-6 && allPointsDistinct(poly)) {
+      if (poly.getArea() > 1e-6) {
         polygons.push_back(poly);
       }
     }
@@ -46,6 +36,13 @@ int main(int argc, char* argv[])
       input.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
   }
+  // Перед выполнением команд печатаем загруженные данные:
+  std::cout << "With data:\n";
+  for (const auto& p : polygons) {
+    std::cout << "\t" << p << "\n";
+  }
+  std::cout << std::endl;
+
   std::map<std::string, std::function<void(const std::vector<Polygon>&, std::ostream&)>> commands;
   commands["AREA"] = Area;
   commands["MAX"] = Max;
@@ -82,6 +79,7 @@ int main(int argc, char* argv[])
       out << "<INVALID COMMAND>\n";
     }
     };
+
   std::string cmd;
   while (std::cin >> cmd) {
     auto it = commands.find(cmd);

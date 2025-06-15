@@ -45,7 +45,6 @@ namespace prokopenko {
   bool Polygon::isPermOf(const Polygon& other) const {
     if (points.size() != other.points.size()) return false;
     size_t n = points.size();
-    if (n == 0) return false;
     for (size_t shift = 0; shift < n; ++shift) {
       bool ok = true;
       for (size_t i = 0; i < n; ++i) {
@@ -91,6 +90,11 @@ namespace prokopenko {
     return in;
   }
 
+  std::ostream& operator<<(std::ostream& out, const Point& point) {
+    out << "(" << point.x << ";" << point.y << ")";
+    return out;
+  }
+
   std::istream& operator>>(std::istream& in, Polygon& polygon) {
     size_t sz;
     in >> sz;
@@ -106,6 +110,14 @@ namespace prokopenko {
     }
     polygon.points = std::move(pts);
     return in;
+  }
+
+  std::ostream& operator<<(std::ostream& out, const Polygon& polygon) {
+    out << polygon.points.size();
+    for (const auto& pt : polygon.points) {
+      out << " " << pt;
+    }
+    return out;
   }
 
 } // namespace prokopenko
