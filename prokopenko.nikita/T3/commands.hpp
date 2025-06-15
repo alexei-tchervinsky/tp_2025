@@ -17,17 +17,10 @@ namespace prokopenko {
   void Less(const std::vector<Polygon>&, std::ostream&);
   void More(const std::vector<Polygon>&, std::ostream&);
   void Equal(const std::vector<Polygon>&, std::ostream&);
+
   void CountOdd(const std::vector<Polygon>&, std::ostream&);
   void CountEven(const std::vector<Polygon>&, std::ostream&);
   void CountN(const std::vector<Polygon>&, std::ostream&, size_t);
-  void MaxSeq(const std::vector<Polygon>&, std::ostream&);
-  void RmEcho(const std::vector<Polygon>&, std::ostream&);
-  void EchoCmd(const std::vector<Polygon>&, std::ostream&);
-  void LessArea(const std::vector<Polygon>&, std::ostream&);
-  void InFrame(const std::vector<Polygon>&, std::ostream&);
-  void Intersections(const std::vector<Polygon>&, std::ostream&);
-  void Rects(const std::vector<Polygon>&, std::ostream&);
-  void RightShapes(const std::vector<Polygon>&, std::ostream&);
 
 } // namespace prokopenko
 

@@ -6,45 +6,36 @@
 #include <limits>
 #include <functional>
 #include <algorithm>
-#include <tuple>
-#include <cctype>
 #include "commands.hpp"
-#include "polygon.hpp"
 
 using namespace prokopenko;
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
+  if (argc != 2) {
+    std::cerr << "Error: wrong input\n";
+    return 1;
+  }
+  std::ifstream input(argv[1]);
+  if (!input) {
+    std::cerr << "Error: file cannot be opened\n";
+    return 1;
+  }
   std::vector<Polygon> polygons;
-
-  if (argc == 2) {
-    std::ifstream input(argv[1]);
-    if (!input) {
-      std::cerr << "Error: file cannot be opened\n";
-      return 1;
-    }
-
-    while (!input.eof()) {
-      Polygon poly;
-      std::streampos pos = input.tellg();
-      if (input >> poly) {
-        double a = poly.getArea();
-        if (a > 1e-6) {
-          polygons.push_back(poly);
-        }
-      }
-      else {
-        input.clear();
-        input.seekg(pos);
-        input.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+  while (!input.eof()) {
+    Polygon poly;
+    std::streampos pos = input.tellg();
+    if (input >> poly) {
+      if (poly.getArea() > 1e-6) {
+        polygons.push_back(poly);
       }
     }
-
-    std::cout << "With data:\n";
-    for (const auto& p : polygons) {
-      std::cout << "\t" << p << "\n";
+    else {
+      input.clear();
+      input.seekg(pos);
+      input.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
   }
-
   std::map<std::string, std::function<void(const std::vector<Polygon>&, std::ostream&)>> commands;
   commands["AREA"] = Area;
   commands["MAX"] = Max;
@@ -56,15 +47,6 @@ int main(int argc, char* argv[]) {
   commands["LESS"] = Less;
   commands["MORE"] = More;
   commands["EQUAL"] = Equal;
-  commands["MAXSEQ"] = MaxSeq;
-  commands["RMECHO"] = RmEcho;
-  commands["ECHO"] = EchoCmd;
-  commands["LESSAREA"] = LessArea;
-  commands["INFRAME"] = InFrame;
-  commands["INTERSECTIONS"] = Intersections;
-  commands["RECTS"] = Rects;
-  commands["RIGHTSHAPES"] = RightShapes;
-
   commands["COUNT"] = [](const std::vector<Polygon>& polys, std::ostream& out) {
     std::string param;
     if (!(std::cin >> param)) {
@@ -90,7 +72,6 @@ int main(int argc, char* argv[]) {
       out << "<INVALID COMMAND>\n";
     }
     };
-
   std::string cmd;
   while (std::cin >> cmd) {
     auto it = commands.find(cmd);
@@ -102,6 +83,5 @@ int main(int argc, char* argv[]) {
       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
   }
-
   return 0;
 }
