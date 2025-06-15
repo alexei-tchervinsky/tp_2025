@@ -9,8 +9,13 @@
 namespace prokopenko {
 
   static constexpr double EPS = 1e-6;
+
   static bool equalArea(const Polygon& a, const Polygon& b) {
     return std::fabs(a.getArea() - b.getArea()) < EPS;
+  }
+
+  static bool isValidPolygon(const Polygon& p) {
+    return p.getArea() > EPS && p.points.size() >= 3;
   }
 
   void Area(const std::vector<Polygon>& polys, std::ostream& out) {
@@ -22,9 +27,8 @@ namespace prokopenko {
     if (param == "EVEN") {
       double s = 0.0;
       for (const auto& p : polys) {
-        double a = p.getArea();
-        if (a > EPS && (p.points.size() % 2 == 0)) {
-          s += a;
+        if (isValidPolygon(p) && (p.points.size() % 2 == 0)) {
+          s += p.getArea();
         }
       }
       out << std::fixed << std::setprecision(1) << s << '\n';
@@ -32,24 +36,18 @@ namespace prokopenko {
     else if (param == "ODD") {
       double s = 0.0;
       for (const auto& p : polys) {
-        double a = p.getArea();
-        if (a > EPS && (p.points.size() % 2 == 1)) {
-          s += a;
+        if (isValidPolygon(p) && (p.points.size() % 2 == 1)) {
+          s += p.getArea();
         }
       }
       out << std::fixed << std::setprecision(1) << s << '\n';
     }
     else if (param == "MEAN") {
-      if (polys.empty()) {
-        out << "<INVALID COMMAND>\n";
-        return;
-      }
       double s = 0.0;
       size_t cnt = 0;
       for (const auto& p : polys) {
-        double a = p.getArea();
-        if (a > EPS) {
-          s += a;
+        if (isValidPolygon(p)) {
+          s += p.getArea();
           ++cnt;
         }
       }
@@ -75,9 +73,8 @@ namespace prokopenko {
       }
       double s = 0.0;
       for (const auto& p : polys) {
-        double a = p.getArea();
-        if (a > EPS && p.points.size() == n) {
-          s += a;
+        if (isValidPolygon(p) && p.points.size() == n) {
+          s += p.getArea();
         }
       }
       out << std::fixed << std::setprecision(1) << s << '\n';
@@ -97,12 +94,9 @@ namespace prokopenko {
       double mval = -1.0;
       bool found = false;
       for (const auto& p : polys) {
-        double a = p.getArea();
-        if (a > EPS) {
-          if (!found || a > mval) {
-            mval = a;
-            found = true;
-          }
+        if (isValidPolygon(p) && (!found || p.getArea() > mval)) {
+          mval = p.getArea();
+          found = true;
         }
       }
       if (!found) {
@@ -116,12 +110,9 @@ namespace prokopenko {
       size_t mv = 0;
       bool found = false;
       for (const auto& p : polys) {
-        double a = p.getArea();
-        if (a > EPS) {
-          if (!found || p.points.size() > mv) {
-            mv = p.points.size();
-            found = true;
-          }
+        if (isValidPolygon(p) && (!found || p.points.size() > mv)) {
+          mv = p.points.size();
+          found = true;
         }
       }
       if (!found) {
@@ -146,12 +137,9 @@ namespace prokopenko {
       double mval = 0.0;
       bool found = false;
       for (const auto& p : polys) {
-        double a = p.getArea();
-        if (a > EPS) {
-          if (!found || a < mval) {
-            mval = a;
-            found = true;
-          }
+        if (isValidPolygon(p) && (!found || p.getArea() < mval)) {
+          mval = p.getArea();
+          found = true;
         }
       }
       if (!found) {
@@ -165,12 +153,9 @@ namespace prokopenko {
       size_t mv = 0;
       bool found = false;
       for (const auto& p : polys) {
-        double a = p.getArea();
-        if (a > EPS) {
-          if (!found || p.points.size() < mv) {
-            mv = p.points.size();
-            found = true;
-          }
+        if (isValidPolygon(p) && (!found || p.points.size() < mv)) {
+          mv = p.points.size();
+          found = true;
         }
       }
       if (!found) {
@@ -186,16 +171,11 @@ namespace prokopenko {
   }
 
   void Mean(const std::vector<Polygon>& polys, std::ostream& out) {
-    if (polys.empty()) {
-      out << "<INVALID COMMAND>\n";
-      return;
-    }
     double s = 0.0;
     size_t cnt = 0;
     for (const auto& p : polys) {
-      double a = p.getArea();
-      if (a > EPS) {
-        s += a;
+      if (isValidPolygon(p)) {
+        s += p.getArea();
         ++cnt;
       }
     }
@@ -210,8 +190,7 @@ namespace prokopenko {
   void CountOdd(const std::vector<Polygon>& polys, std::ostream& out) {
     size_t cnt = 0;
     for (const auto& p : polys) {
-      double a = p.getArea();
-      if (a > EPS && (p.points.size() % 2 == 1)) {
+      if (isValidPolygon(p) && (p.points.size() % 2 == 1)) {
         ++cnt;
       }
     }
@@ -221,8 +200,7 @@ namespace prokopenko {
   void CountEven(const std::vector<Polygon>& polys, std::ostream& out) {
     size_t cnt = 0;
     for (const auto& p : polys) {
-      double a = p.getArea();
-      if (a > EPS && (p.points.size() % 2 == 0)) {
+      if (isValidPolygon(p) && (p.points.size() % 2 == 0)) {
         ++cnt;
       }
     }
@@ -236,8 +214,7 @@ namespace prokopenko {
     }
     size_t cnt = 0;
     for (const auto& p : polys) {
-      double a = p.getArea();
-      if (a > EPS && p.points.size() == n) {
+      if (isValidPolygon(p) && p.points.size() == n) {
         ++cnt;
       }
     }
@@ -256,9 +233,11 @@ namespace prokopenko {
       return;
     }
     size_t cnt = 0;
-    if (pattern.getArea() > EPS) {
+    if (isValidPolygon(pattern)) {
       for (const auto& p : polys) {
-        if (p.isPermOf(pattern)) ++cnt;
+        if (isValidPolygon(p) && p.isPermOf(pattern)) {
+          ++cnt;
+        }
       }
     }
     out << cnt << '\n';
@@ -267,7 +246,9 @@ namespace prokopenko {
   void Right(const std::vector<Polygon>& polys, std::ostream& out) {
     size_t cnt = 0;
     for (const auto& p : polys) {
-      if (p.getArea() > EPS && p.isRight()) ++cnt;
+      if (isValidPolygon(p) && p.isRight()) {
+        ++cnt;
+      }
     }
     out << cnt << '\n';
   }
@@ -284,9 +265,11 @@ namespace prokopenko {
       return;
     }
     size_t cnt = 0;
-    if (pattern.getArea() > EPS) {
+    if (isValidPolygon(pattern)) {
       for (const auto& p : polys) {
-        if (p.isPermOf(pattern)) ++cnt;
+        if (isValidPolygon(p) && p.isPermOf(pattern)) {
+          ++cnt;
+        }
       }
     }
     out << cnt << '\n';
@@ -298,15 +281,16 @@ namespace prokopenko {
       out << "<INVALID COMMAND>\n";
       return;
     }
-    double a0 = pattern.getArea();
-    if (a0 <= EPS) {
+    if (!isValidPolygon(pattern)) {
       out << "<INVALID COMMAND>\n";
       return;
     }
+    double a0 = pattern.getArea();
     size_t cnt = 0;
     for (const auto& p : polys) {
-      double a = p.getArea();
-      if (a > EPS && a < a0) ++cnt;
+      if (isValidPolygon(p) && p.getArea() < a0) {
+        ++cnt;
+      }
     }
     out << cnt << '\n';
   }
@@ -317,15 +301,16 @@ namespace prokopenko {
       out << "<INVALID COMMAND>\n";
       return;
     }
-    double a0 = pattern.getArea();
-    if (a0 <= EPS) {
+    if (!isValidPolygon(pattern)) {
       out << "<INVALID COMMAND>\n";
       return;
     }
+    double a0 = pattern.getArea();
     size_t cnt = 0;
     for (const auto& p : polys) {
-      double a = p.getArea();
-      if (a > EPS && a > a0) ++cnt;
+      if (isValidPolygon(p) && p.getArea() > a0) {
+        ++cnt;
+      }
     }
     out << cnt << '\n';
   }
@@ -337,9 +322,11 @@ namespace prokopenko {
       return;
     }
     size_t cnt = 0;
-    if (pattern.getArea() > EPS) {
+    if (isValidPolygon(pattern)) {
       for (const auto& p : polys) {
-        if (equalArea(p, pattern)) ++cnt;
+        if (isValidPolygon(p) && equalArea(p, pattern)) {
+          ++cnt;
+        }
       }
     }
     out << cnt << '\n';
