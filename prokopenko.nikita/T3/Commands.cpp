@@ -24,12 +24,15 @@ namespace prokopenko {
       out << "<INVALID COMMAND>\n";
       return;
     }
+
     if (param == "EVEN" || param == "ODD") {
       double sum = 0.0;
       for (const auto& p : polys) {
         double a = p.getArea();
-        if (a > EPS && (p.points.size() % 2 == (param == "ODD" ? 1 : 0)))
+        bool isEven = (p.points.size() % 2 == 0);
+        if (a > EPS && ((param == "EVEN") == isEven)) {
           sum += a;
+        }
       }
       out << std::fixed << std::setprecision(1) << sum << '\n';
     }
@@ -43,10 +46,12 @@ namespace prokopenko {
           ++count;
         }
       }
-      if (count == 0)
+      if (count == 0) {
         out << "<INVALID COMMAND>\n";
-      else
+      }
+      else {
         out << std::fixed << std::setprecision(1) << sum / count << '\n';
+      }
     }
     else if (std::all_of(param.begin(), param.end(), ::isdigit)) {
       size_t n = std::stoul(param);
@@ -110,24 +115,37 @@ namespace prokopenko {
 
   void Max(const std::vector<Polygon>& polys, std::ostream& out) {
     std::string param;
-    std::cin >> param;
+    if (!(std::cin >> param)) {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
+
     if (param == "AREA") {
       double maxA = -1.0;
       for (const auto& p : polys) {
         double a = p.getArea();
         if (a > maxA) maxA = a;
       }
-      if (maxA < EPS) out << "<INVALID COMMAND>\n";
-      else out << std::fixed << std::setprecision(1) << maxA << '\n';
+      if (maxA < EPS) {
+        out << "<INVALID COMMAND>\n";
+      }
+      else {
+        out << std::fixed << std::setprecision(1) << maxA << '\n';
+      }
     }
     else if (param == "VERTEXES") {
       size_t maxV = 0;
       for (const auto& p : polys) {
-        if (p.getArea() > EPS && p.points.size() > maxV)
+        if (p.getArea() > EPS && p.points.size() > maxV) {
           maxV = p.points.size();
+        }
       }
-      if (maxV == 0) out << "<INVALID COMMAND>\n";
-      else out << maxV << '\n';
+      if (maxV == 0) {
+        out << "<INVALID COMMAND>\n";
+      }
+      else {
+        out << maxV << '\n';
+      }
     }
     else {
       out << "<INVALID COMMAND>\n";
@@ -135,7 +153,21 @@ namespace prokopenko {
   }
 
   void Mean(const std::vector<Polygon>& polys, std::ostream& out) {
-    Area(polys, out); // это аналог AREA MEAN
+    double sum = 0.0;
+    size_t count = 0;
+    for (const auto& p : polys) {
+      double a = p.getArea();
+      if (a > EPS) {
+        sum += a;
+        ++count;
+      }
+    }
+    if (count == 0) {
+      out << "<INVALID COMMAND>\n";
+    }
+    else {
+      out << std::fixed << std::setprecision(1) << sum / count << '\n';
+    }
   }
 
   void Same(const std::vector<Polygon>& polys, std::ostream& out) {
@@ -174,7 +206,5 @@ namespace prokopenko {
     }
     out << count << '\n';
   }
-
-  // остальные команды реализуются аналогично (если нужно — добавлю их по запросу)
 
 } // namespace prokopenko
