@@ -2,6 +2,8 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <sstream>
+
 #include "polygon.h"
 #include "commands.h"
 
@@ -18,8 +20,11 @@ int main(int argc, char* argv[]) {
     }
 
     std::vector<Polygon> polygons;
-    for (Polygon poly; file >> poly; ) {
-        if (poly.vertexCount() >= 3) {
+    std::string line;
+    while (std::getline(file, line)) {
+        std::istringstream iss(line);
+        Polygon poly;
+        if (iss >> poly && poly.vertexCount() >= 3) {
             polygons.push_back(std::move(poly));
         }
     }
@@ -27,4 +32,3 @@ int main(int argc, char* argv[]) {
     processCommands(polygons);
     return 0;
 }
-
