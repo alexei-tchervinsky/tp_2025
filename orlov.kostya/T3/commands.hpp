@@ -19,9 +19,10 @@ namespace orlov
     void findMinimum(const std::vector<Polygon>&, std::istream&, std::ostream&);
     void findMaximum(const std::vector<Polygon>&, std::istream&, std::ostream&);
 
-    int orientation(Point p, Point q, Point r);
-    bool onSegment(Point p, Point q, Point r);
-    bool checkIntersection(Point p1, Point q1, Point p2, Point q2);
+    int orientation(const Point& p, const Point& q, const Point& r);
+    bool onSegment(const Point& p, const Point& q, const Point& r);
+    bool checkIntersection(const Point& p1, const Point& q1, const Point& p2, const Point& q2);
+    bool isPointInPolygon(const Point& point, const Polygon& polygon);
     bool doPolygonsIntersect(const Polygon& poly1, const Polygon& poly2);
     void intersectPolygons(const std::vector<Polygon>&, std::istream&, std::ostream&);
 

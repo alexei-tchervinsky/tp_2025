@@ -53,7 +53,7 @@ namespace orlov
             bool isEven = (mode == "EVEN");
 
             result = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-                [=](double sum, const Polygon& poly)
+                [isEven](double sum, const Polygon& poly)
                 {
                     return (poly.points.size() % 2 == 0) == isEven ? sum + poly.getArea() : sum;
                 }
@@ -91,7 +91,7 @@ namespace orlov
                 }
 
                 result = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-                    [=](double sum, const Polygon& poly)
+                    [n](double sum, const Polygon& poly)
                     {
                         return poly.points.size() == n ? sum + poly.getArea() : sum;
                     }
@@ -118,7 +118,7 @@ namespace orlov
             bool isEven = (mode == "EVEN");
 
             count = std::count_if(polygons.begin(), polygons.end(),
-                [=](const Polygon& poly)
+                [isEven](const Polygon& poly)
                 {
                     return (poly.points.size() % 2 == 0) == isEven;
                 }
@@ -135,7 +135,7 @@ namespace orlov
                     return;
                 }
                 count = std::count_if(polygons.begin(), polygons.end(),
-                    [=](const Polygon& poly)
+                    [n](const Polygon& poly)
                     {
                         return poly.points.size() == n;
                     }
@@ -219,7 +219,7 @@ namespace orlov
         else is.setstate(std::ios::failbit);
     }
 
-    int orientation(Point p, Point q, Point r)
+    int orientation(const Point& p, const Point& q, const Point& r)
     {
         long long val = static_cast<long long>(q.y_ - p.y_) * (r.x_ - q.x_) -
                         static_cast<long long>(q.x_ - p.x_) * (r.y_ - q.y_);
@@ -228,7 +228,7 @@ namespace orlov
         return (val > 0) ? 1 : 2;
     }
 
-    bool onSegment(Point p, Point q, Point r)
+    bool onSegment(const Point& p, const Point& q, const Point& r)
     {
         if
         (
@@ -240,14 +240,14 @@ namespace orlov
         return false;
     }
 
-    bool checkIntersection(Point p1, Point q1, Point p2, Point q2)
+    bool checkIntersection(const Point& p1, const Point& q1, const Point& p2, const Point& q2)
     {
         int o1 = orientation(p1, q1, p2);
         int o2 = orientation(p1, q1, q2);
         int o3 = orientation(p2, q2, p1);
         int o4 = orientation(p2, q2, q1);
 
-        if (o1 != 0 && o2 != 0 && o3 != 0 && o4 != 0 && o1 != o2 && o3 != o4)
+        if (o1 != o2 && o3 != o4)
             return true;
 
         if (o1 == 0 && onSegment(p1, p2, q1)) return true;
@@ -256,6 +256,28 @@ namespace orlov
         if (o4 == 0 && onSegment(p2, q1, q2)) return true;
 
         return false;
+    }
+
+    bool isPointInPolygon(const Point& point, const Polygon& polygon)
+    {
+        if (polygon.points.size() < 3) return false;
+
+        int intersections = 0;
+        std::size_t n = polygon.points.size();
+
+        for (std::size_t i = 0; i < n; ++i)
+        {
+            Point p1 = polygon.points[i];
+            Point p2 = polygon.points[(i + 1) % n];
+
+            if (((p1.y_ > point.y_) != (p2.y_ > point.y_)) &&
+                (point.x_ < (p2.x_ - p1.x_) * (point.y_ - p1.y_) / (p2.y_ - p1.y_) + p1.x_))
+            {
+                intersections++;
+            }
+        }
+
+        return (intersections % 2) == 1;
     }
 
     bool doPolygonsIntersect(const Polygon& poly1, const Polygon& poly2)
@@ -274,6 +296,16 @@ namespace orlov
 
                 if (checkIntersection(p1, q1, p2, q2)) return true;
             }
+        }
+
+        for (const Point& point : poly1.points)
+        {
+            if (isPointInPolygon(point, poly2)) return true;
+        }
+
+        for (const Point& point : poly2.points)
+        {
+            if (isPointInPolygon(point, poly1)) return true;
         }
 
         return false;
