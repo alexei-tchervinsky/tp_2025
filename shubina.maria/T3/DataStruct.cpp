@@ -66,16 +66,18 @@ std::istream &operator>>(std::istream &is, Polygon &dest) {
         return is;
     }
 
+    std::string line;
+    std::getline(is >> std::ws, line); // Пропускаем пробелы и читаем строку
+    if (line.empty()) {
+        return is;
+    }
+
+    std::istringstream iss(line);
     Polygon tmp{};
     size_t numPoints = 0;
 
-    std::string line;
-    std::getline(is >> std::ws, line); // Skip leading whitespace
-    std::istringstream iss(line);
     iss >> numPoints;
-
-    if (numPoints < 3) {
-        is.setstate(std::ios::failbit);
+    if (numPoints < 3 || iss.fail()) {
         return is;
     }
 
@@ -83,16 +85,14 @@ std::istream &operator>>(std::istream &is, Polygon &dest) {
     for (size_t i = 0; i < numPoints; ++i) {
         Point p;
         if (!(iss >> p)) {
-            is.setstate(std::ios::failbit);
             return is;
         }
         tmp.points.push_back(p);
     }
 
-
+    // Проверяем, остались ли символы
     std::string leftover;
     if (iss >> leftover) {
-        is.setstate(std::ios::failbit);
         return is;
     }
 

@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <numeric>
 #include <iomanip>
-#include <limits>  // для std::numeric_limits
+#include <limits>
 #include <sstream>
 
 namespace shubina {
@@ -109,68 +109,6 @@ namespace shubina {
         }
     }
 
-    void maxCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
-        iofmtguard guard(out);
-        std::string subcmd;
-        in >> subcmd;
-
-        std::vector<Polygon> validPolygons;
-        std::copy_if(polygons.begin(), polygons.end(),
-                     std::back_inserter(validPolygons),
-                     isValidPolygon);
-
-        checkEmpty(validPolygons);
-
-        if (subcmd == "AREA") {
-            auto it = std::max_element(validPolygons.begin(), validPolygons.end(),
-                [](const Polygon& a, const Polygon& b) {
-                    return a.area() < b.area();
-                });
-            out << std::fixed << std::setprecision(1) << it->area() << '\n';
-        }
-        else if (subcmd == "VERTEXES") {
-            auto it = std::max_element(validPolygons.begin(), validPolygons.end(),
-                [](const Polygon& a, const Polygon& b) {
-                    return a.points.size() < b.points.size();
-                });
-            out << it->points.size() << '\n';
-        }
-        else {
-            throw std::invalid_argument("<INVALID COMMAND>");
-        }
-    }
-
-    void minCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
-        iofmtguard guard(out);
-        std::string subcmd;
-        in >> subcmd;
-
-        std::vector<Polygon> validPolygons;
-        std::copy_if(polygons.begin(), polygons.end(),
-                     std::back_inserter(validPolygons),
-                     isValidPolygon);
-
-        checkEmpty(validPolygons);
-
-        if (subcmd == "AREA") {
-            auto it = std::min_element(validPolygons.begin(), validPolygons.end(),
-                [](const Polygon& a, const Polygon& b) {
-                    return a.area() < b.area();
-                });
-            out << std::fixed << std::setprecision(1) << it->area() << '\n';
-        }
-        else if (subcmd == "VERTEXES") {
-            auto it = std::min_element(validPolygons.begin(), validPolygons.end(),
-                [](const Polygon& a, const Polygon& b) {
-                    return a.points.size() < b.points.size();
-                });
-            out << it->points.size() << '\n';
-        }
-        else {
-            throw std::invalid_argument("<INVALID COMMAND>");
-        }
-    }
-
     void countCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
         std::string subcmd;
         in >> subcmd;
@@ -207,40 +145,16 @@ namespace shubina {
         }
     }
 
-    void permsCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
-        Polygon target;
-        if (!(in >> target) || target.points.size() < 3) {
-            throw std::invalid_argument("<INVALID COMMAND>");
-        }
-
-        std::vector<Polygon> validPolygons;
-        std::copy_if(polygons.begin(), polygons.end(),
-                     std::back_inserter(validPolygons),
-                     isValidPolygon);
-
-        out << std::count_if(validPolygons.begin(), validPolygons.end(),
-            [&target](const Polygon& p) {
-                if (p.points.size() != target.points.size()) return false;
-                return std::is_permutation(
-                    p.points.begin(), p.points.end(),
-                    target.points.begin(),
-                    [](const Point& a, const Point& b) {
-                        return a.x == b.x && a.y == b.y;
-                    });
-            }) << '\n';
-    }
-
     void inframeCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
         Polygon target;
         std::string inputLine;
-        std::getline(in >> std::ws, inputLine); // skip leading whitespace
-
+        std::getline(in >> std::ws, inputLine);
         if (inputLine.empty()) {
             throw std::invalid_argument("<INVALID COMMAND>");
         }
 
         std::istringstream iss(inputLine);
-        if (!(iss >> target)) {
+        if (!(iss >> target) || target.points.size() < 3) {
             throw std::invalid_argument("<INVALID COMMAND>");
         }
 
@@ -249,16 +163,10 @@ namespace shubina {
             throw std::invalid_argument("<INVALID COMMAND>");
         }
 
-        if (target.points.size() < 3) {
-            throw std::invalid_argument("<INVALID COMMAND>");
-        }
-
         std::vector<Polygon> validPolygons;
-        for (const auto& poly : polygons) {
-            if (isValidPolygon(poly)) {
-                validPolygons.push_back(poly);
-            }
-        }
+        std::copy_if(polygons.begin(), polygons.end(),
+                     std::back_inserter(validPolygons),
+                     isValidPolygon);
 
         if (validPolygons.empty()) {
             out << "<FALSE>\n";
@@ -279,5 +187,6 @@ namespace shubina {
 
         out << (allInside ? "<TRUE>\n" : "<FALSE>\n");
     }
+
 }
 

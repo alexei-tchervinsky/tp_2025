@@ -2,7 +2,6 @@
 #include <fstream>
 #include <vector>
 #include <limits>
-#include <string>
 #include "DataStruct.h"
 #include "commands.h"
 
@@ -20,8 +19,11 @@ int main(int argc, char* argv[]) {
 
     std::vector<shubina::Polygon> polygons;
     shubina::Polygon poly;
+
     while (file >> poly) {
-        polygons.push_back(poly);
+        if (poly.points.size() >= 3) { // Фильтруем только валидные полигоны
+            polygons.push_back(poly);
+        }
     }
 
     auto commands = shubina::createCommandMap();
