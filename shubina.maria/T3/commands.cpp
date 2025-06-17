@@ -197,13 +197,13 @@ namespace shubina {
         if (subcmd == "ODD") {
             out << std::count_if(polygons.begin(), polygons.end(),
                 [](const Polygon& p) {
-                    return p.points.size() % 2 != 0 && p.points.size() >= 3;
+                    return p.points.size() % 2 != 0;
                 }) << '\n';
         }
         else if (subcmd == "EVEN") {
             out << std::count_if(polygons.begin(), polygons.end(),
                 [](const Polygon& p) {
-                    return p.points.size() % 2 == 0 && p.points.size() >= 3;
+                    return p.points.size() % 2 == 0;
                 }) << '\n';
         }
         else {
@@ -243,7 +243,11 @@ namespace shubina {
 
     void inframeCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
         Polygon target;
-        if (!(in >> target) || target.points.size() < 3) {
+        if (!(in >> target)) {
+            throw std::invalid_argument("<INVALID COMMAND>");
+        }
+
+        if (target.points.size() < 3) {
             throw std::invalid_argument("<INVALID COMMAND>");
         }
 
