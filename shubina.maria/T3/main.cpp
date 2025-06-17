@@ -1,4 +1,3 @@
-// main.cpp
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -22,10 +21,21 @@ int main(int argc, char* argv[]) {
     shubina::Polygon poly;
 
     while (file >> poly) {
-        if (file && poly.points.size() >= 3) { // Only push if read was successful and has enough points
-            polygons.push_back(poly);
+        if (file) {
+            bool valid = true;
+            if (poly.points.size() < 3) {
+                valid = false;
+            }
+            for (const auto& point : poly.points) {
+                if (file.fail()) {
+                    valid = false;
+                    break;
+                }
+            }
+            if (valid) {
+                polygons.push_back(poly);
+            }
         }
-        // Clear any failbit caused by invalid input
         if (file.fail() && !file.eof()) {
             file.clear();
             file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
