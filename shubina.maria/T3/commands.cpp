@@ -40,53 +40,48 @@ namespace shubina {
     }
 
     void areaCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
-        iofmtguard guard(out);
-        std::string subcmd;
-        in >> subcmd;
+    iofmtguard guard(out);
+    std::string subcmd;
+    in >> subcmd;
 
-        auto validPolygon = [](const Polygon& p) { return p.points.size() >= 3; };
+    if (subcmd == "ODD") {
+        double res = std::accumulate(polygons.begin(), polygons.end(), 0.0,
+            [](double sum, const Polygon& p) {
+                return p.points.size() % 2 != 0 ? sum + p.area() : sum;
+            });
+        out << std::fixed << std::setprecision(1) << res << '\n';
+    }
+    else if (subcmd == "EVEN") {
+        double res = std::accumulate(polygons.begin(), polygons.end(), 0.0,
+            [](double sum, const Polygon& p) {
+                return p.points.size() % 2 == 0 ? sum + p.area() : sum;
+            });
+        out << std::fixed << std::setprecision(1) << res << '\n';
+    }
+    else if (subcmd == "MEAN") {
+        checkEmpty(polygons);
+        double total = std::accumulate(polygons.begin(), polygons.end(), 0.0,
+            [](double sum, const Polygon& p) {
+                return sum + p.area();
+            });
+        out << std::fixed << std::setprecision(1) << (total / polygons.size()) << '\n';
+    }
+    else {
+        try {
+            size_t num = std::stoul(subcmd);
+            if (num < 3) throw std::invalid_argument("<INVALID COMMAND>");
 
-        if (subcmd == "ODD") {
             double res = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-                [validPolygon](double sum, const Polygon& p) {
-                    return validPolygon(p) && p.points.size() % 2 != 0 ? sum + p.area() : sum;
+                [num](double sum, const Polygon& p) {
+                    return p.points.size() == num ? sum + p.area() : sum;
                 });
             out << std::fixed << std::setprecision(1) << res << '\n';
         }
-        else if (subcmd == "EVEN") {
-            double res = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-                [validPolygon](double sum, const Polygon& p) {
-                    return validPolygon(p) && p.points.size() % 2 == 0 ? sum + p.area() : sum;
-                });
-            out << std::fixed << std::setprecision(1) << res << '\n';
-        }
-        else if (subcmd == "MEAN") {
-            checkEmpty(polygons);
-            size_t validCount = std::count_if(polygons.begin(), polygons.end(), validPolygon);
-            if (validCount == 0) throw std::invalid_argument("<INVALID COMMAND>");
-
-            double total = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-                [validPolygon](double sum, const Polygon& p) {
-                    return validPolygon(p) ? sum + p.area() : sum;
-                });
-            out << std::fixed << std::setprecision(1) << (total / validCount) << '\n';
-        }
-        else {
-            try {
-                size_t num = std::stoul(subcmd);
-                if (num < 3) throw std::invalid_argument("<INVALID COMMAND>");
-
-                double res = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-                    [num, validPolygon](double sum, const Polygon& p) {
-                        return validPolygon(p) && p.points.size() == num ? sum + p.area() : sum;
-                    });
-                out << std::fixed << std::setprecision(1) << res << '\n';
-            }
-            catch (...) {
-                throw std::invalid_argument("<INVALID COMMAND>");
-            }
+        catch (...) {
+            throw std::invalid_argument("<INVALID COMMAND>");
         }
     }
+}
 
     void maxCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
         iofmtguard guard(out);
@@ -154,39 +149,44 @@ namespace shubina {
         }
     }
 
-    void countCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
-        std::string subcmd;
-        in >> subcmd;
+void countCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
+    std::string subcmd;
+    in >> subcmd;
 
-        auto validPolygon = [](const Polygon& p) { return p.points.size() >= 3; };
-
-        if (subcmd == "ODD") {
-            out << std::count_if(polygons.begin(), polygons.end(),
-                [validPolygon](const Polygon& p) {
-                    return validPolygon(p) && p.points.size() % 2 != 0;
-                }) << '\n';
-        }
-        else if (subcmd == "EVEN") {
-            out << std::count_if(polygons.begin(), polygons.end(),
-                [validPolygon](const Polygon& p) {
-                    return validPolygon(p) && p.points.size() % 2 == 0;
-                }) << '\n';
-        }
-        else {
-            try {
-                size_t num = std::stoul(subcmd);
-                if (num < 3) throw std::invalid_argument("<INVALID COMMAND>");
-
+    if (subcmd == "ODD") {
+        out << std::count_if(polygons.begin(), polygons.end(),
+            [](const Polygon& p) {
+                return p.points.size() % 2 != 0;
+            }) << '\n';
+    }
+    else if (subcmd == "EVEN") {
+        out << std::count_if(polygons.begin(), polygons.end(),
+            [](const Polygon& p) {
+                return p.points.size() % 2 == 0;
+            }) << '\n';
+    }
+    else {
+        try {
+            size_t num = std::stoul(subcmd);
+            if (num < 3) {
+                // Для случаев с 1 или 2 точками тоже считаем
                 out << std::count_if(polygons.begin(), polygons.end(),
-                    [num, validPolygon](const Polygon& p) {
-                        return validPolygon(p) && p.points.size() == num;
+                    [num](const Polygon& p) {
+                        return p.points.size() == num;
                     }) << '\n';
             }
-            catch (...) {
-                throw std::invalid_argument("<INVALID COMMAND>");
+            else {
+                out << std::count_if(polygons.begin(), polygons.end(),
+                    [num](const Polygon& p) {
+                        return p.points.size() == num;
+                    }) << '\n';
             }
         }
+        catch (...) {
+            throw std::invalid_argument("<INVALID COMMAND>");
+        }
     }
+}
 
     void permsCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
         Polygon target;
