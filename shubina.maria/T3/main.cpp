@@ -22,10 +22,7 @@ int main(int argc, char* argv[]) {
 
     while (file >> poly) {
         if (file && poly.points.size() >= 3) {
-            bool valid = !file.fail();  // Simplified check
-            if (valid) {
-                polygons.push_back(poly);
-            }
+            polygons.push_back(poly);
         }
         if (file.fail() && !file.eof()) {
             file.clear();
