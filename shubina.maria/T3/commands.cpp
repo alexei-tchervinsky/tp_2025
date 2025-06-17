@@ -215,33 +215,23 @@ namespace shubina {
             return;
         }
 
-        auto minmax_x = std::minmax_element(validPolygons.begin(), validPolygons.end(),
-            [](const Polygon& a, const Polygon& b) {
-                auto min_a = std::min_element(a.points.begin(), a.points.end(),
-                    [](const Point& p1, const Point& p2) { return p1.x < p2.x; });
-                auto min_b = std::min_element(b.points.begin(), b.points.end(),
-                    [](const Point& p1, const Point& p2) { return p1.x < p2.x; });
-                return min_a->x < min_b->x;
-            });
+        // Инициализация границ
+        int frame_min_x = std::numeric_limits<int>::max();
+        int frame_max_x = std::numeric_limits<int>::min();
+        int frame_min_y = std::numeric_limits<int>::max();
+        int frame_max_y = std::numeric_limits<int>::min();
 
-        auto minmax_y = std::minmax_element(validPolygons.begin(), validPolygons.end(),
-            [](const Polygon& a, const Polygon& b) {
-                auto min_a = std::min_element(a.points.begin(), a.points.end(),
-                    [](const Point& p1, const Point& p2) { return p1.y < p2.y; });
-                auto min_b = std::min_element(b.points.begin(), b.points.end(),
-                    [](const Point& p1, const Point& p2) { return p1.y < p2.y; });
-                return min_a->y < min_b->y;
-            });
+        // Находим границы фрейма по всем точкам всех полигонов
+        for (const auto& poly : validPolygons) {
+            for (const auto& point : poly.points) {
+                frame_min_x = std::min(frame_min_x, point.x);
+                frame_max_x = std::max(frame_max_x, point.x);
+                frame_min_y = std::min(frame_min_y, point.y);
+                frame_max_y = std::max(frame_max_y, point.y);
+            }
+        }
 
-        int frame_min_x = std::min_element((*minmax_x.first).points.begin(), (*minmax_x.first).points.end(),
-            [](const Point& p1, const Point& p2) { return p1.x < p2.x; })->x;
-        int frame_max_x = std::max_element((*minmax_x.second).points.begin(), (*minmax_x.second).points.end(),
-            [](const Point& p1, const Point& p2) { return p1.x < p2.x; })->x;
-        int frame_min_y = std::min_element((*minmax_y.first).points.begin(), (*minmax_y.first).points.end(),
-            [](const Point& p1, const Point& p2) { return p1.y < p2.y; })->y;
-        int frame_max_y = std::max_element((*minmax_y.second).points.begin(), (*minmax_y.second).points.end(),
-            [](const Point& p1, const Point& p2) { return p1.y < p2.y; })->y;
-
+        // Проверяем, что все точки целевого полигона внутри фрейма
         bool isInside = std::all_of(target.points.begin(), target.points.end(),
             [=](const Point& p) {
                 return p.x >= frame_min_x && p.x <= frame_max_x &&
