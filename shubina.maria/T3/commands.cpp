@@ -190,37 +190,35 @@ namespace shubina {
         }
     }
 
-    void countCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
-        std::string subcmd;
-        in >> subcmd;
-
-        if (subcmd == "ODD") {
+   void countCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
+    std::string subcmd;
+    in >> subcmd;
+    if (subcmd == "ODD") {
+        out << std::count_if(polygons.begin(), polygons.end(),
+            [](const Polygon& p) {
+                return p.points.size() % 2 != 0 && p.points.size() >= 3;
+            }) << '\n';
+    }
+    else if (subcmd == "EVEN") {
+        out << std::count_if(polygons.begin(), polygons.end(),
+            [](const Polygon& p) {
+                return p.points.size() % 2 == 0 && p.points.size() >= 3;
+            }) << '\n';
+    }
+    else {
+        try {
+            size_t num = std::stoul(subcmd);
+            if (num < 3) throw std::invalid_argument("<INVALID COMMAND>");
             out << std::count_if(polygons.begin(), polygons.end(),
-                [](const Polygon& p) {
-                    return p.points.size() % 2 != 0 && p.points.size() >= 3;
+                [num](const Polygon& p) {
+                    return p.points.size() == num && p.points.size() >= 3;
                 }) << '\n';
         }
-        else if (subcmd == "EVEN") {
-            out << std::count_if(polygons.begin(), polygons.end(),
-                [](const Polygon& p) {
-                    return p.points.size() % 2 == 0 && p.points.size() >= 3;
-                }) << '\n';
-        }
-        else {
-            try {
-                size_t num = std::stoul(subcmd);
-                if (num < 3) throw std::invalid_argument("<INVALID COMMAND>");
-
-                out << std::count_if(polygons.begin(), polygons.end(),
-                    [num](const Polygon& p) {
-                        return p.points.size() == num;
-                    }) << '\n';
-            }
-            catch (...) {
-                throw std::invalid_argument("<INVALID COMMAND>");
-            }
+        catch (...) {
+            throw std::invalid_argument("<INVALID COMMAND>");
         }
     }
+}
 
     void permsCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
         Polygon target;
