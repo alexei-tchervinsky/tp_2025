@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <numeric>
 #include <iomanip>
+#include <limits>  // Добавлен для numeric_limits
 
 namespace shubina {
     namespace {
@@ -186,7 +187,8 @@ namespace shubina {
             return;
         }
 
-        auto [min_x, max_x] = std::minmax_element(
+        // Заменены structured bindings на отдельные переменные для совместимости
+        auto minmax_x = std::minmax_element(
             polygons.begin(), polygons.end(),
             [](const Polygon &a, const Polygon &b) {
                 auto min_a = std::min_element(a.points.begin(), a.points.end(),
@@ -195,7 +197,8 @@ namespace shubina {
                                              [](const Point &p1, const Point &p2) { return p1.x < p2.x; });
                 return min_a->x < min_b->x;
             });
-        auto [min_y, max_y] = std::minmax_element(
+
+        auto minmax_y = std::minmax_element(
             polygons.begin(), polygons.end(),
             [](const Polygon &a, const Polygon &b) {
                 auto min_a = std::min_element(a.points.begin(), a.points.end(),
@@ -205,13 +208,13 @@ namespace shubina {
                 return min_a->y < min_b->y;
             });
 
-        int frame_min_x = std::min_element(min_x->points.begin(), min_x->points.end(),
+        int frame_min_x = std::min_element((*minmax_x.first).points.begin(), (*minmax_x.first).points.end(),
                                           [](const Point &p1, const Point &p2) { return p1.x < p2.x; })->x;
-        int frame_max_x = std::max_element(max_x->points.begin(), max_x->points.end(),
+        int frame_max_x = std::max_element((*minmax_x.second).points.begin(), (*minmax_x.second).points.end(),
                                           [](const Point &p1, const Point &p2) { return p1.x < p2.x; })->x;
-        int frame_min_y = std::min_element(min_y->points.begin(), min_y->points.end(),
+        int frame_min_y = std::min_element((*minmax_y.first).points.begin(), (*minmax_y.first).points.end(),
                                           [](const Point &p1, const Point &p2) { return p1.y < p2.y; })->y;
-        int frame_max_y = std::max_element(max_y->points.begin(), max_y->points.end(),
+        int frame_max_y = std::max_element((*minmax_y.second).points.begin(), (*minmax_y.second).points.end(),
                                           [](const Point &p1, const Point &p2) { return p1.y < p2.y; })->y;
 
         bool isInside = std::all_of(target.points.begin(), target.points.end(),
