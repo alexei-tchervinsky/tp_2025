@@ -113,26 +113,36 @@ namespace shubina {
         std::string subcmd;
         in >> subcmd;
 
-        auto validEnd = std::remove_if(polygons.begin(), polygons.end(),
-            [](const Polygon& p) { return p.points.size() < 3; });
-
-        if (validEnd == polygons.begin()) {
+        auto it = std::find_if(polygons.begin(), polygons.end(), isValidPolygon);
+        if (it == polygons.end()) {
             throw std::invalid_argument("<INVALID COMMAND>");
         }
 
         if (subcmd == "AREA") {
-            auto it = std::max_element(polygons.begin(), validEnd,
+            auto maxIt = std::max_element(polygons.begin(), polygons.end(),
                 [](const Polygon& a, const Polygon& b) {
+                    bool aValid = a.points.size() >= 3;
+                    bool bValid = b.points.size() >= 3;
+                    if (!aValid && !bValid) return false;
+                    if (!aValid) return true;
+                    if (!bValid) return false;
                     return a.area() < b.area();
                 });
-            out << std::fixed << std::setprecision(1) << it->area() << '\n';
+            if (maxIt->points.size() < 3) throw std::invalid_argument("<INVALID COMMAND>");
+            out << std::fixed << std::setprecision(1) << maxIt->area() << '\n';
         }
         else if (subcmd == "VERTEXES") {
-            auto it = std::max_element(polygons.begin(), validEnd,
+            auto maxIt = std::max_element(polygons.begin(), polygons.end(),
                 [](const Polygon& a, const Polygon& b) {
+                    bool aValid = a.points.size() >= 3;
+                    bool bValid = b.points.size() >= 3;
+                    if (!aValid && !bValid) return false;
+                    if (!aValid) return true;
+                    if (!bValid) return false;
                     return a.points.size() < b.points.size();
                 });
-            out << it->points.size() << '\n';
+            if (maxIt->points.size() < 3) throw std::invalid_argument("<INVALID COMMAND>");
+            out << maxIt->points.size() << '\n';
         }
         else {
             throw std::invalid_argument("<INVALID COMMAND>");
@@ -144,26 +154,36 @@ namespace shubina {
         std::string subcmd;
         in >> subcmd;
 
-        auto validEnd = std::remove_if(polygons.begin(), polygons.end(),
-            [](const Polygon& p) { return p.points.size() < 3; });
-
-        if (validEnd == polygons.begin()) {
+        auto it = std::find_if(polygons.begin(), polygons.end(), isValidPolygon);
+        if (it == polygons.end()) {
             throw std::invalid_argument("<INVALID COMMAND>");
         }
 
         if (subcmd == "AREA") {
-            auto it = std::min_element(polygons.begin(), validEnd,
+            auto minIt = std::min_element(polygons.begin(), polygons.end(),
                 [](const Polygon& a, const Polygon& b) {
+                    bool aValid = a.points.size() >= 3;
+                    bool bValid = b.points.size() >= 3;
+                    if (!aValid && !bValid) return false;
+                    if (!aValid) return true;
+                    if (!bValid) return false;
                     return a.area() < b.area();
                 });
-            out << std::fixed << std::setprecision(1) << it->area() << '\n';
+            if (minIt->points.size() < 3) throw std::invalid_argument("<INVALID COMMAND>");
+            out << std::fixed << std::setprecision(1) << minIt->area() << '\n';
         }
         else if (subcmd == "VERTEXES") {
-            auto it = std::min_element(polygons.begin(), validEnd,
+            auto minIt = std::min_element(polygons.begin(), polygons.end(),
                 [](const Polygon& a, const Polygon& b) {
+                    bool aValid = a.points.size() >= 3;
+                    bool bValid = b.points.size() >= 3;
+                    if (!aValid && !bValid) return false;
+                    if (!aValid) return true;
+                    if (!bValid) return false;
                     return a.points.size() < b.points.size();
                 });
-            out << it->points.size() << '\n';
+            if (minIt->points.size() < 3) throw std::invalid_argument("<INVALID COMMAND>");
+            out << minIt->points.size() << '\n';
         }
         else {
             throw std::invalid_argument("<INVALID COMMAND>");
