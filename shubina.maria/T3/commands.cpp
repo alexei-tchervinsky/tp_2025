@@ -13,6 +13,10 @@ namespace shubina {
                 throw std::invalid_argument("<INVALID COMMAND>");
             }
         }
+
+        bool isValidPolygon(const Polygon& poly) {
+            return poly.points.size() >= 3;
+        }
     }
 
     CommandMap createCommandMap() {
@@ -44,25 +48,32 @@ namespace shubina {
         std::string subcmd;
         in >> subcmd;
 
+        auto validPolygon = [](const Polygon& p) { return p.points.size() >= 3; };
+
         if (subcmd == "ODD") {
             double res = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-                [](double sum, const Polygon& p) {
-                    return p.points.size() % 2 != 0 ? sum + p.area() : sum;
+                [validPolygon](double sum, const Polygon& p) {
+                    return validPolygon(p) && p.points.size() % 2 != 0 ? sum + p.area() : sum;
                 });
             out << std::fixed << std::setprecision(1) << res << '\n';
         }
         else if (subcmd == "EVEN") {
             double res = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-                [](double sum, const Polygon& p) {
-                    return p.points.size() % 2 == 0 ? sum + p.area() : sum;
+                [validPolygon](double sum, const Polygon& p) {
+                    return validPolygon(p) && p.points.size() % 2 == 0 ? sum + p.area() : sum;
                 });
             out << std::fixed << std::setprecision(1) << res << '\n';
         }
         else if (subcmd == "MEAN") {
             checkEmpty(polygons);
+            size_t validCount = std::count_if(polygons.begin(), polygons.end(), validPolygon);
+            if (validCount == 0) throw std::invalid_argument("<INVALID COMMAND>");
+
             double total = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-                [](double sum, const Polygon& p) { return sum + p.area(); });
-            out << std::fixed << std::setprecision(1) << (total / polygons.size()) << '\n';
+                [validPolygon](double sum, const Polygon& p) {
+                    return validPolygon(p) ? sum + p.area() : sum;
+                });
+            out << std::fixed << std::setprecision(1) << (total / validCount) << '\n';
         }
         else {
             try {
@@ -70,8 +81,8 @@ namespace shubina {
                 if (num < 3) throw std::invalid_argument("<INVALID COMMAND>");
 
                 double res = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-                    [num](double sum, const Polygon& p) {
-                        return p.points.size() == num ? sum + p.area() : sum;
+                    [num, validPolygon](double sum, const Polygon& p) {
+                        return validPolygon(p) && p.points.size() == num ? sum + p.area() : sum;
                     });
                 out << std::fixed << std::setprecision(1) << res << '\n';
             }
@@ -87,15 +98,23 @@ namespace shubina {
         in >> subcmd;
         checkEmpty(polygons);
 
+        auto validPolygons = polygons;
+        validPolygons.erase(std::remove_if(validPolygons.begin(), validPolygons.end(),
+            [](const Polygon& p) { return p.points.size() < 3; }), validPolygons.end());
+
+        if (validPolygons.empty()) {
+            throw std::invalid_argument("<INVALID COMMAND>");
+        }
+
         if (subcmd == "AREA") {
-            auto it = std::max_element(polygons.begin(), polygons.end(),
+            auto it = std::max_element(validPolygons.begin(), validPolygons.end(),
                 [](const Polygon& a, const Polygon& b) {
                     return a.area() < b.area();
                 });
             out << std::fixed << std::setprecision(1) << it->area() << '\n';
         }
         else if (subcmd == "VERTEXES") {
-            auto it = std::max_element(polygons.begin(), polygons.end(),
+            auto it = std::max_element(validPolygons.begin(), validPolygons.end(),
                 [](const Polygon& a, const Polygon& b) {
                     return a.points.size() < b.points.size();
                 });
@@ -112,15 +131,23 @@ namespace shubina {
         in >> subcmd;
         checkEmpty(polygons);
 
+        auto validPolygons = polygons;
+        validPolygons.erase(std::remove_if(validPolygons.begin(), validPolygons.end(),
+            [](const Polygon& p) { return p.points.size() < 3; }), validPolygons.end());
+
+        if (validPolygons.empty()) {
+            throw std::invalid_argument("<INVALID COMMAND>");
+        }
+
         if (subcmd == "AREA") {
-            auto it = std::min_element(polygons.begin(), polygons.end(),
+            auto it = std::min_element(validPolygons.begin(), validPolygons.end(),
                 [](const Polygon& a, const Polygon& b) {
                     return a.area() < b.area();
                 });
             out << std::fixed << std::setprecision(1) << it->area() << '\n';
         }
         else if (subcmd == "VERTEXES") {
-            auto it = std::min_element(polygons.begin(), polygons.end(),
+            auto it = std::min_element(validPolygons.begin(), validPolygons.end(),
                 [](const Polygon& a, const Polygon& b) {
                     return a.points.size() < b.points.size();
                 });
@@ -135,16 +162,18 @@ namespace shubina {
         std::string subcmd;
         in >> subcmd;
 
+        auto validPolygon = [](const Polygon& p) { return p.points.size() >= 3; };
+
         if (subcmd == "ODD") {
             out << std::count_if(polygons.begin(), polygons.end(),
-                [](const Polygon& p) {
-                    return p.points.size() % 2 != 0;
+                [validPolygon](const Polygon& p) {
+                    return validPolygon(p) && p.points.size() % 2 != 0;
                 }) << '\n';
         }
         else if (subcmd == "EVEN") {
             out << std::count_if(polygons.begin(), polygons.end(),
-                [](const Polygon& p) {
-                    return p.points.size() % 2 == 0;
+                [validPolygon](const Polygon& p) {
+                    return validPolygon(p) && p.points.size() % 2 == 0;
                 }) << '\n';
         }
         else {
@@ -153,8 +182,8 @@ namespace shubina {
                 if (num < 3) throw std::invalid_argument("<INVALID COMMAND>");
 
                 out << std::count_if(polygons.begin(), polygons.end(),
-                    [num](const Polygon& p) {
-                        return p.points.size() == num;
+                    [num, validPolygon](const Polygon& p) {
+                        return validPolygon(p) && p.points.size() == num;
                     }) << '\n';
             }
             catch (...) {
@@ -171,7 +200,7 @@ namespace shubina {
 
         out << std::count_if(polygons.begin(), polygons.end(),
             [&target](const Polygon& p) {
-                if (p.points.size() != target.points.size()) return false;
+                if (p.points.size() != target.points.size() || p.points.size() < 3) return false;
 
                 return std::is_permutation(
                     p.points.begin(), p.points.end(),
@@ -193,14 +222,22 @@ namespace shubina {
             return;
         }
 
-        // Find bounding rectangle of all polygons
-        int minX = polygons[0].points[0].x;
-        int maxX = polygons[0].points[0].x;
-        int minY = polygons[0].points[0].y;
-        int maxY = polygons[0].points[0].y;
+        // Find bounding rectangle of all valid polygons
+        auto firstValid = std::find_if(polygons.begin(), polygons.end(),
+            [](const Polygon& p) { return p.points.size() >= 3; });
+
+        if (firstValid == polygons.end()) {
+            out << "<FALSE>\n";
+            return;
+        }
+
+        int minX = firstValid->points[0].x;
+        int maxX = firstValid->points[0].x;
+        int minY = firstValid->points[0].y;
+        int maxY = firstValid->points[0].y;
 
         for (const auto& poly : polygons) {
-            if (poly.points.size() < 3) continue; // Skip invalid polygons
+            if (poly.points.size() < 3) continue;
             for (const auto& point : poly.points) {
                 minX = std::min(minX, point.x);
                 maxX = std::max(maxX, point.x);
