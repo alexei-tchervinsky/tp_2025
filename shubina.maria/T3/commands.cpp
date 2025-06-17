@@ -17,6 +17,24 @@ namespace shubina {
         bool isValidPolygon(const Polygon& poly) {
             return poly.points.size() >= 3;
         }
+
+        void calculateFrameBounds(const std::vector<Polygon>& polygons,
+                                int& min_x, int& max_x,
+                                int& min_y, int& max_y) {
+            min_x = std::numeric_limits<int>::max();
+            max_x = std::numeric_limits<int>::min();
+            min_y = std::numeric_limits<int>::max();
+            max_y = std::numeric_limits<int>::min();
+
+            for (const auto& poly : polygons) {
+                for (const auto& point : poly.points) {
+                    min_x = std::min(min_x, point.x);
+                    max_x = std::max(max_x, point.x);
+                    min_y = std::min(min_y, point.y);
+                    max_y = std::max(max_y, point.y);
+                }
+            }
+        }
     }
 
     CommandMap createCommandMap() {
@@ -49,7 +67,9 @@ namespace shubina {
         in >> subcmd;
 
         std::vector<Polygon> validPolygons;
-        std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(validPolygons), isValidPolygon);
+        std::copy_if(polygons.begin(), polygons.end(),
+                    std::back_inserter(validPolygons),
+                    isValidPolygon);
 
         if (subcmd == "ODD") {
             double res = std::accumulate(validPolygons.begin(), validPolygons.end(), 0.0,
@@ -94,7 +114,9 @@ namespace shubina {
         in >> subcmd;
 
         std::vector<Polygon> validPolygons;
-        std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(validPolygons), isValidPolygon);
+        std::copy_if(polygons.begin(), polygons.end(),
+                    std::back_inserter(validPolygons),
+                    isValidPolygon);
         checkEmpty(validPolygons);
 
         if (subcmd == "AREA") {
@@ -122,7 +144,9 @@ namespace shubina {
         in >> subcmd;
 
         std::vector<Polygon> validPolygons;
-        std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(validPolygons), isValidPolygon);
+        std::copy_if(polygons.begin(), polygons.end(),
+                    std::back_inserter(validPolygons),
+                    isValidPolygon);
         checkEmpty(validPolygons);
 
         if (subcmd == "AREA") {
@@ -149,7 +173,9 @@ namespace shubina {
         in >> subcmd;
 
         std::vector<Polygon> validPolygons;
-        std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(validPolygons), isValidPolygon);
+        std::copy_if(polygons.begin(), polygons.end(),
+                    std::back_inserter(validPolygons),
+                    isValidPolygon);
 
         if (subcmd == "ODD") {
             out << std::count_if(validPolygons.begin(), validPolygons.end(),
@@ -186,7 +212,9 @@ namespace shubina {
         }
 
         std::vector<Polygon> validPolygons;
-        std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(validPolygons), isValidPolygon);
+        std::copy_if(polygons.begin(), polygons.end(),
+                    std::back_inserter(validPolygons),
+                    isValidPolygon);
 
         out << std::count_if(validPolygons.begin(), validPolygons.end(),
             [&target](const Polygon& p) {
@@ -203,42 +231,41 @@ namespace shubina {
 
     void inframeCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
         Polygon target;
-        if (!(in >> target) || target.points.size() < 3) {
+        if (!(in >> target)) {
             throw std::invalid_argument("<INVALID COMMAND>");
         }
 
+
+        if (target.points.size() < 3) {
+            throw std::invalid_argument("<INVALID COMMAND>");
+        }
+
+
         std::vector<Polygon> validPolygons;
-        std::copy_if(polygons.begin(), polygons.end(), std::back_inserter(validPolygons), isValidPolygon);
+        std::copy_if(polygons.begin(), polygons.end(),
+                    std::back_inserter(validPolygons),
+                    isValidPolygon);
 
         if (validPolygons.empty()) {
             out << "<FALSE>\n";
             return;
         }
 
-        // Инициализация границ
-        int frame_min_x = std::numeric_limits<int>::max();
-        int frame_max_x = std::numeric_limits<int>::min();
-        int frame_min_y = std::numeric_limits<int>::max();
-        int frame_max_y = std::numeric_limits<int>::min();
 
-        // Находим границы фрейма по всем точкам всех полигонов
-        for (const auto& poly : validPolygons) {
-            for (const auto& point : poly.points) {
-                frame_min_x = std::min(frame_min_x, point.x);
-                frame_max_x = std::max(frame_max_x, point.x);
-                frame_min_y = std::min(frame_min_y, point.y);
-                frame_max_y = std::max(frame_max_y, point.y);
+        int frame_min_x, frame_max_x, frame_min_y, frame_max_y;
+        calculateFrameBounds(validPolygons, frame_min_x, frame_max_x, frame_min_y, frame_max_y);
+
+
+        bool allInside = true;
+        for (const auto& point : target.points) {
+            if (point.x < frame_min_x || point.x > frame_max_x ||
+                point.y < frame_min_y || point.y > frame_max_y) {
+                allInside = false;
+                break;
             }
         }
 
-        // Проверяем, что все точки целевого полигона внутри фрейма
-        bool isInside = std::all_of(target.points.begin(), target.points.end(),
-            [=](const Point& p) {
-                return p.x >= frame_min_x && p.x <= frame_max_x &&
-                       p.y >= frame_min_y && p.y <= frame_max_y;
-            });
-
-        out << (isInside ? "<TRUE>" : "<FALSE>") << '\n';
+        out << (allInside ? "<TRUE>" : "<FALSE>") << '\n';
     }
 }
 
