@@ -1,59 +1,17 @@
 #include "DataStruct.h"
-#include <cmath>
+#include <algorithm>
+#include <iostream>Add commentMore actions
+#include <numeric>
+#include <sstream>
+
 
 namespace shubina {
-
-    std::istream& operator>>(std::istream& is, const Delim& dest) {
-        char c = '\0';
-        is >> c;
-        if (c != dest.expected) {
-            is.setstate(std::ios_base::failbit);
-        }
-        return is;
+    bool Point::operator==(const Point &other) const {
+        return x == other.x && y == other.y;
     }
 
-    std::istream& operator>>(std::istream& is, Point& dest) {
-        char lpar, sep, rpar;
-        int x = 0, y = 0;
-
-        is >> lpar >> x >> sep >> y >> rpar;
-
-        if (!is || lpar != '(' || sep != ';' || rpar != ')') {
-            is.setstate(std::ios_base::failbit);
-            return is;
-        }
-
-        dest.x = x;
-        dest.y = y;
-        return is;
-    }
-
-    std::istream& operator>>(std::istream& is, Polygon& dest) {
-        size_t n = 0;
-        is >> n;
-
-        if (n < 3) {
-            is.setstate(std::ios_base::failbit);
-            return is;
-        }
-
-        dest.points.clear();
-        dest.points.reserve(n);
-
-        for (size_t i = 0; i < n; ++i) {
-            Point p;
-            if (!(is >> p)) {
-                dest.points.clear();
-                break;
-            }
-            dest.points.push_back(p);
-        }
-
-        if (dest.points.size() < 3) {
-            is.setstate(std::ios_base::failbit);
-        }
-
-        return is;
+    bool Polygon::operator==(const Polygon &other) const {
+        return points == other.points;
     }
 
     double Polygon::area() const {
@@ -61,17 +19,79 @@ namespace shubina {
             return 0.0;
         }
 
-        double sum = 0.0;
-        size_t n = points.size();
-
-        for (size_t i = 0; i < n; ++i) {
-            const Point& p1 = points[i];
-            const Point& p2 = points[(i + 1) % n];
-            sum += static_cast<double>(p1.x) * p2.y - static_cast<double>(p2.x) * p1.y;
-        }
+        double sum = std::accumulate(
+            points.begin(),
+            points.end(),
+            0.0,
+            [this](double acc, const Point& p1) {
+                const Point& p2 = points[(&p1 - &points[0] + 1) % points.size()];
+                return acc + (p1.x * p2.y) - (p1.y * p2.x);
+            }
+        );
 
         return std::abs(sum) / 2.0;
     }
 
+    std::istream &operator>>(std::istream &is, const Delim &dest) {
+        std::istream::sentry sentry(is);
+        if (!sentry) {
+            return is;
+        }
+        char c = 0;
+        is.get(c);
+        if (is && (c != dest.delim)) {
+            is.setstate(std::ios::failbit);
+        }
+        return is;
+    }
+
+    std::istream &operator>>(std::istream &is, Point &dest) {
+        std::istream::sentry sentry(is);
+        if (!sentry) {
+            return is;
+        }
+        Point tmp{};
+        is >> Delim{'('};
+        is >> tmp.x;
+        is >> Delim{';'};
+        is >> tmp.y;
+        is >> Delim{')'};
+        if (is) {
+            dest = tmp;
+        }
+        return is;
+    }
+
+    std::istream &operator>>(std::istream &is, Polygon &dest) {
+        std::istream::sentry sentry(is);
+        if (!sentry) {
+            return is;
+        }
+        Polygon tmp{};
+        size_t numPoints = 0;
+        dest.points.clear();
+
+        std::string readNow;
+        std::getline(is, readNow);
+        std::istringstream iss(readNow);
+        iss >> numPoints;
+        if (numPoints < 3) {
+            return is;
+        }
+
+        while (!iss.eof()) {
+            Point p;
+            if (!(iss >> p)) {
+                break;
+            }
+            tmp.points.push_back(p);
+        }
+        if (tmp.points.size() != numPoints) {
+            tmp.points.clear();
+            return is;
+        }
+        dest = std::move(tmp);
+        return is;
+    }
 }
 
