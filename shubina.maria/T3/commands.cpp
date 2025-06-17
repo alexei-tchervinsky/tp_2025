@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <numeric>
 #include <iomanip>
-#include <limits>
 #include <sstream>
 
 namespace shubina {
@@ -20,8 +19,8 @@ namespace shubina {
         }
 
         void calculateFrameBounds(const std::vector<Polygon>& polygons,
-                                int& min_x, int& max_x,
-                                int& min_y, int& max_y) {
+                                  int& min_x, int& max_x,
+                                  int& min_y, int& max_y) {
             min_x = std::numeric_limits<int>::max();
             max_x = std::numeric_limits<int>::min();
             min_y = std::numeric_limits<int>::max();
@@ -52,10 +51,10 @@ namespace shubina {
     }
 
     void executeCommand(const CommandMap& commands,
-                       const std::vector<Polygon>& polygons,
-                       const std::string& command,
-                       std::istream& in,
-                       std::ostream& out) {
+                        const std::vector<Polygon>& polygons,
+                        const std::string& command,
+                        std::istream& in,
+                        std::ostream& out) {
         auto it = commands.find(command);
         if (it == commands.end()) {
             throw std::invalid_argument("<INVALID COMMAND>");
@@ -70,8 +69,8 @@ namespace shubina {
 
         std::vector<Polygon> validPolygons;
         std::copy_if(polygons.begin(), polygons.end(),
-                    std::back_inserter(validPolygons),
-                    isValidPolygon);
+                     std::back_inserter(validPolygons),
+                     isValidPolygon);
 
         if (subcmd == "ODD") {
             double res = std::accumulate(validPolygons.begin(), validPolygons.end(), 0.0,
@@ -97,7 +96,6 @@ namespace shubina {
             try {
                 size_t num = std::stoul(subcmd);
                 if (num < 3) throw std::invalid_argument("<INVALID COMMAND>");
-
                 double res = std::accumulate(validPolygons.begin(), validPolygons.end(), 0.0,
                     [num](double sum, const Polygon& p) {
                         return p.points.size() == num ? sum + p.area() : sum;
@@ -117,8 +115,9 @@ namespace shubina {
 
         std::vector<Polygon> validPolygons;
         std::copy_if(polygons.begin(), polygons.end(),
-                    std::back_inserter(validPolygons),
-                    isValidPolygon);
+                     std::back_inserter(validPolygons),
+                     isValidPolygon);
+
         checkEmpty(validPolygons);
 
         if (subcmd == "AREA") {
@@ -147,8 +146,9 @@ namespace shubina {
 
         std::vector<Polygon> validPolygons;
         std::copy_if(polygons.begin(), polygons.end(),
-                    std::back_inserter(validPolygons),
-                    isValidPolygon);
+                     std::back_inserter(validPolygons),
+                     isValidPolygon);
+
         checkEmpty(validPolygons);
 
         if (subcmd == "AREA") {
@@ -176,8 +176,8 @@ namespace shubina {
 
         std::vector<Polygon> validPolygons;
         std::copy_if(polygons.begin(), polygons.end(),
-                    std::back_inserter(validPolygons),
-                    isValidPolygon);
+                     std::back_inserter(validPolygons),
+                     isValidPolygon);
 
         if (subcmd == "ODD") {
             out << std::count_if(validPolygons.begin(), validPolygons.end(),
@@ -195,7 +195,6 @@ namespace shubina {
             try {
                 size_t num = std::stoul(subcmd);
                 if (num < 3) throw std::invalid_argument("<INVALID COMMAND>");
-
                 out << std::count_if(validPolygons.begin(), validPolygons.end(),
                     [num](const Polygon& p) {
                         return p.points.size() == num;
@@ -215,13 +214,12 @@ namespace shubina {
 
         std::vector<Polygon> validPolygons;
         std::copy_if(polygons.begin(), polygons.end(),
-                    std::back_inserter(validPolygons),
-                    isValidPolygon);
+                     std::back_inserter(validPolygons),
+                     isValidPolygon);
 
         out << std::count_if(validPolygons.begin(), validPolygons.end(),
             [&target](const Polygon& p) {
                 if (p.points.size() != target.points.size()) return false;
-
                 return std::is_permutation(
                     p.points.begin(), p.points.end(),
                     target.points.begin(),
@@ -234,24 +232,27 @@ namespace shubina {
     void inframeCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
         Polygon target;
         std::string inputLine;
-        std::getline(in >> std::ws, inputLine);
+        std::getline(in >> std::ws, inputLine); // skip leading whitespace
 
         if (inputLine.empty()) {
             throw std::invalid_argument("<INVALID COMMAND>");
         }
 
         std::istringstream iss(inputLine);
-        if (!(iss >> target) || target.points.size() < 3) {
+        if (!(iss >> target)) {
             throw std::invalid_argument("<INVALID COMMAND>");
         }
 
-        // Check for remaining input
-        std::string remaining;
-        if (iss >> remaining) {
+
+        std::string leftover;
+        if (iss >> leftover) {
             throw std::invalid_argument("<INVALID COMMAND>");
         }
 
-        // Filter valid polygons
+        if (target.points.size() < 3) {
+            throw std::invalid_argument("<INVALID COMMAND>");
+        }
+
         std::vector<Polygon> validPolygons;
         for (const auto& poly : polygons) {
             if (isValidPolygon(poly)) {
@@ -264,11 +265,11 @@ namespace shubina {
             return;
         }
 
-        // Calculate frame boundaries
+
         int frame_min_x, frame_max_x, frame_min_y, frame_max_y;
         calculateFrameBounds(validPolygons, frame_min_x, frame_max_x, frame_min_y, frame_max_y);
 
-        // Check all points
+
         bool allInside = true;
         for (const auto& point : target.points) {
             if (point.x < frame_min_x || point.x > frame_max_x ||
@@ -278,7 +279,7 @@ namespace shubina {
             }
         }
 
-        out << (allInside ? "<TRUE>" : "<FALSE>") << '\n';
+        out << (allInside ? "<TRUE>\n" : "<FALSE>\n");
     }
 }
 
