@@ -28,6 +28,7 @@ namespace shubina {
             max_y = std::numeric_limits<int>::min();
 
             for (const auto& poly : polygons) {
+                if (!isValidPolygon(poly)) continue;
                 for (const auto& point : poly.points) {
                     min_x = std::min(min_x, point.x);
                     max_x = std::max(max_x, point.x);
@@ -233,29 +234,24 @@ namespace shubina {
     void inframeCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
         Polygon target;
         std::string inputLine;
-        std::getline(in, inputLine);
+        std::getline(in >> std::ws, inputLine);
 
         if (inputLine.empty()) {
             throw std::invalid_argument("<INVALID COMMAND>");
         }
 
         std::istringstream iss(inputLine);
-        if (!(iss >> target)) {
+        if (!(iss >> target) || target.points.size() < 3) {
             throw std::invalid_argument("<INVALID COMMAND>");
         }
 
-        // Проверка на оставшиеся данные в строке
+        // Check for remaining input
         std::string remaining;
         if (iss >> remaining) {
             throw std::invalid_argument("<INVALID COMMAND>");
         }
 
-        // Проверка на минимальное количество точек
-        if (target.points.size() < 3) {
-            throw std::invalid_argument("<INVALID COMMAND>");
-        }
-
-        // Фильтрация валидных полигонов
+        // Filter valid polygons
         std::vector<Polygon> validPolygons;
         for (const auto& poly : polygons) {
             if (isValidPolygon(poly)) {
@@ -268,11 +264,11 @@ namespace shubina {
             return;
         }
 
-        // Вычисление границ фрейма
+        // Calculate frame boundaries
         int frame_min_x, frame_max_x, frame_min_y, frame_max_y;
         calculateFrameBounds(validPolygons, frame_min_x, frame_max_x, frame_min_y, frame_max_y);
 
-        // Проверка всех точек целевого полигона
+        // Check all points
         bool allInside = true;
         for (const auto& point : target.points) {
             if (point.x < frame_min_x || point.x > frame_max_x ||
