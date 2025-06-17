@@ -1,4 +1,3 @@
-// commands.cpp
 #include "iofmtguard.h"
 #include "commands.h"
 #include "DataStruct.h"
@@ -131,25 +130,28 @@ namespace shubina {
         in >> subcmd;
 
         if (subcmd == "ODD") {
-            out << std::count_if(polygons.begin(), polygons.end(),
+            size_t count = std::count_if(polygons.begin(), polygons.end(),
                                  [](const Polygon &p) {
                                      return p.points.size() % 2 != 0;
-                                 }) << '\n';
+                                 });
+            out << count << '\n';
         } else if (subcmd == "EVEN") {
-            out << std::count_if(polygons.begin(), polygons.end(),
+            size_t count = std::count_if(polygons.begin(), polygons.end(),
                                  [](const Polygon &p) {
                                      return p.points.size() % 2 == 0;
-                                 }) << '\n';
+                                 });
+            out << count << '\n';
         } else {
             try {
                 size_t num = std::stoul(subcmd);
                 if (num < 3) {
                     throw std::invalid_argument("INVALID COMMAND");
                 }
-                out << std::count_if(polygons.begin(), polygons.end(),
+                size_t count = std::count_if(polygons.begin(), polygons.end(),
                                      [num](const Polygon &p) {
                                          return p.points.size() == num;
-                                     }) << '\n';
+                                     });
+                out << count << '\n';
             } catch (...) {
                 throw std::invalid_argument("INVALID COMMAND");
             }
