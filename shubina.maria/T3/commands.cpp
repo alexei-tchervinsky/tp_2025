@@ -3,8 +3,8 @@
 #include "DataStruct.h"
 #include <algorithm>
 #include <numeric>
-#include <limits>
 #include <iomanip>
+#include <limits>  // для std::numeric_limits
 #include <sstream>
 
 namespace shubina {
@@ -244,7 +244,6 @@ namespace shubina {
             throw std::invalid_argument("<INVALID COMMAND>");
         }
 
-
         std::string leftover;
         if (iss >> leftover) {
             throw std::invalid_argument("<INVALID COMMAND>");
@@ -266,10 +265,8 @@ namespace shubina {
             return;
         }
 
-
         int frame_min_x, frame_max_x, frame_min_y, frame_max_y;
         calculateFrameBounds(validPolygons, frame_min_x, frame_max_x, frame_min_y, frame_max_y);
-
 
         bool allInside = true;
         for (const auto& point : target.points) {
