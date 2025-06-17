@@ -21,17 +21,8 @@ int main(int argc, char* argv[]) {
     shubina::Polygon poly;
 
     while (file >> poly) {
-        if (file) {
-            bool valid = true;
-            if (poly.points.size() < 3) {
-                valid = false;
-            }
-            for (const auto& point : poly.points) {
-                if (file.fail()) {
-                    valid = false;
-                    break;
-                }
-            }
+        if (file && poly.points.size() >= 3) {
+            bool valid = !file.fail();  // Simplified check
             if (valid) {
                 polygons.push_back(poly);
             }
