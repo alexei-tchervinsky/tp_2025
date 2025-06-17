@@ -13,6 +13,29 @@ namespace shubina {
                 throw std::invalid_argument("<INVALID COMMAND>");
             }
         }
+
+        bool isValidPolygon(const Polygon& poly) {
+            return poly.points.size() >= 3;
+        }
+
+        void calculateFrameBounds(const std::vector<Polygon>& polygons,
+                                int& min_x, int& max_x,
+                                int& min_y, int& max_y) {
+            min_x = std::numeric_limits<int>::max();
+            max_x = std::numeric_limits<int>::min();
+            min_y = std::numeric_limits<int>::max();
+            max_y = std::numeric_limits<int>::min();
+
+            for (const auto& poly : polygons) {
+                if (poly.points.size() < 3) continue;
+                for (const auto& point : poly.points) {
+                    min_x = std::min(min_x, point.x);
+                    max_x = std::max(max_x, point.x);
+                    min_y = std::min(min_y, point.y);
+                    max_y = std::max(max_y, point.y);
+                }
+            }
+        }
     }
 
     CommandMap createCommandMap() {
@@ -47,24 +70,26 @@ namespace shubina {
         if (subcmd == "ODD") {
             double res = std::accumulate(polygons.begin(), polygons.end(), 0.0,
                 [](double sum, const Polygon& p) {
-                    return p.points.size() % 2 != 0 ? sum + p.area() : sum;
+                    return p.points.size() % 2 != 0 && p.points.size() >= 3 ? sum + p.area() : sum;
                 });
             out << std::fixed << std::setprecision(1) << res << '\n';
         }
         else if (subcmd == "EVEN") {
             double res = std::accumulate(polygons.begin(), polygons.end(), 0.0,
                 [](double sum, const Polygon& p) {
-                    return p.points.size() % 2 == 0 ? sum + p.area() : sum;
+                    return p.points.size() % 2 == 0 && p.points.size() >= 3 ? sum + p.area() : sum;
                 });
             out << std::fixed << std::setprecision(1) << res << '\n';
         }
         else if (subcmd == "MEAN") {
             checkEmpty(polygons);
+            size_t validCount = std::count_if(polygons.begin(), polygons.end(), isValidPolygon);
+            if (validCount == 0) throw std::invalid_argument("<INVALID COMMAND>");
             double total = std::accumulate(polygons.begin(), polygons.end(), 0.0,
                 [](double sum, const Polygon& p) {
-                    return sum + p.area();
+                    return p.points.size() >= 3 ? sum + p.area() : sum;
                 });
-            out << std::fixed << std::setprecision(1) << (total / polygons.size()) << '\n';
+            out << std::fixed << std::setprecision(1) << (total / validCount) << '\n';
         }
         else {
             try {
@@ -87,25 +112,23 @@ namespace shubina {
         iofmtguard guard(out);
         std::string subcmd;
         in >> subcmd;
-        checkEmpty(polygons);
 
-        auto validPolygons = polygons;
-        validPolygons.erase(std::remove_if(validPolygons.begin(), validPolygons.end(),
-            [](const Polygon& p) { return p.points.size() < 3; }), validPolygons.end());
+        auto validEnd = std::remove_if(polygons.begin(), polygons.end(),
+            [](const Polygon& p) { return p.points.size() < 3; });
 
-        if (validPolygons.empty()) {
+        if (validEnd == polygons.begin()) {
             throw std::invalid_argument("<INVALID COMMAND>");
         }
 
         if (subcmd == "AREA") {
-            auto it = std::max_element(validPolygons.begin(), validPolygons.end(),
+            auto it = std::max_element(polygons.begin(), validEnd,
                 [](const Polygon& a, const Polygon& b) {
                     return a.area() < b.area();
                 });
             out << std::fixed << std::setprecision(1) << it->area() << '\n';
         }
         else if (subcmd == "VERTEXES") {
-            auto it = std::max_element(validPolygons.begin(), validPolygons.end(),
+            auto it = std::max_element(polygons.begin(), validEnd,
                 [](const Polygon& a, const Polygon& b) {
                     return a.points.size() < b.points.size();
                 });
@@ -120,25 +143,23 @@ namespace shubina {
         iofmtguard guard(out);
         std::string subcmd;
         in >> subcmd;
-        checkEmpty(polygons);
 
-        auto validPolygons = polygons;
-        validPolygons.erase(std::remove_if(validPolygons.begin(), validPolygons.end(),
-            [](const Polygon& p) { return p.points.size() < 3; }), validPolygons.end());
+        auto validEnd = std::remove_if(polygons.begin(), polygons.end(),
+            [](const Polygon& p) { return p.points.size() < 3; });
 
-        if (validPolygons.empty()) {
+        if (validEnd == polygons.begin()) {
             throw std::invalid_argument("<INVALID COMMAND>");
         }
 
         if (subcmd == "AREA") {
-            auto it = std::min_element(validPolygons.begin(), validPolygons.end(),
+            auto it = std::min_element(polygons.begin(), validEnd,
                 [](const Polygon& a, const Polygon& b) {
                     return a.area() < b.area();
                 });
             out << std::fixed << std::setprecision(1) << it->area() << '\n';
         }
         else if (subcmd == "VERTEXES") {
-            auto it = std::min_element(validPolygons.begin(), validPolygons.end(),
+            auto it = std::min_element(polygons.begin(), validEnd,
                 [](const Polygon& a, const Polygon& b) {
                     return a.points.size() < b.points.size();
                 });
@@ -156,18 +177,20 @@ namespace shubina {
         if (subcmd == "ODD") {
             out << std::count_if(polygons.begin(), polygons.end(),
                 [](const Polygon& p) {
-                    return p.points.size() % 2 != 0;
+                    return p.points.size() % 2 != 0 && p.points.size() >= 3;
                 }) << '\n';
         }
         else if (subcmd == "EVEN") {
             out << std::count_if(polygons.begin(), polygons.end(),
                 [](const Polygon& p) {
-                    return p.points.size() % 2 == 0;
+                    return p.points.size() % 2 == 0 && p.points.size() >= 3;
                 }) << '\n';
         }
         else {
             try {
                 size_t num = std::stoul(subcmd);
+                if (num < 3) throw std::invalid_argument("<INVALID COMMAND>");
+
                 out << std::count_if(polygons.begin(), polygons.end(),
                     [num](const Polygon& p) {
                         return p.points.size() == num;
@@ -204,42 +227,19 @@ namespace shubina {
             throw std::invalid_argument("<INVALID COMMAND>");
         }
 
-        if (polygons.empty()) {
-            out << "<FALSE>\n";
-            return;
-        }
+        int frame_min_x, frame_max_x, frame_min_y, frame_max_y;
+        calculateFrameBounds(polygons, frame_min_x, frame_max_x, frame_min_y, frame_max_y);
 
-        // Find bounding rectangle of all valid polygons
-        auto firstValid = std::find_if(polygons.begin(), polygons.end(),
-            [](const Polygon& p) { return p.points.size() >= 3; });
-
-        if (firstValid == polygons.end()) {
-            out << "<FALSE>\n";
-            return;
-        }
-
-        int minX = firstValid->points[0].x;
-        int maxX = firstValid->points[0].x;
-        int minY = firstValid->points[0].y;
-        int maxY = firstValid->points[0].y;
-
-        for (const auto& poly : polygons) {
-            if (poly.points.size() < 3) continue;
-            for (const auto& point : poly.points) {
-                minX = std::min(minX, point.x);
-                maxX = std::max(maxX, point.x);
-                minY = std::min(minY, point.y);
-                maxY = std::max(maxY, point.y);
+        bool allInside = true;
+        for (const auto& point : target.points) {
+            if (point.x < frame_min_x || point.x > frame_max_x ||
+                point.y < frame_min_y || point.y > frame_max_y) {
+                allInside = false;
+                break;
             }
         }
 
-        // Check if all points of target are inside the bounding rectangle
-        bool inside = std::all_of(target.points.begin(), target.points.end(),
-                                [minX, maxX, minY, maxY](const Point& p) {
-                                    return p.x >= minX && p.x <= maxX && p.y >= minY && p.y <= maxY;
-                                });
-
-        out << (inside ? "<TRUE>" : "<FALSE>") << '\n';
+        out << (allInside ? "<TRUE>" : "<FALSE>") << '\n';
     }
 }
 
