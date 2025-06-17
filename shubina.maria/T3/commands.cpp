@@ -13,10 +13,6 @@ namespace shubina {
                 throw std::invalid_argument("<INVALID COMMAND>");
             }
         }
-
-        bool isValidPolygon(const Polygon& poly) {
-            return poly.points.size() >= 3;
-        }
     }
 
     CommandMap createCommandMap() {
