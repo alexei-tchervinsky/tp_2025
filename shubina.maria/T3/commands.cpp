@@ -225,7 +225,8 @@ namespace shubina {
     void permsCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
         Polygon target;
         if (!(in >> target) || target.points.size() < 3) {
-            throw std::invalid_argument("<INVALID COMMAND>");
+            out << "<INVALID COMMAND>\n"; // Output for invalid polygon
+            return;
         }
 
         out << std::count_if(polygons.begin(), polygons.end(),
@@ -243,12 +244,9 @@ namespace shubina {
 
     void inframeCommand(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
         Polygon target;
-        if (!(in >> target)) {
-            throw std::invalid_argument("<INVALID COMMAND>");
-        }
-
-        if (target.points.size() < 3) {
-            throw std::invalid_argument("<INVALID COMMAND>");
+        if (!(in >> target) || target.points.size() < 3) {
+            out << "<INVALID COMMAND>\n"; // Output for invalid polygon
+            return;
         }
 
         int frame_min_x, frame_max_x, frame_min_y, frame_max_y;
@@ -266,4 +264,5 @@ namespace shubina {
         out << (allInside ? "<TRUE>" : "<FALSE>") << '\n';
     }
 }
+
 
