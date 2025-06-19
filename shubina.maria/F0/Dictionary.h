@@ -4,6 +4,8 @@
 #include <string>
 #include <set>
 #include <map>
+#include <vector>
+#include <stdexcept>
 
 class Dictionary {
 private:
@@ -11,8 +13,9 @@ private:
 
 public:
     void insert(const std::string& key, const std::string& translation);
-    std::set<std::string> search(const std::string& key) const;
+    std::vector<std::string> search(const std::string& key) const;
     bool remove(const std::string& key);
+    void printAll() const;
 };
 
 #endif // DICTIONARY_H
