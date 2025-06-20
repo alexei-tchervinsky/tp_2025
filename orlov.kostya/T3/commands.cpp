@@ -262,20 +262,24 @@ namespace orlov
     {
         if (polygon.points.size() < 3) return false;
 
-        int intersections = 0;
         std::size_t n = polygon.points.size();
+        std::vector<std::size_t> indxs(n);
+        std::iota(indxs.begin(), indxs.end(), 0);
 
-        for (std::size_t i = 0; i < n; ++i)
-        {
-            Point p1 = polygon.points[i];
-            Point p2 = polygon.points[(i + 1) % n];
-
-            if (((p1.y_ > point.y_) != (p2.y_ > point.y_)) &&
-                (point.x_ < (p2.x_ - p1.x_) * (point.y_ - p1.y_) / (p2.y_ - p1.y_) + p1.x_))
+        int intersections = std::accumulate(indxs.begin(), indxs.end(), 0,
+            [&](int acc, std::size_t i)
             {
-                intersections++;
-            }
-        }
+                Point p1 = polygon.points[i];
+                Point p2 = polygon.points[(i + 1) % n];
+
+                if
+                (
+                    ((p1.y_ > point.y_) != (p2.y_ > point.y_)) &&
+                    (point.x_ < (p2.x_ - p1.x_) * (point.y_ - p1.y_) / (p2.y_ - p1.y_) + p1.x_)
+                )
+                    return acc + 1;
+                return acc;
+            });
 
         return (intersections % 2) == 1;
     }
@@ -284,31 +288,42 @@ namespace orlov
     {
         if (poly1.points.empty() || poly2.points.empty()) return false;
 
-        for (std::size_t i = 0; i < poly1.points.size(); ++i)
-        {
-            Point p1 = poly1.points[i];
-            Point q1 = poly1.points[(i + 1) % poly1.points.size()];
-
-            for (std::size_t j = 0; j < poly2.points.size(); ++j)
+        std::function<bool(std::size_t, std::size_t)> checkEdgeIntersections =
+            [&](std::size_t i, std::size_t j)
             {
+                if (i >= poly1.points.size()) return false;
+                if (j >= poly2.points.size()) return checkEdgeIntersections(i + 1, 0);
+
+                Point p1 = poly1.points[i];
+                Point q1 = poly1.points[(i + 1) % poly1.points.size()];
                 Point p2 = poly2.points[j];
                 Point q2 = poly2.points[(j + 1) % poly2.points.size()];
 
                 if (checkIntersection(p1, q1, p2, q2)) return true;
-            }
-        }
+                return checkEdgeIntersections(i, j + 1);
+            };
 
-        for (const Point& point : poly1.points)
-        {
-            if (isPointInPolygon(point, poly2)) return true;
-        }
+        if (checkEdgeIntersections(0, 0)) return true;
 
-        for (const Point& point : poly2.points)
-        {
-            if (isPointInPolygon(point, poly1)) return true;
-        }
+        std::function<bool(std::size_t)> checkPoly1InPoly2 =
+            [&](std::size_t i)
+            {
+                if (i >= poly1.points.size()) return false;
+                if (isPointInPolygon(poly1.points[i], poly2)) return true;
+                return checkPoly1InPoly2(i + 1);
+            };
 
-        return false;
+        if (checkPoly1InPoly2(0)) return true;
+
+        std::function<bool(std::size_t)> checkPoly2InPoly1 =
+            [&](std::size_t i)
+            {
+                if (i >= poly2.points.size()) return false;
+                if (isPointInPolygon(poly2.points[i], poly1)) return true;
+                return checkPoly2InPoly1(i + 1);
+            };
+
+        return checkPoly2InPoly1(0);
     }
 
     void intersectPolygons(const std::vector<Polygon>& polygons, std::istream& is, std::ostream& os)
@@ -318,12 +333,13 @@ namespace orlov
 
         if (!is) return;
 
-        std::size_t intersectionsCount = 0;
-        for (const auto& poly : polygons)
-        {
-            if (doPolygonsIntersect(poly, target))
-                intersectionsCount++;
-        }
+        std::size_t intersectionsCount = std::accumulate(polygons.begin(), polygons.end(), std::size_t(0),
+            [&target](std::size_t count, const Polygon& poly)
+            {
+                return count + (doPolygonsIntersect(poly, target) ? 1 : 0);
+            }
+        );
+
         os << intersectionsCount;
     }
 

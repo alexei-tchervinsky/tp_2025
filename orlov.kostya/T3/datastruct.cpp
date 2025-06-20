@@ -1,6 +1,7 @@
 #include <cmath>
 #include <algorithm>
 #include <iterator>
+#include <numeric>
 
 #include "datastruct.hpp"
 #include "ioObjects.hpp"
@@ -33,13 +34,14 @@ namespace orlov
     {
         if (points.size() < 3) return 0.0;
 
-        double area = 0.0;
+        std::vector<std::size_t> indices(points.size());
+        std::iota(indices.begin(), indices.end(), 0);
 
-        for(std::size_t i = 0; i < points.size(); ++i)
-        {
-            std::size_t j = (i + 1) % points.size();
-            area += points[i].x_ * points[j].y_ - points[j].x_ * points[i].y_;
-        }
+        double area = std::accumulate(indices.begin(), indices.end(), 0.0,
+            [this](double acc, std::size_t i) {
+                std::size_t j = (i + 1) % points.size();
+                return acc + points[i].x_ * points[j].y_ - points[j].x_ * points[i].y_;
+            });
 
         return std::abs(area) / 2.0;
     }
