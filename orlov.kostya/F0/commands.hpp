@@ -84,17 +84,23 @@ void testKruscal()
 {
     std::cout << "\nTest for kruscal alg\n";
 
-    Graph testGraph(10);
+    Graph testGraph(5);
 
     testGraph.addVertex(0);
     testGraph.addVertex(1);
-    testGraph.addVertex(5);
+    testGraph.addVertex(2);
     testGraph.addVertex(3);
-    testGraph.addVertex(9);
+    testGraph.addVertex(4);
+    testGraph.addVertex(5);
 
-    testGraph.addEdge(1, 0, 9);
-    testGraph.addEdge(1, 5, 3);
-    testGraph.addEdge(1, 5, 9);
+    testGraph.addEdge(4, 0, 1);
+    testGraph.addEdge(6, 0, 5);
+    testGraph.addEdge(6, 1, 2);
+    testGraph.addEdge(8, 2, 3);
+    testGraph.addEdge(5, 2, 5);
+    testGraph.addEdge(3, 3, 4);
+    testGraph.addEdge(5, 3, 5);
+    testGraph.addEdge(2, 4, 5);
     testGraph.displayAll();
 
     std::cout << "\nResult of Kruskal algorithm:" << std::endl;
@@ -116,17 +122,21 @@ void testPrim()
 {
     std::cout << "\nTest for prim alg\n";
 
-    Graph testGraph(10);
+    Graph testGraph(5);
 
     testGraph.addVertex(0);
     testGraph.addVertex(1);
-    testGraph.addVertex(5);
+    testGraph.addVertex(2);
     testGraph.addVertex(3);
-    testGraph.addVertex(9);
+    testGraph.addVertex(4);
 
-    testGraph.addEdge(1, 0, 9);
-    testGraph.addEdge(1, 5, 3);
-    testGraph.addEdge(1, 5, 9);
+    testGraph.addEdge(2, 0, 1);
+    testGraph.addEdge(6, 0, 3);
+    testGraph.addEdge(3, 1, 2);
+    testGraph.addEdge(8, 1, 3);
+    testGraph.addEdge(5, 1, 4);
+    testGraph.addEdge(7, 2, 4);
+    testGraph.addEdge(9, 3, 4);
     testGraph.displayAll();
 
     std::cout << "Result of Prim algorithm (start Vertex 0):" << std::endl;
