@@ -218,7 +218,7 @@ void Graph::displayAll()
     std::cout << "- Total weight: " << totalWeight << std::endl;
     std::cout
         << "- Average edge weight: "
-        << (edgeCount ? (double)totalWeight/edgeCount : 0) << std::endl;
+        << (edgeCount ? static_cast<double>(totalWeight)/edgeCount : 0) << std::endl;
 
     std::cout << "End of adjacency matrix" << std::endl;
 }

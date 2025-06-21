@@ -4,6 +4,7 @@
 #include <vector>
 #include <queue>
 #include <functional>
+#include <algorithm>
 #include "graph.hpp"
 #include "struct.hpp"
 
