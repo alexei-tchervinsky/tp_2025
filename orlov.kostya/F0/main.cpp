@@ -15,8 +15,10 @@ int main()
             << "\tGRAPH: test for Graph\n"
             << "\tKRUSCAL: test for Kruscal algorithm\n"
             << "\tPRIM: test for Prim algorithm\n"
-            << "\tKRUSCAL AND PRIM IND MST: test for Kruscal and Prim algorithm with indentical MST\n"
-            << "\tKRUSCAL AND PRIM DIFF MST: test for Kruscal and Prim algorithm with diffrent MST\n"
+            << "\tKRUSCAL AND PRIM IND MST: test for Kruscal and Prim"
+            << "algorithm with indentical MST\n"
+            << "\tKRUSCAL AND PRIM DIFF MST: test for Kruscal and Prim"
+            << "algorithm with diffrent MST\n"
             ;
 
         std::cout << "Please, enter command from list:\n";

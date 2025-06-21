@@ -15,7 +15,9 @@ struct Edge
         second_parent_(0)
     {}
 
-    Edge(std::size_t value, std::size_t first_parent, std::size_t second_parent) :
+    Edge(
+        std::size_t value, std::size_t first_parent, std::size_t second_parent
+        ) :
         value_(value),
         first_parent_(first_parent),
         second_parent_(second_parent)

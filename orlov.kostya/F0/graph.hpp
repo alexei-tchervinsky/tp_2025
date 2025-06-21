@@ -130,7 +130,8 @@ std::vector<Edge> Graph::getAllEdges() const
 std::vector<Edge> Graph::getEdges(std::size_t vertex) const
 {
     std::vector<Edge> res;
-    if (vertex >= size_ || deletedVertex_[vertex] || !usedVertex_[vertex]) return res;
+    if (vertex >= size_ || deletedVertex_[vertex] || !usedVertex_[vertex])
+        return res;
 
     for (std::size_t i = 0; i < size_; ++i)
     {
@@ -215,7 +216,9 @@ void Graph::displayAll()
     std::cout << std::endl;
     std::cout << "- Total edges: " << edgeCount << std::endl;
     std::cout << "- Total weight: " << totalWeight << std::endl;
-    std::cout << "- Average edge weight: " << (edgeCount ? (double)totalWeight/edgeCount : 0) << std::endl;
+    std::cout
+        << "- Average edge weight: "
+        << (edgeCount ? (double)totalWeight/edgeCount : 0) << std::endl;
 
     std::cout << "End of adjacency matrix" << std::endl;
 }

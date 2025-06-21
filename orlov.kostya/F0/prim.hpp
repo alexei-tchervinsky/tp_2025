@@ -27,7 +27,9 @@ std::vector<Edge> primAlg(const Graph& graph, std::size_t vertex)
         {
             res.push_back(minEdge);
 
-            std::size_t new_vertex = visited[minEdge.first_parent_] ? minEdge.second_parent_ : minEdge.first_parent_;
+            std::size_t new_vertex =
+                visited[minEdge.first_parent_] ? minEdge.second_parent_ :
+                minEdge.first_parent_;
             visited[new_vertex] = true;
 
             for (const auto& e : graph.getEdges(new_vertex))
@@ -35,7 +37,10 @@ std::vector<Edge> primAlg(const Graph& graph, std::size_t vertex)
         }
     }
 
-    if (static_cast<std::size_t>(std::count(visited.begin(), visited.end(), true)) < graph.getSize())
+    if (static_cast<std::size_t>
+            (std::count(visited.begin(), visited.end(), true)) <
+            graph.getSize()
+        )
         throw std::runtime_error("не связный");
 
     return res;

@@ -115,7 +115,8 @@ void testKruscal()
     for (std::size_t i = 0; i < kruscal.size(); ++i)
         totalKruscal += kruscal[i].value_;
 
-    std::cout << "total for Kruscal alg: " << totalKruscal << std::endl << std::endl;
+    std::cout
+        << "total for Kruscal alg: " << totalKruscal << std::endl << std::endl;
 }
 
 void testPrim()
@@ -157,7 +158,9 @@ void testPrim()
 void testKruscalAndPrimIndMst()
 {
     std::cout << "\nTest for Kruskal and Prim algorithm" << std::endl;
-    std::cout << "Create graph with identical MST for Kruskal and Prim:\n" << std::endl;
+    std::cout
+        << "Create graph with identical MST for Kruskal and Prim:\n"
+        << std::endl;
 
     Graph graph1(5);
 
@@ -190,7 +193,8 @@ void testKruscalAndPrimIndMst()
     for (std::size_t i = 0; i < kruscal.size(); ++i)
         totalKruscal += kruscal[i].value_;
 
-    std::cout << "total for Kruscal alg: " << totalKruscal << std::endl << std::endl;
+    std::cout
+        << "total for Kruscal alg: " << totalKruscal << std::endl << std::endl;
 
     std::cout << "Result of Prim algorithm (start Vertex 0):" << std::endl;
 
@@ -209,7 +213,9 @@ void testKruscalAndPrimIndMst()
 
 void testKruscalAndPrimDiffMst()
 {
-    std::cout << "\nCreate graph with diffrent MST for Kruskal and Prim:\n" << std::endl;
+    std::cout
+        << "\nCreate graph with diffrent MST for Kruskal and Prim:\n"
+        << std::endl;
     Graph graph2(4);
 
     graph2.addVertex(0);
