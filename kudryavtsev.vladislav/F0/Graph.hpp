@@ -60,14 +60,14 @@ void Graph::add_node(Node node) {
 void Graph::remove_node(Node node) {
     if (!has_node(node)) throw std::invalid_argument("Node does not exist");
     adjacency_list.erase(node);
-    for (auto& [key, edges] : adjacency_list) {
+    for (auto& pair : adjacency_list) {
         std::vector<Edge> new_edges;
-        for (const auto& edge : edges) {
+        for (const auto& edge : pair.second) {
             if (edge.to != node) {
                 new_edges.push_back(edge);
             }
         }
-        edges = std::move(new_edges);
+        pair.second = std::move(new_edges);
     }
 }
 
