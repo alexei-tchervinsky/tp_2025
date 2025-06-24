@@ -30,7 +30,7 @@ private:
     }
 
 public:
-    HashTable(size_t size = 100) : tableSize_(size), table_(size) {}
+    HashTable(size_t size = 100) : table_(size), tableSize_(size) {}
 
     void insert(const std::string& word, const std::vector<std::string>& translations);
     std::vector<std::string> search(const std::string& word) const;
