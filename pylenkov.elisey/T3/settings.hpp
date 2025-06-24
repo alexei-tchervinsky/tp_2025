@@ -3,8 +3,6 @@
 
 #include <string>
 
-#define ALEXEIT
-
 // #define DO_LOG
 
 #ifdef DO_LOG
